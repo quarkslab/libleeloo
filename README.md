@@ -30,11 +30,11 @@ Under Debian-based systems, this can be installed thanks to:
 
 This project uses CMake. To compile it, follow these steps:
 
- $ cd /path/to/src
- $ mkdir build
- $ cd build
- $ cmake -DCMAKE_BUILD_TYPE=Release -DPYTHON_VERSION=3.3 ..
- $ make
+    $ cd /path/to/src
+    $ mkdir build
+    $ cd build
+    $ cmake -DCMAKE_BUILD_TYPE=Release -DPYTHON_VERSION=3.3 ..
+    $ make
 
 The supported build types are :
 
@@ -49,7 +49,7 @@ Installation
 
 After building the library, just run as root:
 
- # make install
+    # make install
 
 This will install the library to /usr/local, and the Python module to the current Python installation.
 
@@ -60,17 +60,17 @@ Some examples can be found in the ``tools/`` and ``tests/`` directory.
 
 One tool is provided for randomizing IP ranges :
 
-  $ ./ip_ranges_rand
-  Usage: ./ip_ranges_rand range1 [-][range2] [-][range3] ...
-  
-  This tool will aggregate all the given ranges and will write a random order of the corresponding IP.
-  
-  where range can be described as:
-          CIDR notation:  192.168.1.0/24
-          Ranges:         10.4-5.8.9-250
-          Single IP:      192.168.1.10
-  
-  A '-' symbol before any range will remove it from the final set.
+    $ ./ip_ranges_rand
+    Usage: ./ip_ranges_rand range1 [-][range2] [-][range3] ...
+    
+    This tool will aggregate all the given ranges and will write a random order of the corresponding IP.
+    
+    where range can be described as:
+            CIDR notation:  192.168.1.0/24
+            Ranges:         10.4-5.8.9-250
+            Single IP:      192.168.1.10
+    
+    A '-' symbol before any range will remove it from the final set.
 
 Contact
 -------
