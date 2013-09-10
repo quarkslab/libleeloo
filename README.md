@@ -16,7 +16,7 @@ information.
 Compilation
 -----------
 
-You need at least GCC 4.7, a Linux-based system, and these libraries:
+You need at least GCC 4.7 or Clang 3.4, a Linux-based system, and these libraries:
 
  * Boost Random >= 1.49
  * Intel Threading Building Blocks (https://www.threadingbuildingblocks.org/) >= 4.0
