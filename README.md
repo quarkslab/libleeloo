@@ -10,8 +10,8 @@ of integers with fast and memory-wise randomisation of their elements. It can
 be used directly in any C++ program or through the Python bindings.
 
 One common usage of this library is to aggregate and randomize IPv4 ranges,
-which can be found in large-scale IP scanners. See the Example section for more
-informations.
+which can be found in large-scale IP scanners. See the Examples section for more
+information.
 
 Compilation
 -----------
