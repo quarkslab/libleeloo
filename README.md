@@ -42,7 +42,7 @@ The supported build types are :
  * relwithdebinfo : compiles with full optimisations and debug symbols (-O3 -march=native -g)
  * release : compiles with full optimisations and no debug symbol (-O3 -march=native)
 
-The Python version tells CMake for which Python version the bindings must be compiled.
+The PYTHON_VERSION variable tells CMake for which Python version the bindings must be compiled.
 
 Installation
 ------------
