@@ -26,7 +26,7 @@ Support for other OS-es and compilers may be provied in the future.
 
 Under Debian-based systems, this can be installed thanks to:
 
- # aptitude install libtbb-dev libboost-random-dev libboost-python-dev
+    # aptitude install libtbb-dev libboost-random-dev libboost-python-dev
 
 This project uses CMake. To compile it, follow these steps:
 
