@@ -72,6 +72,8 @@ One tool is provided for randomizing IP ranges :
     
     A '-' symbol before any range will remove it from the final set.
 
+You can also read a blog post about some math used in this library in Quarkslab's blog here : http://www.quarkslab.com/en-blog+read+45
+
 Contact
 -------
 
