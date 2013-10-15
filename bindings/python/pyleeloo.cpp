@@ -54,10 +54,11 @@ bool (leeloo::ip_list_intervals::*ip_remove3)(const char*)                      
 bool (leeloo::ip_list_intervals::*contains1)(uint32_t const) const = &leeloo::ip_list_intervals::contains;
 bool (leeloo::ip_list_intervals::*contains2)(const char*)    const = &leeloo::ip_list_intervals::contains;
 
+template <class Integer>
 class set_read_only
 {
 public:
-	typedef uint32_t const* iterator;
+	typedef Integer const* iterator;
 
 public:
 	set_read_only():
@@ -65,13 +66,13 @@ public:
 		_size(0)
 	{ }
 
-	set_read_only(uint32_t const* buf, size_t const size):
+	set_read_only(Integer const* buf, size_t const size):
 		_buf(buf),
 		_size(size)
 	{ }
 
 public:
-	inline uint32_t at(size_t idx) const
+	inline Integer at(size_t idx) const
 	{
 		assert(idx < _size);
 		return _buf[idx];
@@ -79,18 +80,21 @@ public:
 
 	inline size_t size() const { return _size; }
 
-	uint32_t const* begin() const { return _buf; }
-	uint32_t const* end() const   { return _buf+_size; }
+	Integer const* begin() const { return _buf; }
+	Integer const* end() const   { return _buf+_size; }
 
 private:
-	uint32_t const* _buf;
+	Integer const* _buf;
 	size_t _size;
 };
+
+typedef set_read_only<uint32_t> u32_set_read_only;
+typedef set_read_only<uint64_t> u64_set_read_only;
 
 static void ip_list_random_sets(leeloo::ip_list_intervals const& l, size_t const size_div, object& f_set)
 {
 	l.random_sets(size_div,
-	              [&f_set](uint32_t const* buf, size_t const size) { f_set(set_read_only(buf, size)); },
+	              [&f_set](uint32_t const* buf, size_t const size) { f_set(u32_set_read_only(buf, size)); },
 				  leeloo::random_engine<uint32_t>(g_mt_rand));
 }
 
@@ -119,6 +123,22 @@ static uint32_t python_ipv4toi2(const char* ip, bool& valid)
 	return leeloo::ips_parser::ipv4toi(ip, strlen(ip), valid);
 }
 
+// uint64 intervals
+//
+
+typedef leeloo::interval<uint64_t> u64_interval;
+typedef leeloo::list_intervals<u64_interval> u64_list_intervals;
+
+void (u64_list_intervals::*u64_add1)(u64_list_intervals::base_type const, u64_list_intervals::base_type const) = &u64_list_intervals::add;
+
+static void u64_list_random_sets(u64_list_intervals const& l, size_t const size_div, object& f_set)
+{
+	l.random_sets(size_div,
+	              [&f_set](uint64_t const* buf, size_t const size) { f_set(u64_set_read_only(buf, size)); },
+				  leeloo::random_engine<uint64_t>(g_mt_rand));
+}
+
+
 BOOST_PYTHON_MODULE(pyleeloo)
 {
 	init_rand_gen();
@@ -129,6 +149,13 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("upper", &leeloo::ip_interval::upper)
 		.def("set_lower", &leeloo::ip_interval::set_lower)
 		.def("set_upper", &leeloo::ip_interval::set_upper);
+
+	class_<u64_interval>("u64_interval")
+		.def("assign", &u64_interval::assign)
+		.def("lower", &u64_interval::lower)
+		.def("upper", &u64_interval::upper)
+		.def("set_lower", &u64_interval::set_lower)
+		.def("set_upper", &u64_interval::set_upper);
 
 	class_<leeloo::ip_list_intervals>("ip_list_intervals")
 		.def("add", ip_add1)
@@ -150,10 +177,28 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("read_from_file", &leeloo::ip_list_intervals::read_from_file)
 		.def("__iter__", iterator<leeloo::ip_list_intervals>());
 
-	class_<set_read_only>("set_read_only")
-		.def("at", &set_read_only::at)
-		.def("size", &set_read_only::size)
-		.def("__iter__", iterator<set_read_only>());
+	class_<u64_list_intervals>("u64_list_intervals")
+		.def("add", u64_add1)
+		.def("aggregate", &u64_list_intervals::aggregate)
+		.def("create_index_cache", &u64_list_intervals::create_index_cache)
+		.def("size", &u64_list_intervals::size)
+		.def("reserve", &u64_list_intervals::reserve)
+		.def("clear", &u64_list_intervals::clear)
+		.def("at", &u64_list_intervals::at)
+		.def("random_sets", &u64_list_random_sets)
+		.def("dump_to_file", &u64_list_intervals::dump_to_file)
+		.def("read_from_file", &u64_list_intervals::read_from_file)
+		.def("__iter__", iterator<u64_list_intervals>());
+
+	class_<u32_set_read_only>("u32_set_read_only")
+		.def("at", &u32_set_read_only::at)
+		.def("size", &u32_set_read_only::size)
+		.def("__iter__", iterator<u32_set_read_only>());
+
+	class_<u64_set_read_only>("u64_set_read_only")
+		.def("at", &u64_set_read_only::at)
+		.def("size", &u64_set_read_only::size)
+		.def("__iter__", iterator<u64_set_read_only>());
 
 	def("ipv4toi", python_ipv4toi1);
 	def("ipv4toi", python_ipv4toi2);
