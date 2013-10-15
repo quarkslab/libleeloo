@@ -29,8 +29,6 @@
 #include <iostream>
 #include <ctime>
 
-#include <omp.h>
-
 #include <leeloo/bench.h>
 #include <leeloo/helpers.h>
 #include <leeloo/random.h>

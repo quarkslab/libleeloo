@@ -10,13 +10,13 @@ of integers with fast and memory-wise randomisation of their elements. It can
 be used directly in any C++ program or through the Python bindings.
 
 One common usage of this library is to aggregate and randomize IPv4 ranges,
-which can be found in large-scale IP scanners. See the Example section for more
-informations.
+which can be found in large-scale IP scanners. See the Examples section for more
+information.
 
 Compilation
 -----------
 
-You need at least GCC 4.7, a Linux-based system, and these libraries:
+You need at least GCC 4.7 or Clang 3.4, a Linux-based system, and these libraries:
 
  * Boost Random >= 1.49
  * Intel Threading Building Blocks (https://www.threadingbuildingblocks.org/) >= 4.0
@@ -26,7 +26,7 @@ Support for other OS-es and compilers may be provied in the future.
 
 Under Debian-based systems, this can be installed thanks to:
 
- # aptitude install libtbb-dev libboost-random-dev libboost-python-dev
+    # aptitude install libtbb-dev libboost-random-dev libboost-python-dev
 
 This project uses CMake. To compile it, follow these steps:
 
@@ -42,7 +42,7 @@ The supported build types are :
  * relwithdebinfo : compiles with full optimisations and debug symbols (-O3 -march=native -g)
  * release : compiles with full optimisations and no debug symbol (-O3 -march=native)
 
-The Python version tells CMake for which Python version the bindings must be compiled.
+The PYTHON_VERSION variable tells CMake for which Python version the bindings must be compiled.
 
 Installation
 ------------
@@ -71,6 +71,8 @@ One tool is provided for randomizing IP ranges :
             Single IP:      192.168.1.10
     
     A '-' symbol before any range will remove it from the final set.
+
+You can also read a blog post about some math used in this library in Quarkslab's blog here : http://www.quarkslab.com/en-blog+read+45
 
 Contact
 -------
