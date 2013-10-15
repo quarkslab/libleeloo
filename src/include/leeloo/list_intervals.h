@@ -205,8 +205,8 @@ public:
 		UPRNG<uint32_t, false> uprng;
 		uprng.init(size_all, rand_eng);
 
-		uint32_t* interval_buf;
-		posix_memalign((void**) &interval_buf, 16, sizeof(uint32_t)*size_div);
+		base_type* interval_buf;
+		posix_memalign((void**) &interval_buf, 16, sizeof(base_type)*size_div);
 
 		const size_type size_all_full = (size_all/size_div)*size_div;
 		for (size_type i = 0; i < size_all_full; i += size_div) {
@@ -223,6 +223,8 @@ public:
 			}
 			fset(interval_buf, rem);
 		}
+
+		free(interval_buf);
 	}
 
 	template <class Fset, class RandEngine>
