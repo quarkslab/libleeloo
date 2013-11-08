@@ -125,7 +125,6 @@ public:
 
 	bool contains(const char* ip_str) const;
 
-private:
 	static inline uint32_t cidr2mask(const int cidr)
 	{
 		assert(cidr > 0);
