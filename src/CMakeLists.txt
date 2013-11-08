@@ -5,6 +5,7 @@ set(SRC_FILES
 )
 
 set(HEADER_DIST_FILES
+	include/leeloo/atomic_helpers.h
 	include/leeloo/bench.h
 	include/leeloo/bits_permutation.h
 	include/leeloo/helpers.h
