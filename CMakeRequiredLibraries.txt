@@ -1,6 +1,4 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-
-set(TBB_INSTALL_DIR /opt/tbb-latest)
 find_package(TBB REQUIRED)
 
 # Python and boost python
