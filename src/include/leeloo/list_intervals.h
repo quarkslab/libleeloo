@@ -125,26 +125,27 @@ public:
 	}
 
 	template <bool exclude = false>
-	inline void insert(interval_type const& i)
+	inline void insert(typename std::enable_if<exclude == true, interval_type const&>::type i)
 	{
-		// This will be optimised by the compiler
-		if (exclude) {
-			remove(i);
-		}
-		else {
-			add(i);
-		}
+		remove(i);
 	}
 
 	template <bool exclude = false>
-	inline void insert(base_type const a, base_type const b)
+	inline void insert(typename std::enable_if<exclude == false, interval_type const&>::type i)
 	{
-		if (exclude) {
-			remove(a, b);
-		}
-		else {
-			add(a, b);
-		}
+		add(i);
+	}
+
+	template <bool exclude = false>
+	inline void insert(typename std::enable_if<exclude == true, base_type const>::type a, base_type const b)
+	{
+		remove(a, b);
+	}
+
+	template <bool exclude = false>
+	inline void insert(typename std::enable_if<exclude == false, base_type const>::type a, base_type const b)
+	{
+		add(a, b);
 	}
 
 	void aggregate()

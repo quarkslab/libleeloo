@@ -83,12 +83,6 @@ static inline uint32_t cidr2size(const int cidr)
 	return 1U<<(32-cidr);
 }
 
-static inline uint32_t cidr2mask(const int cidr)
-{
-	assert(cidr > 0);
-	return (1U<<(32-cidr))-1;
-}
-
 uint32_t leeloo::ips_parser::ipv4toi(const char* str, const size_t size, bool& valid, int min_dots)
 {
 	if (size == 0) {
@@ -208,8 +202,7 @@ static bool __parse_ips(leeloo::ip_list_intervals& l, const char* str)
 			return false;
 		}
 
-		const uint32_t mask = cidr2mask(cidr);
-		l.insert<exclude>(ip_start & (~mask), ip_start|mask);
+		l.insert_cidr<exclude>(ip_start, cidr);
 
 		return true;
 	}

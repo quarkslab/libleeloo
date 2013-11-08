@@ -62,11 +62,16 @@ int main()
 			std::cerr << "Return code of parse_ips isn't valid!" << std::cerr;\
 			return 1;\
 		}\
+		out.aggregate();\
 		if (is_valid) {\
 			leeloo::ip_list_intervals ref;\
 			ref.add(leeloo::ips_parser::ipv4toi(ip_start, strlen(ip_start), valid), leeloo::ips_parser::ipv4toi(ip_end, strlen(ip_end), valid));\
 			if (ref != out) {\
 				std::cerr << "Interval computed is bad!" << std::endl;\
+				std::cerr << "out:" << std::endl;\
+				print_intervals(out);\
+				std::cerr << "ref:" << std::endl;\
+				print_intervals(ref);\
 				return 1;\
 			}\
 		}\

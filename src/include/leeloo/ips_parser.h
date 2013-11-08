@@ -31,6 +31,7 @@
 
 #include <cstdlib>
 #include <cstdint>
+#include <type_traits>
 
 namespace leeloo {
 
@@ -44,14 +45,15 @@ bool parse_ips_add(ip_list_intervals& l, const char* str);
 bool parse_ips_remove(ip_list_intervals& l, const char* str);
 
 template <bool exclude = false>
-inline bool parse_ips(ip_list_intervals& l, const char* str)
+inline bool parse_ips(typename std::enable_if<exclude == true, ip_list_intervals&>::type l, const char* str)
 {
-	if (exclude) {
-		return parse_ips_add(l, str);
-	}
-	else {
-		return parse_ips_remove(l, str);
-	}
+	return parse_ips_remove(l, str);
+}
+
+template <bool exclude = false>
+inline bool parse_ips(typename std::enable_if<exclude == false, ip_list_intervals&>::type l, const char* str)
+{
+	return parse_ips_add(l, str);
 }
 
 }

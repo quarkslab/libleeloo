@@ -46,14 +46,24 @@ public:
 	bool remove(const char* str_interval);
 
 	template <bool exclude = false>
-	inline void insert(const char* str_interval)
+	inline void insert(typename std::enable_if<exclude == true, const char*>::type str_interval)
 	{
-		if (exclude) {
-			remove(str_interval);
-		}
-		else {
-			add(str_interval);
-		}
+		remove(str_interval);
+	}
+
+	template <bool exclude = false>
+	inline void insert(typename std::enable_if<exclude == false, const char*>::type str_interval)
+	{
+		add(str_interval);
+	}
+
+	// Interval here is described as a cidr: base_ip/prefix_size
+	template <bool exclude = false>
+	inline void insert_cidr(uint32_t const base_ip, int const prefix_size)
+	{
+		assert(prefix_size > 0);
+		const uint32_t mask = cidr2mask(prefix_size);
+		insert<exclude>(base_ip & (~mask), base_ip|mask);
 	}
 
 	// Interval here is closed ([a,b]). This will force the non-inclusion of 255.255.255.255.
@@ -114,6 +124,13 @@ public:
 	inline bool contains(uint32_t const ip) const { return interval_base_type::contains(ip); }
 
 	bool contains(const char* ip_str) const;
+
+private:
+	static inline uint32_t cidr2mask(const int cidr)
+	{
+		assert(cidr > 0);
+		return (1U<<(32-cidr))-1;
+	}
 };
 
 }
