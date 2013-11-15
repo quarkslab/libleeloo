@@ -39,12 +39,13 @@
 #include <exception>
 
 #include <leeloo/bench.h>
+#include <leeloo/exports.h>
 #include <leeloo/uni.h>
 #include <leeloo/utility.h>
 
 namespace leeloo {
 
-class file_exception: public std::exception
+class LEELOO_API file_exception: public std::exception
 {
 public:
 	file_exception():
@@ -61,7 +62,7 @@ private:
 	std::string _what;
 };
 
-class file_format_exception: public std::exception
+class LEELOO_API file_format_exception: public std::exception
 {
 public:
 	file_format_exception(const char* msg):
@@ -380,7 +381,7 @@ public:
 	}
 
 private:
-	static void aggregate_container(container_type& ints)
+	LEELOO_LOCAL static void aggregate_container(container_type& ints)
 	{
 		if (ints.size() <= 1) {
 			return;
@@ -411,7 +412,7 @@ private:
 		ints = std::move(ret);
 	}
 
-	void split_merged_interval_removed(interval_type const& cur_merge_, container_type& ret, typename container_type::const_iterator& it_removed)
+	LEELOO_LOCAL void split_merged_interval_removed(interval_type const& cur_merge_, container_type& ret, typename container_type::const_iterator& it_removed)
 	{
 		bool notend;
 		while (((notend = it_removed != removed_intervals().end())) &&
@@ -458,7 +459,7 @@ private:
 		}
 	}
 
-	size_type get_rth_value(size_type const r, size_t const interval_start, size_t const interval_end) const
+	LEELOO_LOCAL size_type get_rth_value(size_type const r, size_t const interval_start, size_t const interval_end) const
 	{
 		// [interval_start,interval_end[
 		ssize_t cur = r;
@@ -472,7 +473,8 @@ private:
 		}
 		return -1;
 	}
-	size_t get_cached_interval_idx(size_type const r, ssize_t& rem) const
+
+	LEELOO_LOCAL size_t get_cached_interval_idx(size_type const r, ssize_t& rem) const
 	{
 		// Dichotomy!
 		size_t a = 0;
@@ -516,8 +518,8 @@ public:
 	iterator end() const { return intervals().end(); }
 
 private:
-	inline container_type& intervals() { return _intervals; }
-	inline container_type& removed_intervals() { return _excluded_intervals; }
+	LEELOO_LOCAL inline container_type& intervals() { return _intervals; }
+	LEELOO_LOCAL inline container_type& removed_intervals() { return _excluded_intervals; }
 
 private:
 	container_type _intervals;
@@ -528,5 +530,24 @@ private:
 };
 
 }
+
+// Common exported instanciations (outside of any namespace)
+//
+
+#ifdef LEELOO_INCLUDE_U8
+LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::list_intervals<leeloo::interval<uint8_t>>;
+#endif
+
+#ifdef LEELOO_INCLUDE_U16
+LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::list_intervals<leeloo::interval<uint16_t>>;
+#endif
+
+#ifdef LEELOO_INCLUDE_U32
+LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::list_intervals<leeloo::interval<uint32_t>>;
+#endif
+
+#ifdef LEELOO_INCLUDE_U64
+LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::list_intervals<leeloo::interval<uint64_t>>;
+#endif
 
 #endif

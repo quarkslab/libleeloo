@@ -1,5 +1,5 @@
 if ((CMAKE_COMPILER_IS_GNUCC) OR ("CMAKE_CXX_COMPILER_ID" STREQUAL "Clang"))
-	set(CMAKE_CXX_FLAGS_COMMON "-Wall -Wextra -std=c++11 -march=native")
+	set(CMAKE_CXX_FLAGS_COMMON "-Wall -Wextra -std=c++11 -march=native -fvisibility=hidden")
 
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_COMMON} -g3")
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_COMMON} -g3 -O3 -DNDEBUG")

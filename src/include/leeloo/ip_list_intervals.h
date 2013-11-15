@@ -33,11 +33,13 @@
 #include <leeloo/interval.h>
 #include <leeloo/list_intervals.h>
 
+#include <leeloo/exports.h>
+
 namespace leeloo {
 
 typedef interval<uint32_t> ip_interval;
 
-class ip_list_intervals: public list_intervals<ip_interval>
+class LEELOO_API ip_list_intervals: public list_intervals<ip_interval>
 {
 	typedef list_intervals<ip_interval> interval_base_type;
 

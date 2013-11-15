@@ -29,10 +29,12 @@
 #ifndef LEELOO_HELPERS_H
 #define LEELOO_HELPERS_H
 
+#include <leeloo/exports.h>
+
 namespace leeloo {
 
 // Get current timestamp in seconds
-double get_current_timestamp();
+extern LEELOO_API double get_current_timestamp();
 
 }
 

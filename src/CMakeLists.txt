@@ -2,6 +2,7 @@ set(SRC_FILES
 	helpers.cpp
 	ip_list_intervals.cpp
 	ips_parser.cpp
+	list_intervals.cpp
 )
 
 set(HEADER_DIST_FILES
@@ -23,6 +24,10 @@ set(HEADER_DIST_FILES
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${TBB_INCLUDE_DIR})
+
+foreach (INC ${LEELOO_INCLUDE})
+	add_definitions(-DLEELOO_INCLUDE_U${INC})
+endforeach()
 
 add_library(leeloo SHARED ${SRC_FILES})
 target_link_libraries(leeloo ${TBB_LIBRARIES})

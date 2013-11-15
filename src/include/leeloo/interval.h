@@ -31,6 +31,8 @@
 
 #include <algorithm>
 
+#include <leeloo/exports.h>
+
 namespace leeloo {
 
 // interval is half-opened [lower,upper[
@@ -95,5 +97,24 @@ private:
 };
 
 } // leeloo
+
+// Common exported instanciations (outside of any namespace)
+//
+
+#ifdef LEELOO_INCLUDE_U8
+LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::interval<uint8_t>;
+#endif
+
+#ifdef LEELOO_INCLUDE_U16
+LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::interval<uint16_t>;
+#endif
+
+#ifdef LEELOO_INCLUDE_U32
+LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::interval<uint32_t>;
+#endif
+
+#ifdef LEELOO_INCLUDE_U64
+LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::interval<uint64_t>;
+#endif
 
 #endif

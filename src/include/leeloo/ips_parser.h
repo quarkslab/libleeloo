@@ -33,16 +33,18 @@
 #include <cstdint>
 #include <type_traits>
 
+#include <leeloo/exports.h>
+
 namespace leeloo {
 
 class ip_list_intervals;
 
 namespace ips_parser {
 
-uint32_t ipv4toi(const char* str, const size_t size, bool& valid, int min_dots = 3);
+extern LEELOO_API uint32_t ipv4toi(const char* str, const size_t size, bool& valid, int min_dots = 3);
 
-bool parse_ips_add(ip_list_intervals& l, const char* str);
-bool parse_ips_remove(ip_list_intervals& l, const char* str);
+extern LEELOO_API bool parse_ips_add(ip_list_intervals& l, const char* str);
+extern LEELOO_API bool parse_ips_remove(ip_list_intervals& l, const char* str);
 
 template <bool exclude = false>
 inline bool parse_ips(typename std::enable_if<exclude == true, ip_list_intervals&>::type l, const char* str)
