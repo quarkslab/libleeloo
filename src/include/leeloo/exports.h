@@ -21,4 +21,6 @@
   #define LEELOO_TEMPLATE_EXPIMP extern
 #endif
 
+#include <leeloo/instances_exported.h>
+
 #endif

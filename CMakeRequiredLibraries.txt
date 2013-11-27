@@ -1,19 +1,2 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package(TBB REQUIRED)
-
-# Compile python bindings only if asked for
-if (NOT DEFINED ENABLE_PYTHON_BINDINGS OR ENABLE_PYTHON_BINDINGS)
-	# Python and boost python
-	if(NOT DEFINED PYTHON_VERSION)
-		set(PYTHON_VERSION 3.3)
-	endif()
-
-	find_package(PythonLibs ${PYTHON_VERSION})
-	set(PythonInterp_FIND_VERSION ${PYTHON_VERSION})
-	find_package(PythonInterp)
-	string(REGEX REPLACE "\\." "" PYTHON_VERSION_BOOST ${PYTHON_VERSION})
-	find_package(Boost COMPONENTS python-py${PYTHON_VERSION_BOOST})
-
-	# Compiles python binding iif both python-libs and boost-python are available
-	set(ENABLE_PYTHON_BINDINGS ${Boost_FOUND} AND ${PYTHONLIBS_FOUND})
-endif()

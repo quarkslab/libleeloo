@@ -1,3 +1,11 @@
+set(LEELOO_INCLUDE_U8 0)
+set(LEELOO_INCLUDE_U16 0)
+set(LEELOO_INCLUDE_U32 0)
+set(LEELOO_INCLUDE_U64 0)
+foreach (INC ${LEELOO_INCLUDE})
+	set(LEELOO_INCLUDE_U${INC} 1)
+endforeach()
+
 set(SRC_FILES
 	helpers.cpp
 	ip_list_intervals.cpp
@@ -5,10 +13,14 @@ set(SRC_FILES
 	list_intervals.cpp
 )
 
+set(INSTANCES_EXPORTED_H ${CMAKE_CURRENT_BINARY_DIR}/include/leeloo/instances_exported.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/leeloo/instances_exported.h.in ${INSTANCES_EXPORTED_H})
+
 set(HEADER_DIST_FILES
 	include/leeloo/atomic_helpers.h
 	include/leeloo/bench.h
 	include/leeloo/bits_permutation.h
+	include/leeloo/exports.h
 	include/leeloo/helpers.h
 	include/leeloo/interval.h
 	include/leeloo/intrinsics.h
@@ -17,17 +29,15 @@ set(HEADER_DIST_FILES
 	include/leeloo/list_intervals.h
 	include/leeloo/math_helpers.h
 	include/leeloo/prime_helpers.h
+	include/leeloo/random.h
 	include/leeloo/uni.h
 	include/leeloo/uprng.h
 	include/leeloo/utility.h
+	${INSTANCES_EXPORTED_H}
 )
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${TBB_INCLUDE_DIR})
-
-foreach (INC ${LEELOO_INCLUDE})
-	add_definitions(-DLEELOO_INCLUDE_U${INC})
-endforeach()
 
 add_library(leeloo SHARED ${SRC_FILES})
 target_link_libraries(leeloo ${TBB_LIBRARIES})

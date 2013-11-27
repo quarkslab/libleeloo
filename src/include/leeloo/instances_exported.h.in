@@ -1,0 +1,25 @@
+#ifndef LEELOO_INSTANCES_EXPORTED_H
+#define LEELOO_INSTANCES_EXPORTED_H
+
+// Define which instances are exported for this build.
+// This defines the LEELOO_INCLUDE_* macros according to what's been given in
+// the cmake configuration.
+// This file is distributed with the compiled binaries, so that they match.
+
+#if @LEELOO_INCLUDE_U8@
+#define LEELOO_INCLUDE_U8
+#endif
+
+#if @LEELOO_INCLUDE_U16@
+#define LEELOO_INCLUDE_U16
+#endif
+
+#if @LEELOO_INCLUDE_U32@
+#define LEELOO_INCLUDE_U32
+#endif
+
+#if @LEELOO_INCLUDE_U64@
+#define LEELOO_INCLUDE_U64
+#endif
+
+#endif

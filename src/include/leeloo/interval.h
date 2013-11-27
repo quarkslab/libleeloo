@@ -99,7 +99,6 @@ private:
 } // leeloo
 
 // Common exported instanciations (outside of any namespace)
-//
 
 #ifdef LEELOO_INCLUDE_U8
 LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::interval<uint8_t>;
