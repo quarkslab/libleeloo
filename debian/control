@@ -18,7 +18,7 @@ Package: libleeloo
 Section: libs
 Architecture: amd64
 Multi-Arch: same
-Depends: ${shlibs:Depends}, ${misc:Depends}, libtbb
+Depends: ${shlibs:Depends}, ${misc:Depends}, libtbb2
 Description: libleeloo
  libleeloo
 
