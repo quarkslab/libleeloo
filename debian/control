@@ -21,3 +21,11 @@ Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends}, libtbb
 Description: libleeloo
  libleeloo
+
+Package: libleeloo-dbg
+Section: libs
+Architecture: amd64
+Multi-Arch: same
+Depends: ${shlibs:Depends}, ${misc:Depends}, libleeloo
+Description: libleeloo
+ libleeloo debug symbols
