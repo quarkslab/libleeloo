@@ -54,6 +54,7 @@ In order to install the python bindings, do the following :
     $ make
 
 Then, as root :
+
     # make install
 
 The PYTHON_VERSION variable tells CMake for which Python version the bindings must be compiled.
