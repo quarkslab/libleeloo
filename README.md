@@ -31,9 +31,8 @@ Under Debian-based systems, this can be installed thanks to:
 This project uses CMake. To compile it, follow these steps:
 
     $ cd /path/to/src
-    $ mkdir build
-    $ cd build
-    $ cmake -DCMAKE_BUILD_TYPE=Release -DPYTHON_VERSION=3.3 ..
+    $ mkdir build && cd build
+    $ cmake -DCMAKE_BUILD_TYPE=Release ..
     $ make
 
 The supported build types are :
@@ -41,6 +40,21 @@ The supported build types are :
  * debug: compiles with no optimisations and debug symbols (-g)
  * relwithdebinfo : compiles with full optimisations and debug symbols (-O3 -march=native -g)
  * release : compiles with full optimisations and no debug symbol (-O3 -march=native)
+
+This will compile the library. Then, as root, you can install it :
+
+    # make install
+
+In order to install the python bindings, do the following :
+
+    $ cd /path/to/src
+    $ cd bindings/python
+    $ mkdir build && cd build
+    $ cmake -DCMAKE_BUILD_TYPE=Release -DPYHON_VERSION=3.3 ..
+    $ make
+
+Then, as root :
+    # make install
 
 The PYTHON_VERSION variable tells CMake for which Python version the bindings must be compiled.
 
@@ -72,7 +86,7 @@ One tool is provided for randomizing IP ranges :
     
     A '-' symbol before any range will remove it from the final set.
 
-You can also read a blog post about some math used in this library in Quarkslab's blog here : http://www.quarkslab.com/en-blog+read+45
+You can also read a blog post about some math used in this library in Quarkslab's blog here : http://blog.quarkslab.com/unique-random-number-set-computation.html
 
 Contact
 -------
