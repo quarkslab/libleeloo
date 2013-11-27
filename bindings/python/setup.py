@@ -25,10 +25,8 @@ class Build(build):
         os.chdir(leeloo_build_dir)
         check_call(['cmake',
                     '-DCMAKE_BUILD_TYPE=release',
-                    '-DNO_TESTS=1',
-                    '-DNO_TOOLS=1',
                     '-DPYTHON_VERSION='+py_version,
-                    os.path.join(cwd, '../..')])
+                    cwd])
         check_call(['make','-j'])
         os.chdir(cwd)
 
@@ -36,7 +34,7 @@ class Build(build):
         leeloo_package_dir = os.path.join(tmp_dir, "pyleeloo")
         #leeloo_package_dir = os.path.join(self.build_temp, 'package/leeloo')
         os.makedirs(leeloo_package_dir)
-        shutil.copy(os.path.join(leeloo_build_dir, "bindings/python/pyleeloo.so"), os.path.join(leeloo_package_dir, "pyleeloo.so"))
+        shutil.copy(os.path.join(leeloo_build_dir, "pyleeloo.so"), os.path.join(leeloo_package_dir, "pyleeloo.so"))
         with open(os.path.join(leeloo_package_dir, "__init__.py"), "w") as f:
             f.write("# leeloo python package\n")
             f.write("from .pyleeloo import *")
