@@ -9,4 +9,3 @@ set (LEELOO_FOUND "NO")
 
 find_path(LIBLEELOO_INCLUDE_DIRS leeloo/list_intervals.h HINTS /usr/include /usr/local/include)
 find_library(LIBLEELOO_LIBRARIES leeloo)
-message(${LIBLEELOO_LIBRARIES})
