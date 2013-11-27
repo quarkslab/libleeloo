@@ -1,0 +1,18 @@
+Source: pyleeloo
+Maintainer: Adrien Guinet <aguinet@quarkslab.com>
+Section: python
+Priority: optional
+Build-Depends: python-all-dev (>= 2.6.6-3), python3-all-dev, debhelper (>= 7), libleeloo-dev
+X-Python-Version: >= 2.4
+X-Python3-Version: >= 3.1
+Standards-Version: 3.9.1
+
+Package: python-pyleeloo
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}, libleeloo
+Description: Library to manage big sets of integers
+
+Package: python3-pyleeloo
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}, libleeloo
+Description: Library to manage big sets of integers

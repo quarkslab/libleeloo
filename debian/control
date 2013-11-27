@@ -1,0 +1,23 @@
+Source: libleeloo
+Priority: optional
+Maintainer: Adrien Guinet <aguinet@quarkslab.com>
+Build-Depends: debhelper (>= 8.0.0), cmake, libtbb-dev
+Standards-Version: 3.9.4
+Section: libs
+Homepage: http://quarkslab.com
+Vcs-Browser: https://github.com/quarkslab/libleeloo.git
+
+Package: libleeloo-dev
+Section: libdevel
+Architecture: any
+Depends: libleeloo (= ${binary:Version}), libtbb-dev
+Description: libleeloo development files
+ libleeloo development files
+
+Package: libleeloo
+Section: libs
+Architecture: amd64
+Multi-Arch: same
+Depends: ${shlibs:Depends}, ${misc:Depends}, libtbb
+Description: libleeloo
+ libleeloo
