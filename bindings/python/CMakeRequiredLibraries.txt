@@ -6,7 +6,9 @@ if(NOT DEFINED PYTHON_VERSION)
 	set(PYTHON_VERSION 3.3)
 endif()
 string(REGEX REPLACE "\\." "" PYTHON_VERSION_BOOST ${PYTHON_VERSION})
-
 find_package(PythonLibs ${PYTHON_VERSION} REQUIRED)
+set(PythonInterp_FIND_VERSION ${PYTHON_VERSION})
+find_package(PythonInterp)
 find_package(Boost COMPONENTS python-py${PYTHON_VERSION_BOOST} REQUIRED)
+
 find_package(leeloo)
