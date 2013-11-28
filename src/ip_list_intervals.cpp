@@ -39,12 +39,12 @@ static bool __insert(leeloo::ip_list_intervals& obj, const char* str_interval)
 
 bool leeloo::ip_list_intervals::add(const char* str_interval)
 {
-	return __insert<true>(*this, str_interval);
+	return __insert<false>(*this, str_interval);
 }
 
 bool leeloo::ip_list_intervals::remove(const char* str_interval)
 {
-	return __insert<false>(*this, str_interval);
+	return __insert<true>(*this, str_interval);
 }
 
 bool leeloo::ip_list_intervals::contains(const char* ip_str) const
