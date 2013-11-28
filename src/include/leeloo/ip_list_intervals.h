@@ -41,6 +41,7 @@ typedef interval<uint32_t> ip_interval;
 
 class LEELOO_API ip_list_intervals: public list_intervals<ip_interval>
 {
+public:
 	typedef list_intervals<ip_interval> interval_base_type;
 
 public:
@@ -85,6 +86,11 @@ public:
 		}
 	}
 
+	inline void add(leeloo::ip_list_intervals const& o)
+	{
+		interval_base_type::add(o);
+	}
+
 	inline void remove(uint32_t const a, uint32_t const b)
 	{
 		uint32_t b_ = b;
@@ -99,6 +105,11 @@ public:
 		if (a != 0xFFFFFFFF) {
 			interval_base_type::remove(a, a+1);
 		}
+	}
+
+	inline void remove(leeloo::ip_list_intervals const& o)
+	{
+		interval_base_type::remove(o);
 	}
 
 	template <bool exclude = false>

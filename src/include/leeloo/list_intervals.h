@@ -125,6 +125,23 @@ public:
 		removed_intervals().push_back(i);
 	}
 
+	// The two following functions suppose that the other intervals had been
+	// aggregated.
+	inline void add(list_intervals const& o)
+	{
+		// AG: I'm afraid that insert isn't optimized here... That's one
+		// limitation of std::*.
+		intervals().reserve(intervals().size() + o.intervals().size());
+		intervals().insert(intervals().end(), o.intervals().begin(), o.intervals().end());
+	}
+
+	inline void remove(list_intervals const& o)
+	{
+		// AG: same remark as above
+		removed_intervals().reserve(removed_intervals().size() + o.intervals().size());
+		removed_intervals().insert(removed_intervals().end(), o.intervals().begin(), o.intervals().end());
+	}
+
 	template <bool exclude = false>
 	inline void insert(typename std::enable_if<exclude == true, interval_type const&>::type i)
 	{
@@ -182,9 +199,12 @@ public:
 			}
 		}
 
+		// Now, merge the removed intervals, and do the final merge
 		split_merged_interval_removed(cur_merge, ret, it_removed);
 
-		// Now, merge the removed intervals, and do the final merge
+		// Clear the removed intervals
+		removed_intervals().clear();
+
 		intervals() = std::move(ret);
 	}
 
@@ -520,6 +540,7 @@ public:
 private:
 	LEELOO_LOCAL inline container_type& intervals() { return _intervals; }
 	LEELOO_LOCAL inline container_type& removed_intervals() { return _excluded_intervals; }
+	LEELOO_LOCAL inline container_type const& removed_intervals() const { return _excluded_intervals; }
 
 private:
 	container_type _intervals;

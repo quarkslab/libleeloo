@@ -46,10 +46,12 @@ boost::random::mt19937 g_mt_rand;
 void (leeloo::ip_list_intervals::*ip_add1)(leeloo::ip_list_intervals::base_type const, leeloo::ip_list_intervals::base_type const) = &leeloo::ip_list_intervals::add;
 void (leeloo::ip_list_intervals::*ip_add2)(leeloo::ip_list_intervals::base_type const)                                             = &leeloo::ip_list_intervals::add;
 bool (leeloo::ip_list_intervals::*ip_add3)(const char*)                                                                            = &leeloo::ip_list_intervals::add;
+void (leeloo::ip_list_intervals::*ip_add4)(leeloo::ip_list_intervals const&)                                                       = &leeloo::ip_list_intervals::add;
 
 void (leeloo::ip_list_intervals::*ip_remove1)(leeloo::ip_list_intervals::base_type const, leeloo::ip_list_intervals::base_type const) = &leeloo::ip_list_intervals::remove;
 void (leeloo::ip_list_intervals::*ip_remove2)(leeloo::ip_list_intervals::base_type const)                                             = &leeloo::ip_list_intervals::remove;
 bool (leeloo::ip_list_intervals::*ip_remove3)(const char*)                                                                            = &leeloo::ip_list_intervals::remove;
+void (leeloo::ip_list_intervals::*ip_remove4)(leeloo::ip_list_intervals const&)                                                       = &leeloo::ip_list_intervals::remove;
 
 bool (leeloo::ip_list_intervals::*contains1)(uint32_t const) const = &leeloo::ip_list_intervals::contains;
 bool (leeloo::ip_list_intervals::*contains2)(const char*)    const = &leeloo::ip_list_intervals::contains;
@@ -130,6 +132,7 @@ typedef leeloo::interval<uint64_t> u64_interval;
 typedef leeloo::list_intervals<u64_interval> u64_list_intervals;
 
 void (u64_list_intervals::*u64_add1)(u64_list_intervals::base_type const, u64_list_intervals::base_type const) = &u64_list_intervals::add;
+void (u64_list_intervals::*u64_add2)(u64_list_intervals const&)                                                = &u64_list_intervals::add;
 
 static void u64_list_random_sets(u64_list_intervals const& l, size_t const size_div, object& f_set)
 {
@@ -161,9 +164,11 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("add", ip_add1)
 		.def("add", ip_add2)
 		.def("add", ip_add3)
+		.def("add", ip_add4)
 		.def("remove", ip_remove1)
 		.def("remove", ip_remove2)
 		.def("remove", ip_remove3)
+		.def("remove", ip_remove4)
 		.def("aggregate", &leeloo::ip_list_intervals::aggregate)
 		.def("create_index_cache", &leeloo::ip_list_intervals::create_index_cache)
 		.def("size", &leeloo::ip_list_intervals::size)
@@ -179,6 +184,7 @@ BOOST_PYTHON_MODULE(pyleeloo)
 
 	class_<u64_list_intervals>("u64_list_intervals")
 		.def("add", u64_add1)
+		.def("add", u64_add2)
 		.def("aggregate", &u64_list_intervals::aggregate)
 		.def("create_index_cache", &u64_list_intervals::create_index_cache)
 		.def("size", &u64_list_intervals::size)
