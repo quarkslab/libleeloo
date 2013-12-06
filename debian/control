@@ -1,7 +1,7 @@
 Source: libleeloo
 Priority: optional
 Maintainer: Adrien Guinet <aguinet@quarkslab.com>
-Build-Depends: debhelper (>= 8.0.0), cmake, libtbb-dev
+Build-Depends: debhelper (>= 8.0.0), cmake, libtbb-dev, dh-exec
 Standards-Version: 3.9.4
 Section: libs
 Homepage: http://quarkslab.com

@@ -3,6 +3,8 @@
 # to do: "for every supported python versions, compile a package with
 # distutils"...
 
+export DH_VERBOSE=1
+
 PY3VERS = $(shell py3versions -rv)
 DPKG_EXPORT_BUILDFLAGS = 1
 include /usr/share/dpkg/buildflags.mk
@@ -14,7 +16,7 @@ include /usr/share/dpkg/buildflags.mk
 override_dh_auto_build:
 	dh_auto_build
 	set -e && for pyv in $(PY3VERS); do \
-	  python$$pyvers setup.py build ; \
+	  python$$pyv setup.py build ; \
 	done
 
 override_dh_install:
