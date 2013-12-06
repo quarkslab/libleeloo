@@ -11,21 +11,47 @@ Package: libleeloo-dev
 Section: libdevel
 Architecture: any
 Depends: libleeloo (= ${binary:Version}), libtbb-dev
-Description: libleeloo development files
- libleeloo development files
+Description: Library to manage big sets of integers - development files
+ leeloo library development files
+ . 
+ leeloo is a C++ library that helps manages big sets of integer intervals.
+ .
+ It can easily aggregate them into the smaller set possible, dump and/or read
+ intervals from binary files and generate a random order of the integers
+ represented.
+ .
+ It can specifically be used for managing IPv4 ranges. A parser is provided, so
+ that intervals can be specified as CIDR ranges, or with a dash/dot notation
+ (like 192.168.4-9.10-254).
 
 Package: libleeloo
 Section: libs
 Architecture: amd64
 Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends}, libtbb2
-Description: libleeloo
- libleeloo
+Description: Library to manage big sets of integers
+ leeloo is a C++ library that helps manages big sets of integer intervals.
+ . 
+ It can easily aggregate them into the smaller set possible, dump and/or read
+ intervals from binary files and generate a random order of the integers
+ represented.
+ .
+ It can specifically be used for managing IPv4 ranges. A parser is provided, so
+ that intervals can be specified as CIDR ranges, or with a dash/dot notation
+ (like 192.168.4-9.10-254).
 
 Package: libleeloo-dbg
 Section: libs
 Architecture: amd64
 Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends}, libleeloo
-Description: libleeloo
- libleeloo debug symbols
+Description: Library to manage big sets of integers - debug symbols
+ leeloo library debug symbols
+ .
+ It can easily aggregate them into the smaller set possible, dump and/or read
+ intervals from binary files and generate a random order of the integers
+ represented.
+ .
+ It can specifically be used for managing IPv4 ranges. A parser is provided, so
+ that intervals can be specified as CIDR ranges, or with a dash/dot notation
+ (like 192.168.4-9.10-254).

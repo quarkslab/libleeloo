@@ -1,5 +1,5 @@
-libleeloo (1.0-1) unstable; urgency=low
+libleeloo (1.0) unstable; urgency=low
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * Initial release
 
  -- Adrien Guinet <aguinet@quarkslab.com>  Fri, 15 Nov 2013 10:44:43 +0100

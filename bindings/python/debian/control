@@ -10,9 +10,31 @@ Standards-Version: 3.9.1
 Package: python-pyleeloo
 Architecture: all
 Depends: ${misc:Depends}, ${python:Depends}, libleeloo
-Description: Library to manage big sets of integers
+Description: Library to manage big sets of integers - Python bindings
+ Python bindings for libleeloo
+ .
+ leeloo is a C++ library that helps manages big sets of integer intervals.
+ .
+ It can easily aggregate them into the smaller set possible, dump and/or read
+ intervals from binary files and generate a random order of the integers
+ represented.
+ .
+ It can specifically be used for managing IPv4 ranges. A parser is provided, so
+ that intervals can be specified as CIDR ranges, or with a dash/dot notation
+ (like 192.168.4-9.10-254).
 
 Package: python3-pyleeloo
 Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends}, libleeloo
-Description: Library to manage big sets of integers
+Description: Library to manage big sets of integers - Python3 bindings
+ Python3 bindings for libleeloo
+ .
+ leeloo is a C++ library that helps manages big sets of integer intervals.
+ .
+ It can easily aggregate them into the smaller set possible, dump and/or read
+ intervals from binary files and generate a random order of the integers
+ represented.
+ .
+ It can specifically be used for managing IPv4 ranges. A parser is provided, so
+ that intervals can be specified as CIDR ranges, or with a dash/dot notation
+ (like 192.168.4-9.10-254).
