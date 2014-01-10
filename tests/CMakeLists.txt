@@ -27,3 +27,6 @@ target_link_libraries(read_file leeloo)
 
 add_executable(dump_file dump_file.cpp)
 target_link_libraries(dump_file leeloo)
+
+#add_executable(test_vli test_vli.cpp)
+#target_link_libraries(test_vli leeloo vli)

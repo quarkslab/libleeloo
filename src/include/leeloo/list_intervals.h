@@ -76,7 +76,7 @@ private:
 	const char* _msg;
 };
 
-template <class Interval, class SizeType = size_t>
+template <class Interval, class SizeType = uint32_t>
 class list_intervals 
 {
 public:
@@ -210,7 +210,7 @@ public:
 
 	size_type size() const
 	{
-		size_type ret = 0;
+		size_type ret(0);
 		for (interval_type const& i: intervals()) {
 			ret += i.width();
 		}
@@ -224,7 +224,7 @@ public:
 			size_div = 1;
 		}
 		const size_type size_all = size();
-		UPRNG<uint32_t, false> uprng;
+		UPRNG<size_type, false> uprng;
 		uprng.init(size_all, rand_eng);
 
 		base_type* interval_buf;
@@ -284,7 +284,7 @@ public:
 		assert(cache_entry_size > 0);
 		_cache_entry_size = cache_entry_size;
 		const size_t intervals_count = intervals().size();
-		size_type cur_size = 0;
+		size_type cur_size(0);
 		_index_cache.clear();
 		_index_cache.reserve((intervals_count+cache_entry_size-1)/cache_entry_size);
 		for (size_t i = 0; i < intervals_count; i += cache_entry_size) {
@@ -319,7 +319,7 @@ public:
 	bool contains(base_type const v) const
 	{
 		// Suppose that intervals have been aggregated! (and are thus sorted)
-		size_type a = 0;
+		size_type a(0);
 		size_type b = intervals().size(); 
 
 		while ((b-a) > 4) {

@@ -192,8 +192,7 @@ static bool __parse_ips(leeloo::ip_list_intervals& l, const char* str)
 			return false;
 		}
 		const int cidr = strtol(slash+1, nullptr, 10);
-		// Do not accept '/0'...
-		if (cidr <= 0) {
+		if (cidr < 0) {
 			return false;
 		}
 		bool valid = false;

@@ -140,7 +140,10 @@ public:
 
 	static inline uint32_t cidr2mask(const int cidr)
 	{
-		assert(cidr > 0);
+		assert(cidr >= 0);
+		if (cidr == 0) {
+			return 0xFFFFFFFF;
+		}
 		return (1U<<(32-cidr))-1;
 	}
 };

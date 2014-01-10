@@ -88,7 +88,7 @@ public:
 public:
 	static interval empty()
 	{
-		return interval(0, 0);
+		return interval(base_type(0), base_type(0));
 	}
 
 private:
