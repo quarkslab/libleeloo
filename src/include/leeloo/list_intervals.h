@@ -229,6 +229,9 @@ public:
 
 		base_type* interval_buf;
 		posix_memalign((void**) &interval_buf, 16, sizeof(base_type)*size_div);
+		if (interval_buf == nullptr) {
+			return;
+		}
 
 		const size_type size_all_full = (size_all/size_div)*size_div;
 		for (size_type i = 0; i < size_all_full; i += size_div) {
@@ -263,7 +266,6 @@ public:
 	inline base_type at(size_type const r) const
 	{
 		assert(r < size());
-		// Dummy algorithm, should make a better one with cached indexes
 		return get_rth_value(r, 0, intervals().size());
 	}
 
