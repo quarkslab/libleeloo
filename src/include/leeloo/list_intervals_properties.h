@@ -146,84 +146,31 @@ public:
 	}
 
 	template <class FMerger>
-	void aggregate_properties(FMerger const& fmerger)
+	void aggregate_properties(FMerger const& fpush, FMerger const& fpop)
 	{
-		if (properties().size() == 0) {
+		if (properties().size() <= 1) {
 			return;
 		}
 
 		properties().sort();
 		properties_storage_type ret;
-		interval_type cur_merge = properties().interval_at(0);
+		interval_type const* cur_it = properties().interval_at(0);
 		property_type cur_property = properties().property_at(0);
+		property_type const* next_prop_pop;
+		base_type next_pop_at;
 
 		for (size_t i = 1; i < properties().size(); i++) {
-			interval_type const& it   = properties().interval_at(i);
+			interval_type const& it = properties().interval_at(i);
 			property_type const& prop = properties().property_at(i);
-			const base_type it_lower = it.lower();
-			const base_type it_upper = it.upper();
-			/*if ((cur_merge.lower() >= it_lower) &&
-				(cur_merge.upper() <= it_upper)) {
-				interval_type i1(it_lower, cur_merge.lower());
-				ret.add(i1, prop);
+			if (it.lower() < cur_it->
+				interval_type iret(cur_it->lower(), it.lower());
+				ret.add(std::move(iret), cur_property);
 				
-				interval_type i2(cur_merge.lower(), cur_merge.upper());
-				property_type p2 = cur_property;
-				fmerger(p2, prop);
-				ret.add(i2, p2);
-
-				cur_merge.set_lower(cur_merge.upper());
-				cur_merge.set_upper(it_upper);
-				cur_property = prop;
+				fmerger(cur_property, properties().property_at(i));
+				next_prop_pop = &prop;
+				next_pop_at = it.upper();
 			}
-			else*/
-			if ((cur_merge.lower() >= it_lower) &&
-				(cur_merge.upper() >= it_upper) &&
-				(cur_merge.lower() <= it_upper)) {
-				interval_type i1(it_lower, cur_merge.lower());
-				ret.add(i1, prop);
 
-				interval_type i2(cur_merge.lower(), it_upper);
-				property_type p2 = cur_property;
-				fmerger(p2, prop);
-				ret.add(i2, p2);
-			}
-			else
-			if ((cur_merge.lower() <= it_lower) &&
-				(cur_merge.upper() <= it_upper) &&
-				(cur_merge.upper() >= it_lower)) {
-				interval_type i1(cur_merge.lower(), it_lower);
-				ret.add(i1, cur_property);
-
-				interval_type i2(it_lower, cur_merge.upper());
-				property_type p2 = cur_property;
-				fmerger(p2, prop);
-				ret.add(i2, p2);
-
-				cur_merge.set_lower(cur_merge.upper());
-				cur_merge.set_upper(it_upper);
-				cur_property = prop;
-			}
-			else
-			if ((cur_merge.lower() <= it_lower) &&
-				(cur_merge.upper() >= it_upper)) {
-				interval_type i1(cur_merge.lower(), it_lower);
-				ret.add(i1, cur_property);
-
-				property_type p2 = cur_property;
-				fmerger(p2, prop);
-				ret.add(it, p2);
-
-				cur_merge.set_lower(it_lower);
-			}
-			else {
-				std::cerr << "gnehe" << std::endl;
-			}
-		}
-
-		if (cur_merge.width() > 0) {
-			ret.add(cur_merge, cur_property);
-		}
 
 		_properties = std::move(ret);
 	}
