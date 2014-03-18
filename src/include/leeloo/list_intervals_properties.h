@@ -146,33 +146,61 @@ public:
 	}
 
 	template <class FMerger>
-	void aggregate_properties(FMerger const& fpush, FMerger const& fpop)
+	void aggregate_properties(FMerger const& fadd, FMerger const& fremove)
 	{
 		if (properties().size() <= 1) {
 			return;
 		}
 
+		typedef std::map<base_type, property_type const*> properties_pop_storage
+
 		properties().sort();
 		properties_storage_type ret;
-		interval_type const* cur_it = properties().interval_at(0);
+		interval_type cur_it = properties().interval_at(0);
 		property_type cur_property = properties().property_at(0);
-		property_type const* next_prop_pop;
-		base_type next_pop_at;
+		properties_pop_storage properties_pop;
+		properties_pop.insert(std::make_pair(cur_it.upper(), &properties().property_at(0));
 
 		for (size_t i = 1; i < properties().size(); i++) {
 			interval_type const& it = properties().interval_at(i);
 			property_type const& prop = properties().property_at(i);
-			if (it.lower() < cur_it->
-				interval_type iret(cur_it->lower(), it.lower());
+			if (it.lower() < cur_it.upper()) {
+				interval_type iret(cur_it.lower(), it.lower());
 				ret.add(std::move(iret), cur_property);
 				
-				fmerger(cur_property, properties().property_at(i));
-				next_prop_pop = &prop;
-				next_pop_at = it.upper();
+				fadd(cur_property, properties().property_at(i));
+				properties_pop.emplace(it.upper(), &prop);
 			}
+			else {
+				ret.add(cur_it, cur_property);
+				while (properties_pop.size() > 0) {
+					properties_pop_storage::iterator it_first = properties_pop.begin();
+					if (it_first->first > it.lower()) {
+						break;
+					}
+					fremove(cur_property, *it_first->second);
+					properties_pop_storage::iterator it_next = it_first; it_next++;
+					if (it_next != properties_pop.end()) {
+						ret.add(interval_type(it_first->first, it_next->end), cur_property);
+					}
+					properties_pop.erase(it_first);
+				}
 
+				if (properties_pop.size() > 0) {
+					fadd(cur_property, prop);
+					properties_pop.emplace(it.upper(), &prop);
+
+					interval_type iret(it.lower(), properties_pop().begin()->first);
+					ret.add(std::move(iret), cur_property);
+				}
+				else {
+					ret.add(it, prop);
+				}
+			}
+		}
 
 		_properties = std::move(ret);
+
 	}
 
 	property_type const* property_of(base_type const& v) const
