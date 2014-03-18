@@ -19,6 +19,9 @@ target_link_libraries(random_sets leeloo)
 add_executable(list_intervals list_intervals.cpp)
 target_link_libraries(list_intervals leeloo)
 
+add_executable(list_intervals_properties list_intervals_properties.cpp)
+target_link_libraries(list_intervals_properties leeloo)
+
 add_executable(list_intervals_at_perf list_intervals_at_perf.cpp)
 target_link_libraries(list_intervals_at_perf leeloo)
 
