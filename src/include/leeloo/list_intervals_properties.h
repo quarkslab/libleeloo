@@ -3,6 +3,7 @@
 
 #include <leeloo/list_intervals.h>
 #include <leeloo/bit_field.h>
+#include <leeloo/sort_permute.h>
 
 #include <iostream>
 
@@ -61,6 +62,8 @@ class PropertiesHorizontal
 		property_type _property;
 	};
 
+	typedef std::vector<Member> list_members;
+
 public:
 	inline void add(interval_type const& interval, property_type const& property)
 	{
@@ -70,15 +73,6 @@ public:
 	inline void add(interval_type&& interval, property_type&& property)
 	{
 		_properties.emplace_back(Member(interval, property));
-	}
-
-	void sort()
-	{
-		std::sort(_properties.begin(), _properties.end(),
-				[](Member const& a, Member const& b)
-				{
-					return a._interval.lower() < b._interval.lower();
-				});
 	}
 
 	inline interval_type const& interval_at(const size_t idx) const
@@ -107,8 +101,14 @@ public:
 
 	inline size_type size() const { return _properties.size(); }
 
+	void clear_storage()
+	{
+		_properties.~list_members();
+		new (&_properties) list_members();
+	}
+
 private:
-	std::vector<Member> _properties;
+	list_members _properties;
 };
 
 }
@@ -136,88 +136,142 @@ public:
 	typedef typename list_intervals_type::base_type base_type;
 
 private:
-	struct properties_ir
+	class properties_ir
 	{
-	private:
+	public:
 		struct elt
 		{
-			base_value x;
+			inline property_type const& property(properties_ir const& ir) const
+			{
+				return ir.property_at(prop_idx);
+			}
+
+			inline bool operator<(elt const& o) const { return x < o.x; }
+
+			base_type x;
 			size_type prop_idx;
 		};
+
 	private:
-		std::vector<elt> _ir;
-		std::vector<properties> _properties;
+		typedef std::vector<elt> list_elts;
+		typedef std::vector<property_type> list_properties;
+
+	public:
+		void add(interval_type const& it, property_type const& prop)
+		{
+			size_type prop_idx = _properties.size();
+			_properties.push_back(prop);
+			add(it, prop_idx);
+		}
+
+		void add(interval_type const& it, property_type&& prop)
+		{
+			size_type prop_idx = _properties.size();
+			_properties.emplace_back(prop);
+			add(it, prop_idx);
+		}
+
+		void reserve(size_type const n)
+		{
+			_ir.reserve(n*2);
+			_actions.reserve(n*2);
+			_properties.reserve(n);
+		}
+
+		void sort()
+		{
+			std::sort(make_sort_permute_iter(_ir.begin(), _actions.begin()),
+				   	  make_sort_permute_iter(_ir.end(), _actions.begin()+size_elts()),
+					  sort_permute_iter_compare<typename list_elts::iterator, typename bit_field::iterator>());
+		}
+
+		void clear_storage()
+		{
+			// AG: it seems that the only way to free memory of an std::vector
+			// of glibc is to call its destructor.
+			_ir.~list_elts();
+			new (&_ir) list_elts();
+
+			_properties.~list_properties();
+			new (&_properties) list_properties();
+
+			_actions.clear_storage();
+		}
+
+		inline property_type const& property_at(size_type i) const { return _properties[i]; }
+		inline elt const& elt_at(size_type i) const { return _ir[i]; }
+		inline bool action_at(size_type i) const { return _actions.get_bit_fast(i); }
+
+		size_type size_elts() const { return _ir.size(); }
+
+	private:
+		void add(interval_type const& it, size_type const prop_idx)
+		{
+			elt e;
+			e.x = it.lower();
+			e.prop_idx = prop_idx;
+			_actions.set_bit(_ir.size());
+			_ir.push_back(e);
+
+			e.x = it.upper();
+			_actions.clear_bit(_ir.size());
+			_ir.push_back(e);
+		}
+
+	private:
+		list_elts _ir;
+		list_properties _properties;
+		// Bit is at 1 for push, 0 for pop
 		bit_field _actions;
 	};
 
 public:
 	inline void add_property(interval_type const& i, property_type const& p)
 	{
-		properties().add(i, p);
+		ir().add(i, p);
 	}
 
 
-	inline void add_property(interval_type&& i, property_type&& p)
+	inline void add_property(interval_type const& i, property_type&& p)
 	{
-		properties().add(i, p);
+		ir().add(i, p);
 	}
 
-	template <class FMerger>
-	void aggregate_properties(FMerger const& fadd, FMerger const& fremove)
+	template <class FAdd, class FRemove>
+	void aggregate_properties(FAdd const& fadd, FRemove const& fremove)
 	{
-		if (properties().size() <= 1) {
+		if (ir().size_elts() == 0) {
+			properties().clear_storage();
 			return;
 		}
+		
+		assert(ir().size_elts() % 2 == 0);
 
-		typedef std::map<base_type, property_type const*> properties_pop_storage
+		ir().sort();
+		typename properties_ir::elt const& first_elt = ir().elt_at(0);
+		base_type prev_value = first_elt.x;
+		property_type cur_property = first_elt.property(ir());
 
-		properties().sort();
-		properties_storage_type ret;
-		interval_type cur_it = properties().interval_at(0);
-		property_type cur_property = properties().property_at(0);
-		properties_pop_storage properties_pop;
-		properties_pop.insert(std::make_pair(cur_it.upper(), &properties().property_at(0));
+		for (size_type i = 1; i < ir().size_elts(); i++) {
+			typename properties_ir::elt const& elt = ir().elt_at(i);
+			const bool action = ir().action_at(i);
 
-		for (size_t i = 1; i < properties().size(); i++) {
-			interval_type const& it = properties().interval_at(i);
-			property_type const& prop = properties().property_at(i);
-			if (it.lower() < cur_it.upper()) {
-				interval_type iret(cur_it.lower(), it.lower());
-				ret.add(std::move(iret), cur_property);
-				
-				fadd(cur_property, properties().property_at(i));
-				properties_pop.emplace(it.upper(), &prop);
+			_properties.add(interval_type(prev_value, elt.x), cur_property);
+			if (action) {
+				// Add the elt property to the current property
+				// TODO: std::move the property ?
+				fadd(cur_property, elt.property(ir()));
 			}
 			else {
-				ret.add(cur_it, cur_property);
-				while (properties_pop.size() > 0) {
-					properties_pop_storage::iterator it_first = properties_pop.begin();
-					if (it_first->first > it.lower()) {
-						break;
-					}
-					fremove(cur_property, *it_first->second);
-					properties_pop_storage::iterator it_next = it_first; it_next++;
-					if (it_next != properties_pop.end()) {
-						ret.add(interval_type(it_first->first, it_next->end), cur_property);
-					}
-					properties_pop.erase(it_first);
-				}
-
-				if (properties_pop.size() > 0) {
-					fadd(cur_property, prop);
-					properties_pop.emplace(it.upper(), &prop);
-
-					interval_type iret(it.lower(), properties_pop().begin()->first);
-					ret.add(std::move(iret), cur_property);
-				}
-				else {
-					ret.add(it, prop);
-				}
+				// Remove the elt property to the current property
+				// TODO: std::move the property ?
+				fremove(cur_property, elt.property(ir()));
 			}
+			prev_value = elt.x;
 		}
 
-		_properties = std::move(ret);
-
+		// Free memory taken by the IR
+		ir().clear_storage();
 	}
 
 	property_type const* property_of(base_type const& v) const
@@ -253,8 +307,12 @@ private:
 	inline properties_storage_type& properties() { return _properties; }
 	inline properties_storage_type const& properties() const { return _properties; }
 
+	inline properties_ir& ir() { return _properties_ir; }
+	inline properties_ir const& ir() const { return _properties_ir; }
+
 private:
 	properties_storage_type _properties;
+	properties_ir _properties_ir;
 };
 
 }

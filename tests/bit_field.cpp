@@ -1,7 +1,9 @@
+#include <leeloo/sort_permute.h>
 #include <leeloo/bit_field.h>
 #include <iostream>
 #include <time.h>
 #include <stdlib.h>
+#include <algorithm>
 
 #define N 1007
 
@@ -52,6 +54,38 @@ int main()
 			std::cerr << "error with negative adv " << i << std::endl;
 			ret = 1;
 		}
+	}
+
+	// Iterator assignation
+	bf.clear_all();
+	it = bf.begin();
+	*it = true;
+	if (bf.get_bit_fast(0) != true) {
+		std::cerr << "error iterator assignation immediate" << std::endl;
+	}
+	std::cout << (*(bf.begin()+1)) << std::endl;
+	*it = *(bf.begin()+1);
+	if (bf.get_bit_fast(0) != false) {
+		std::cerr << "error iterator assignation iterator" << std::endl;
+	}
+
+	int ar1[] = {6, 5, 4, 3, 2};
+	int ar2[] = {0, 1, 2, 3, 4};
+	const size_t n = sizeof(ar1)/sizeof(int);
+	leeloo::bit_field bf2(n);
+	bf2.clear_all();
+	bf2.set_bit(0);
+	for (size_t i = 0; i < n; i++) {
+		std::cout << bf2.get_bit_fast(i) << std::endl;
+	}
+
+	std::cout << "sort" << std::endl;
+	std::sort(leeloo::make_sort_permute_iter(ar1, bf2.begin()), leeloo::make_sort_permute_iter(ar1+n, bf2.begin()+n), leeloo::sort_permute_iter_compare<int*, int*>());
+	for (int i: ar1) {
+		std::cout << i << std::endl;
+	}
+	for (size_t i = 0; i < n; i++) {
+		std::cout << bf2.get_bit_fast(i) << std::endl;
 	}
 
 	return ret;

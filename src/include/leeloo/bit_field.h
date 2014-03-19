@@ -7,6 +7,8 @@
 #include <memory>
 #include <cstring>
 
+#include <iostream>
+
 namespace leeloo {
 
 class bit_field
@@ -31,7 +33,7 @@ public:
 			_bit(0)
 		{ }
 
-		bit_reference(integer_type* chunk, uint8_t bit):
+		explicit bit_reference(integer_type* chunk, uint8_t bit):
 			_chunk(chunk),
 			_bit(bit)
 		{ }
@@ -42,17 +44,21 @@ public:
 		{ }
 
 	public:
-		inline operator bool() const { return (*_chunk) & (one << _bit); }
-		inline bit_reference& operator=(bool const o)
+		inline operator bool() const
 		{
-			if (o) {
+			return (*_chunk) & (one << _bit);
+		}
+
+		inline void set_value(bool const v)
+		{
+			if (v) {
 				*_chunk |= (one << _bit);
 			}
 			else {
 				*_chunk &= ~(one << _bit);
 			}
-			return *this;
 		}
+
 		inline bool operator==(bit_reference const& o) const
 		{
 			return (_chunk == o._chunk) && (_bit == o._bit);
@@ -115,8 +121,36 @@ public:
 		uint8_t _bit;
 	};
 
+	class bit_value
+	{
+	public:
+		bit_value()
+		{ }
+
+		bit_value(bit_reference const& r):
+			_r(r)
+		{ }
+
+	public:
+		inline operator bool() const { return (bool) _r; }
+		inline void operator=(bit_value const& o)
+		{
+			const bool v = (bool) o;
+			_r.set_value(v);
+		}
+		inline void operator=(bool o)
+		{
+			_r.set_value(o);
+		}
+		inline bit_reference& ref() { return _r; }
+		inline bit_reference const& ref() const { return _r; }
+	
+	private:
+		bit_reference _r;
+	};
+
 public:
-	class bitfield_iterator: public boost::iterator_facade<bitfield_iterator, bit_reference, boost::random_access_traversal_tag>
+	class bitfield_iterator: public boost::iterator_facade<bitfield_iterator, bool, boost::random_access_traversal_tag, bit_value>
 	{
 	public:
 		bitfield_iterator()
@@ -129,19 +163,23 @@ public:
 	public:
 		friend class boost::iterator_core_access;
 
-		inline void increment() { _ref.increment(); }
-		inline void decrement() { _ref.decrement(); }
-		inline void advance(ssize_t n) { _ref.advance(n); }
+		inline void increment() { ref().increment(); }
+		inline void decrement() { ref().decrement(); }
+		inline void advance(ssize_t n) { ref().advance(n); }
 		inline bool equal(bitfield_iterator const& o) const
 		{
-			return _ref == o._ref;
+			return ref() == o.ref();
 		}
 		inline ssize_t distance_to(bitfield_iterator const& o) const
 		{
-			return _ref.distance_to(o._ref);
+			return ref().distance_to(o.ref());
 		}
 
-		bit_reference& dereference() const { return const_cast<bitfield_iterator*>(this)->_ref; }
+		bit_value dereference() const { return bit_value(const_cast<bitfield_iterator*>(this)->_ref); }
+
+	private:
+		inline bit_reference& ref() { return _ref; }
+		inline bit_reference const& ref() const { return _ref; }
 
 	private:
 		bit_reference _ref;

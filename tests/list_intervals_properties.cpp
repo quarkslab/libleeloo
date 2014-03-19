@@ -80,22 +80,41 @@ int main(int argc, char** argv)
 	list.add_property(interval(16, 20), {5});
 	list.add_property(interval(1, 20), {6});
 	list.aggregate();
-	list.aggregate_properties([](property& org, property const& o)
+	list.aggregate_properties(
+			[](property& org, property const& o)
 			{
 				for (int i: o) {
 					org.push_back(i);
+				}
+			},
+			[](property& org, property const& o)
+			{
+				property::iterator it;
+				for (int i: o) {
+					it = std::find(org.begin(), org.end(), i);
+					if (it != org.end()) {
+						org.erase(it);
+					}
 				}
 			});
 
 	print_intervals(list);
 	property const* p;
+	p = list.property_of(1);
+	print_property(*p);
 	p = list.property_of(5);
 	print_property(*p);
-	p = list.property_of(8);
+	p = list.property_of(6);
 	print_property(*p);
 	p = list.property_of(9);
 	print_property(*p);
-	p = list.property_of(10);
+	p = list.property_of(12);
+	print_property(*p);
+	p = list.property_of(15);
+	print_property(*p);
+	p = list.property_of(16);
+	print_property(*p);
+	p = list.property_of(18);
 	print_property(*p);
 
 	return 0;
