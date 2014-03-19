@@ -2,6 +2,8 @@
 #define LEELOO_LIST_INTERVALS_PROPERTIES_H
 
 #include <leeloo/list_intervals.h>
+#include <leeloo/bit_field.h>
+
 #include <iostream>
 
 namespace leeloo {
@@ -132,6 +134,21 @@ public:
 	typedef list_intervals<interval_type, size_type> list_intervals_type;
 	typedef typename PropertiesStorage::template bind<interval_type, property_type, size_type>::result properties_storage_type;
 	typedef typename list_intervals_type::base_type base_type;
+
+private:
+	struct properties_ir
+	{
+	private:
+		struct elt
+		{
+			base_value x;
+			size_type prop_idx;
+		};
+	private:
+		std::vector<elt> _ir;
+		std::vector<properties> _properties;
+		bit_field _actions;
+	};
 
 public:
 	inline void add_property(interval_type const& i, property_type const& p)
