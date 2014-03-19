@@ -12,7 +12,7 @@ namespace leeloo {
 namespace __impl {
 
 template <class Interval, class Property, class SizeType>
-class PropertiesHorizontal
+class LEELOO_LOCAL PropertiesHorizontal
 {
 	typedef Interval interval_type;
 	typedef Property property_type;
@@ -136,7 +136,7 @@ public:
 	typedef typename list_intervals_type::base_type base_type;
 
 private:
-	class properties_ir
+	class LEELOO_LOCAL properties_ir
 	{
 	public:
 		struct elt
@@ -304,11 +304,11 @@ public:
 	}
 
 private:
-	inline properties_storage_type& properties() { return _properties; }
-	inline properties_storage_type const& properties() const { return _properties; }
+	LEELOO_LOCAL inline properties_storage_type& properties() { return _properties; }
+	LEELOO_LOCAL inline properties_storage_type const& properties() const { return _properties; }
 
-	inline properties_ir& ir() { return _properties_ir; }
-	inline properties_ir const& ir() const { return _properties_ir; }
+	LEELOO_LOCAL inline properties_ir& ir() { return _properties_ir; }
+	LEELOO_LOCAL inline properties_ir const& ir() const { return _properties_ir; }
 
 private:
 	properties_storage_type _properties;

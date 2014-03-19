@@ -70,7 +70,6 @@ int main()
 	}
 
 	int ar1[] = {6, 5, 4, 3, 2};
-	int ar2[] = {0, 1, 2, 3, 4};
 	const size_t n = sizeof(ar1)/sizeof(int);
 	leeloo::bit_field bf2(n);
 	bf2.clear_all();

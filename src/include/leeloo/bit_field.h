@@ -9,6 +9,8 @@
 
 #include <iostream>
 
+#include <leeloo/exports.h>
+
 namespace leeloo {
 
 class bit_field
@@ -25,7 +27,7 @@ private:
 	static constexpr int ln2_bits_per_chunk = boost::static_log2<bits_per_chunk>::value;
 
 public:
-	class bit_reference
+	class LEELOO_LOCAL bit_reference
 	{
 	public:
 		bit_reference():
@@ -121,7 +123,7 @@ public:
 		uint8_t _bit;
 	};
 
-	class bit_value
+	class LEELOO_LOCAL bit_value
 	{
 	public:
 		bit_value()
@@ -178,8 +180,8 @@ public:
 		bit_value dereference() const { return bit_value(const_cast<bitfield_iterator*>(this)->_ref); }
 
 	private:
-		inline bit_reference& ref() { return _ref; }
-		inline bit_reference const& ref() const { return _ref; }
+		LEELOO_LOCAL inline bit_reference& ref() { return _ref; }
+		LEELOO_LOCAL inline bit_reference const& ref() const { return _ref; }
 
 	private:
 		bit_reference _ref;
@@ -342,17 +344,17 @@ public:
 	}
 
 private:
-	inline integer_type* buffer() { return _buf; }
-	inline integer_type const* buffer() const { return _buf; }
+	LEELOO_LOCAL inline integer_type* buffer() { return _buf; }
+	LEELOO_LOCAL inline integer_type const* buffer() const { return _buf; }
 
-	inline integer_type& chunk_at(size_type const n) { return buffer()[n]; }
-	inline integer_type const& chunk_at(size_type const n) const { return buffer()[n]; }
+	LEELOO_LOCAL inline integer_type& chunk_at(size_type const n) { return buffer()[n]; }
+	LEELOO_LOCAL inline integer_type const& chunk_at(size_type const n) const { return buffer()[n]; }
 
-	inline size_type size_chunks() const { return _size; }
-	inline size_type size_bits() const { return size_chunks()*bits_per_chunk; }
+	LEELOO_LOCAL inline size_type size_chunks() const { return _size; }
+	LEELOO_LOCAL inline size_type size_bits() const { return size_chunks()*bits_per_chunk; }
 
 private:
-	void copy(bit_field const& o)
+	LEELOO_LOCAL void copy(bit_field const& o)
 	{
 		_buf = allocator_type().allocate(o.size_chunks());
 		if (_buf == nullptr) {
@@ -362,7 +364,7 @@ private:
 		memcpy(buffer(), o.buffer(), size_chunks());
 	}
 
-	void move(bit_field&& o)
+	LEELOO_LOCAL void move(bit_field&& o)
 	{
 		_buf = o._buf;
 		_size = o._size;
