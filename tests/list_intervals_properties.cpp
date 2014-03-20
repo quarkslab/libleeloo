@@ -36,6 +36,8 @@
 
 #include <leeloo/interval.h>
 #include <leeloo/list_intervals_properties.h>
+#include <leeloo/list_intervals_with_properties.h>
+#include <leeloo/random.h>
 
 template <class Interval>
 void print_intervals(Interval const& l)
@@ -52,8 +54,9 @@ typedef leeloo::interval<uint32_t> interval;
 // Interval of type [a,b[
 typedef leeloo::list_intervals_properties<interval, property, uint32_t> list_intervals_properties;
 
-void print_property(property const& p)
+void print_property(int v, property const& p)
 {
+	std::cout << v << ": ";
 	for (int i: p) {
 		std::cout << i << ",";
 	}
@@ -68,18 +71,11 @@ int main(int argc, char** argv)
 	}
 
 	list_intervals_properties list;
-	list.add(0, 2);
-	list.add(5, 9);
-	list.add(1, 5);
-	list.add(8, 9);
-	list.add(9, 15);
-	list.add(19, 21);
 	list.add_property(interval(5, 11), {1});
 	list.add_property(interval(9, 14), {2});
 	list.add_property(interval(12, 16), {4});
 	list.add_property(interval(16, 20), {5});
 	list.add_property(interval(1, 20), {6});
-	list.aggregate();
 	list.aggregate_properties(
 			[](property& org, property const& o)
 			{
@@ -98,24 +94,77 @@ int main(int argc, char** argv)
 				}
 			});
 
-	print_intervals(list);
 	property const* p;
 	p = list.property_of(1);
-	print_property(*p);
+	print_property(1, *p);
 	p = list.property_of(5);
-	print_property(*p);
+	print_property(5, *p);
 	p = list.property_of(6);
-	print_property(*p);
+	print_property(6, *p);
 	p = list.property_of(9);
-	print_property(*p);
+	print_property(9, *p);
 	p = list.property_of(12);
-	print_property(*p);
+	print_property(12, *p);
 	p = list.property_of(15);
-	print_property(*p);
+	print_property(15, *p);
 	p = list.property_of(16);
-	print_property(*p);
+	print_property(16, *p);
 	p = list.property_of(18);
-	print_property(*p);
+	print_property(18, *p);
+
+	leeloo::list_intervals_with_properties<leeloo::list_intervals<interval>, property> lip;
+	lip.add(0, 2);
+	lip.add(5, 9);
+	lip.add(1, 5);
+	lip.add(8, 9);
+	lip.add(9, 15);
+	lip.add(19, 21);
+	lip.add_property(interval(5, 11), {1});
+	lip.add_property(interval(9, 14), {2});
+	lip.add_property(interval(12, 16), {4});
+	lip.add_property(interval(16, 20), {5});
+	lip.add_property(interval(1, 20), {6});
+	lip.aggregate();
+	lip.aggregate_properties(
+			[](property& org, property const& o)
+			{
+				for (int i: o) {
+					org.push_back(i);
+				}
+			},
+			[](property& org, property const& o)
+			{
+				property::iterator it;
+				for (int i: o) {
+					it = std::find(org.begin(), org.end(), i);
+					if (it != org.end()) {
+						org.erase(it);
+					}
+				}
+			});
+	lip.create_index_cache(16);
+
+	std::cout << "random_sets_with_properties" << std::endl;
+
+	boost::random::mt19937 mt_rand(time(NULL));
+	lip.random_sets_with_properties(4,
+		[](uint32_t const* ints, property const* const* properties, size_t n)
+		{
+			for (size_t i = 0; i < n; i++) {
+				std::cout << ints[i] << ": ";
+				property const* p = properties[i];
+				if (p == nullptr) {
+					std::cout << "no properties";
+				}
+				else {
+					for (int i: *p) {
+						std::cout << i << ",";
+					}
+				}
+				std::cout << std::endl;
+			}
+		},
+		leeloo::random_engine<uint32_t>(mt_rand));
 
 	return 0;
 }

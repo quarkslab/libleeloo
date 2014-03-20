@@ -124,16 +124,15 @@ public:
 };
 
 template <class Interval, class Property, class SizeType = uint32_t, class PropertiesStorage = PropertiesHorizontal>
-class list_intervals_properties: public list_intervals<Interval, SizeType>
+class list_intervals_properties
 {
 public:
 	typedef Interval interval_type;
 	typedef SizeType size_type;
 	typedef Property property_type;
+	typedef typename interval_type::base_type base_type;
 
-	typedef list_intervals<interval_type, size_type> list_intervals_type;
 	typedef typename PropertiesStorage::template bind<interval_type, property_type, size_type>::result properties_storage_type;
-	typedef typename list_intervals_type::base_type base_type;
 
 private:
 	class LEELOO_LOCAL properties_ir
