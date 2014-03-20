@@ -82,13 +82,13 @@ private:
 
     void advance(difference_type n)
     {
-        _ci += n;
-        _vi += n;
+        std::advance(_ci, n);
+        std::advance(_vi, n);
     }
 
     difference_type distance_to(sort_permute_iter const& other) const
     {
-        return ( other._ci - _ci);
+        return std::distance( _ci, other._ci );
     }
 };
 
@@ -123,11 +123,11 @@ make_sort_permute_iter(SortIter ci, PermuteIter vi)
 namespace std {
 
 template <class A, class B>
-void swap(std::tuple<A&, B> const& a,
-          std::tuple<A&, B> const& b)
+void swap(std::tuple<A&, B> && a,
+          std::tuple<A&, B> && b)
 {
 	std::swap(std::get<0>(a), std::get<0>(b));
-	std::swap(const_cast<B&>(std::get<1>(a)), const_cast<B&>(std::get<1>(b)));
+	std::swap(std::get<1>(a), std::get<1>(b));
 }
 
 }
