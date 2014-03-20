@@ -19,17 +19,22 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/leeloo/instances_exported.h.i
 set(HEADER_DIST_FILES
 	include/leeloo/atomic_helpers.h
 	include/leeloo/bench.h
+	include/leeloo/bit_field.h
 	include/leeloo/bits_permutation.h
 	include/leeloo/exports.h
 	include/leeloo/helpers.h
 	include/leeloo/interval.h
 	include/leeloo/intrinsics.h
 	include/leeloo/ip_list_intervals.h
+	include/leeloo/ip_list_intervals_with_properties.h
 	include/leeloo/ips_parser.h
 	include/leeloo/list_intervals.h
+	include/leeloo/list_intervals_properties.h
+	include/leeloo/list_intervals_with_properties.h
 	include/leeloo/math_helpers.h
 	include/leeloo/prime_helpers.h
 	include/leeloo/random.h
+	include/leeloo/sort_permute.h
 	include/leeloo/uni.h
 	include/leeloo/uprng.h
 	include/leeloo/utility.h

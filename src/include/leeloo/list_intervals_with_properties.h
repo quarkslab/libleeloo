@@ -63,10 +63,26 @@ public:
 		properties().add_property(i, std::move(p));
 	}
 
+	inline void add_property(base_type const a, base_type const b, property_type const& p)
+	{
+		properties().add_property(a, b, p);
+	}
+
+	inline void add_property(base_type const a, base_type const b, property_type&& p)
+	{
+		properties().add_property(a, b, std::move(p));
+	}
+
 	template <class FAdd, class FRemove>
 	inline void aggregate_properties(FAdd const& fadd, FRemove const& fremove)
 	{
 		properties().aggregate_properties(fadd, fremove);
+	}
+
+	template <class FAdd, class FRemove, class FDuplicate>
+	inline void aggregate_properties(FAdd const& fadd, FRemove const& fremove, FDuplicate const& fdup)
+	{
+		properties().aggregate_properties(fadd, fremove, fdup);
 	}
 
 	inline property_type const* property_of(base_type const& v) const

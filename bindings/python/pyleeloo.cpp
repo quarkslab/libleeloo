@@ -35,6 +35,7 @@
 #include <fcntl.h>
 
 #include <leeloo/ip_list_intervals.h>
+#include <leeloo/ip_list_intervals_with_properties.h>
 #include <leeloo/ips_parser.h>
 #include <leeloo/list_intervals.h>
 #include <leeloo/random.h>
@@ -141,6 +142,95 @@ static void u64_list_random_sets(u64_list_intervals const& l, size_t const size_
 				  leeloo::random_engine<uint64_t>(g_mt_rand));
 }
 
+// Properties
+typedef object property_python;
+
+template <class Integer, class Property>
+class set_properties_read_only
+{
+public:
+	typedef Integer const* iterator;
+
+public:
+	set_properties_read_only():
+		_buf(nullptr),
+		_properties(nullptr),
+		_size(0)
+	{ }
+
+	set_properties_read_only(Integer const* buf, Property const* const* properties, size_t const size):
+		_buf(buf),
+		_properties(properties),
+		_size(size)
+	{ }
+
+public:
+	inline Integer at(size_t idx) const
+	{
+		assert(idx < _size);
+		return _buf[idx];
+	}
+
+	inline Property const* property_at(size_t idx) const
+	{
+		assert(idx < _size);
+		return _properties[idx];
+	}
+
+	inline size_t size() const { return _size; }
+
+private:
+	Integer const* _buf;
+	Property const* const* _properties;
+	size_t _size;
+};
+
+// IP intervals with properties
+typedef leeloo::ip_list_intervals_with_properties<property_python> ip_list_intervals_with_properties_python;
+typedef set_properties_read_only<uint32_t, property_python> u32_set_properties_read_only_python;
+
+void (ip_list_intervals_with_properties_python::*ip_add_property1)(uint32_t const, uint32_t, property_python const& p) = &ip_list_intervals_with_properties_python::add_property;
+void (ip_list_intervals_with_properties_python::*ip_add_property2)(leeloo::ip_interval const&, property_python const&p)        = &ip_list_intervals_with_properties_python::add_property;
+
+static property_python u32_set_properties_read_only_python_property_at_wrapper(u32_set_properties_read_only_python const& s, size_t idx)
+{
+	property_python const* p = s.property_at(idx);
+	if (p == nullptr) {
+		return property_python();
+	}
+	return *p;
+}
+
+static void ip_list_intervals_with_properties_python_aggregate_properties(ip_list_intervals_with_properties_python& l, object& fadd, object& fremove)
+{
+	const object copyMod = import("copy");
+	const object deepcopy = copyMod.attr("deepcopy");
+	l.aggregate_properties(fadd, fremove,
+		[&deepcopy](property_python const& p)
+		{
+			return deepcopy(p);
+		});
+}
+
+static void ip_list_with_properties_python_random_sets_with_properties(ip_list_intervals_with_properties_python const& l, size_t const size_div, object& f_set)
+{
+	l.random_sets_with_properties(size_div, 
+		[&f_set](uint32_t const* buf, property_python const* const* props, size_t const size)
+		{
+			f_set(u32_set_properties_read_only_python(buf, props, size));
+		}
+		,
+		leeloo::random_engine<uint64_t>(g_mt_rand));
+}
+
+static property_python ip_list_intervals_with_properties_python_property_of_wrapper(ip_list_intervals_with_properties_python const& l, uint32_t v)
+{
+	property_python const* p = l.property_of(v);
+	if (p == nullptr) {
+		return property_python();
+	}
+	return *p;
+}
 
 BOOST_PYTHON_MODULE(pyleeloo)
 {
@@ -196,10 +286,42 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("read_from_file", &u64_list_intervals::read_from_file)
 		.def("__iter__", iterator<u64_list_intervals>());
 
+	class_<ip_list_intervals_with_properties_python>("ip_list_intervals_with_properties")
+		.def("add", ip_add1)
+		.def("add", ip_add2)
+		.def("add", ip_add3)
+		.def("add", ip_add4)
+		.def("remove", ip_remove1)
+		.def("remove", ip_remove2)
+		.def("remove", ip_remove3)
+		.def("remove", ip_remove4)
+		.def("add_property", ip_add_property1)
+		.def("add_property", ip_add_property2)
+		.def("aggregate", &ip_list_intervals_with_properties_python::aggregate)
+		.def("aggregate_properties", &ip_list_intervals_with_properties_python_aggregate_properties)
+		.def("property_of", &ip_list_intervals_with_properties_python_property_of_wrapper)
+		.def("create_index_cache", &ip_list_intervals_with_properties_python::create_index_cache)
+		.def("size", &ip_list_intervals_with_properties_python::size)
+		.def("reserve", &ip_list_intervals_with_properties_python::reserve)
+		.def("clear", &ip_list_intervals_with_properties_python::clear)
+		.def("at", &ip_list_intervals_with_properties_python::at)
+		.def("random_sets", &ip_list_random_sets)
+		.def("random_sets_with_properties", &ip_list_with_properties_python_random_sets_with_properties)
+		.def("contains", contains1)
+		.def("contains", contains2)
+		.def("dump_to_file", &ip_list_intervals_with_properties_python::dump_to_file)
+		.def("read_from_file", &ip_list_intervals_with_properties_python::read_from_file)
+		.def("__iter__", iterator<ip_list_intervals_with_properties_python>());
+
 	class_<u32_set_read_only>("u32_set_read_only")
 		.def("at", &u32_set_read_only::at)
 		.def("size", &u32_set_read_only::size)
 		.def("__iter__", iterator<u32_set_read_only>());
+
+	class_<u32_set_properties_read_only_python>("u32_set_properties_read_only_python")
+		.def("at", &u32_set_properties_read_only_python::at)
+		.def("property_at", &u32_set_properties_read_only_python_property_at_wrapper)
+		.def("size", &u32_set_properties_read_only_python::size);
 
 	class_<u64_set_read_only>("u64_set_read_only")
 		.def("at", &u64_set_read_only::at)

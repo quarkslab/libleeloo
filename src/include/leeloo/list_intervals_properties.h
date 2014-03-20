@@ -222,6 +222,12 @@ private:
 		bit_field _actions;
 	};
 
+	struct no_property_duplicate
+	{
+		template <class T>
+		inline T const& operator()(T const& t) const { return t; }
+	};
+
 public:
 	inline void add_property(interval_type const& i, property_type const& p)
 	{
@@ -234,8 +240,24 @@ public:
 		ir().add(i, std::move(p));
 	}
 
+	inline void add_property(base_type const a, base_type const b, property_type const& p)
+	{
+		add_property(interval_type(a, b), p);
+	}
+
+	inline void add_property(base_type const a, base_type const b, property_type&& p)
+	{
+		add_property(interval_type(a, b), std::move(p));
+	}
+
 	template <class FAdd, class FRemove>
 	void aggregate_properties(FAdd const& fadd, FRemove const& fremove)
+	{
+		aggregate_properties(fadd, fremove, no_property_duplicate());
+	}
+
+	template <class FAdd, class FRemove, class FDuplicate>
+	void aggregate_properties(FAdd const& fadd, FRemove const& fremove, FDuplicate const& fdup)
 	{
 		if (ir().size_elts() == 0) {
 			properties().clear_storage();
@@ -253,7 +275,7 @@ public:
 			typename properties_ir::elt const& elt = ir().elt_at(i);
 			const bool action = ir().action_at(i);
 
-			_properties.add(interval_type(prev_value, elt.x), cur_property);
+			_properties.add(interval_type(prev_value, elt.x), fdup(cur_property));
 			if (action) {
 				// Add the elt property to the current property
 				// TODO: std::move the property ?
