@@ -31,13 +31,12 @@ class LEELOO_LOCAL PropertiesHorizontal
 		{ }
 
 		Member(Member const& member):
-			_interval(member._interval),
-			_property(member._property)
+            Member(member._interval, member._property)
 		{ }
 
 		Member(Member&& member):
-			_interval(member._interval),
-			_property(member._property)
+			_interval(std::move(member._interval)),
+			_property(std::move(member._property))
 		{ }
 
 		Member& operator=(Member const& o)
@@ -103,6 +102,7 @@ public:
 
 	void clear_storage()
 	{
+        // trick to force deallocation of the underlying vector
 		_properties.~list_members();
 		new (&_properties) list_members();
 	}
@@ -206,9 +206,7 @@ private:
 	private:
 		void add(interval_type const& it, size_type const prop_idx)
 		{
-			elt e;
-			e.x = it.lower();
-			e.prop_idx = prop_idx;
+			elt e = {it.lower(), prop_idx};
 			_actions.set_bit(_ir.size());
 			_ir.push_back(e);
 
@@ -233,7 +231,7 @@ public:
 
 	inline void add_property(interval_type const& i, property_type&& p)
 	{
-		ir().add(i, p);
+		ir().add(i, std::move(p));
 	}
 
 	template <class FAdd, class FRemove>
