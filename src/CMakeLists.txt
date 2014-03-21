@@ -7,6 +7,7 @@ foreach (INC ${LEELOO_INCLUDE})
 endforeach()
 
 set(SRC_FILES
+	bit_field.cpp
 	helpers.cpp
 	ip_list_intervals.cpp
 	ips_parser.cpp
