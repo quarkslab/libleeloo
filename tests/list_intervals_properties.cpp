@@ -65,10 +65,7 @@ void print_property(int v, property const& p)
 
 int main(int argc, char** argv)
 {
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " n" << std::endl;
-		return 1;
-	}
+	srand(time(NULL));
 
 	list_intervals_properties list;
 	list.add_property(interval(5, 11), {1});
