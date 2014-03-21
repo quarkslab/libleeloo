@@ -189,8 +189,9 @@ private:
 typedef leeloo::ip_list_intervals_with_properties<property_python> ip_list_intervals_with_properties_python;
 typedef set_properties_read_only<uint32_t, property_python> u32_set_properties_read_only_python;
 
-void (ip_list_intervals_with_properties_python::*ip_add_property1)(uint32_t const, uint32_t, property_python const& p) = &ip_list_intervals_with_properties_python::add_property;
-void (ip_list_intervals_with_properties_python::*ip_add_property2)(leeloo::ip_interval const&, property_python const&p)        = &ip_list_intervals_with_properties_python::add_property;
+void (ip_list_intervals_with_properties_python::*ip_add_property1)(uint32_t const, uint32_t, property_python const& p)  = &ip_list_intervals_with_properties_python::add_property;
+void (ip_list_intervals_with_properties_python::*ip_add_property2)(leeloo::ip_interval const&, property_python const&p) = &ip_list_intervals_with_properties_python::add_property;
+void (ip_list_intervals_with_properties_python::*ip_add_property3)(const char*, property_python const&p)                = &ip_list_intervals_with_properties_python::add_property;
 
 static property_python u32_set_properties_read_only_python_property_at_wrapper(u32_set_properties_read_only_python const& s, size_t idx)
 {
@@ -237,6 +238,15 @@ static void ip_list_with_properties_python_random_sets_with_properties(ip_list_i
 static property_python ip_list_intervals_with_properties_python_property_of_wrapper(ip_list_intervals_with_properties_python const& l, uint32_t v)
 {
 	property_python const* p = l.property_of(v);
+	if (p == nullptr) {
+		return property_python();
+	}
+	return *p;
+}
+
+static property_python ip_list_intervals_with_properties_python_property_of_wrapper_str(ip_list_intervals_with_properties_python const& l, const char* str)
+{
+	property_python const* p = l.property_of(str);
 	if (p == nullptr) {
 		return property_python();
 	}
@@ -308,10 +318,12 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("remove", ip_remove4)
 		.def("add_property", ip_add_property1)
 		.def("add_property", ip_add_property2)
+		.def("add_property", ip_add_property3)
 		.def("aggregate", &ip_list_intervals_with_properties_python::aggregate)
 		.def("aggregate_properties", &ip_list_intervals_with_properties_python_aggregate_properties)
 		.def("aggregate_properties_no_rem", &ip_list_intervals_with_properties_python_aggregate_properties_no_rem)
 		.def("property_of", &ip_list_intervals_with_properties_python_property_of_wrapper)
+		.def("property_of", &ip_list_intervals_with_properties_python_property_of_wrapper_str)
 		.def("create_index_cache", &ip_list_intervals_with_properties_python::create_index_cache)
 		.def("size", &ip_list_intervals_with_properties_python::size)
 		.def("reserve", &ip_list_intervals_with_properties_python::reserve)
