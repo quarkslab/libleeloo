@@ -9,6 +9,7 @@
 #include <iterator>
 #include <tuple>
 #include <functional>
+#include <iostream>
 
 namespace leeloo {
 
@@ -82,8 +83,8 @@ private:
 
     void advance(difference_type n)
     {
-        std::advance(_ci, n);
-        std::advance(_vi, n);
+		_ci += n;
+		_vi += n;
     }
 
     difference_type distance_to(sort_permute_iter const& other) const
