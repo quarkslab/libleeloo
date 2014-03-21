@@ -7,13 +7,14 @@
 #include <memory>
 #include <cstring>
 
-#include <iostream>
+#include <utility>
+#include <algorithm>
 
 #include <leeloo/exports.h>
 
 namespace leeloo {
 
-class bit_field
+class LEELOO_API bit_field
 {
 public:
 	typedef size_t integer_type;
@@ -46,6 +47,8 @@ public:
 		{ }
 
 	public:
+		inline int bit() const { return _bit; }
+
 		inline operator bool() const
 		{
 			return (*_chunk) & (one << _bit);
@@ -101,7 +104,7 @@ public:
 			}
 			if (new_bit >= (ssize_t)bits_per_chunk) {
 				_chunk++;
-				_bit = bits_per_chunk-new_bit;
+				_bit = new_bit-bits_per_chunk;
 			}
 			else
 			if (new_bit < 0) {
@@ -146,6 +149,8 @@ public:
 		}
 		inline bit_reference& ref() { return _r; }
 		inline bit_reference const& ref() const { return _r; }
+
+		inline int bit() const { return _r.bit(); }
 	
 	private:
 		bit_reference _r;
@@ -252,6 +257,8 @@ public:
 		memset(buffer(), 0x55, sizeof(integer_type)*size_chunks());
 	}
 
+	void set_random();
+
 	void clear_storage()
 	{
 		if (_buf) {
@@ -322,6 +329,22 @@ public:
 		return chunk_at(bit_index_to_chunk(idx)) & (one<<(bit_index_to_chunk_bit(idx)));
 	}
 
+	bool compare(bit_field const& o) const
+	{
+		if (size_chunks() != o.size_chunks()) {
+			return false;
+		}
+		for (size_type i = 0; i < size_chunks(); i++) {
+			if (chunk_at(i) != o.chunk_at(i)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	inline bool operator!=(bit_field const& o) const { return !compare(o); }
+	inline bool operator==(bit_field const& o) const { return compare(o); }
+
 public:
 	iterator begin() { return bitfield_iterator(bit_reference(_buf, 0)); }
 	iterator end()   { return bitfield_iterator(bit_reference(_buf+_size, 0)); }
@@ -360,8 +383,8 @@ private:
 		if (_buf == nullptr) {
 			throw std::bad_alloc();
 		}
-		_size = size_chunks();
-		memcpy(buffer(), o.buffer(), size_chunks());
+		_size = o.size_chunks();
+		memcpy(buffer(), o.buffer(), size_chunks()*sizeof(integer_type));
 	}
 
 	LEELOO_LOCAL void move(bit_field&& o)
@@ -382,6 +405,18 @@ private:
 	integer_type* _buf;
 	size_t _size;
 };
+
+}
+
+namespace std {
+
+template <>
+void swap(leeloo::bit_field::bit_value& a, leeloo::bit_field::bit_value& b)
+{
+	const bool tmp = b;
+	b = a;
+	a = tmp;
+}
 
 }
 
