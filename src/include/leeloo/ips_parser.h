@@ -41,6 +41,9 @@ class ip_list_intervals;
 
 namespace ips_parser {
 
+typedef void(*interval_callback)(uint32_t a, uint32_t b);
+
+extern LEELOO_API uint32_t ipv4toi(const char* str, bool& valid, int min_dots = 3);
 extern LEELOO_API uint32_t ipv4toi(const char* str, const size_t size, bool& valid, int min_dots = 3);
 
 extern LEELOO_API bool parse_ips_add(ip_list_intervals& l, const char* str);

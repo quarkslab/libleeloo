@@ -29,6 +29,8 @@
 #include <leeloo/ips_parser.h>
 #include <leeloo/ip_list_intervals.h>
 
+#include <string.h>
+
 // This is a closed interval [min, max]
 struct byte_interval
 {
@@ -120,6 +122,11 @@ uint32_t leeloo::ips_parser::ipv4toi(const char* str, const size_t size, bool& v
 
 	valid = (cur_idx <= (2-min_dots));
 	return ret;
+}
+
+uint32_t leeloo::ips_parser::ipv4toi(const char* str, bool& valid, int min_dots)
+{
+	return ipv4toi(str, strlen(str), valid, min_dots);
 }
 
 template <bool exclude>
