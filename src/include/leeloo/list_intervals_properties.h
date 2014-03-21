@@ -5,7 +5,7 @@
 #include <leeloo/bit_field.h>
 #include <leeloo/sort_permute.h>
 
-#include <iostream>
+#include <list>
 
 namespace leeloo {
 
@@ -293,6 +293,56 @@ public:
 		ir().clear_storage();
 	}
 
+	template <class FAdd>
+	void aggregate_properties_no_rem(FAdd const& fadd)
+	{
+		aggregate_properties_no_rem(fadd, no_property_duplicate());
+	}
+
+	template <class FAdd, class FDuplicate>
+	void aggregate_properties_no_rem(FAdd const& fadd, FDuplicate const& fdup)
+	{
+		if (ir().size_elts() == 0) {
+			properties().clear_storage();
+			return;
+		}
+		
+		assert(ir().size_elts() % 2 == 0);
+
+		ir().sort();
+		typename properties_ir::elt const& first_elt = ir().elt_at(0);
+		base_type prev_value = first_elt.x;
+		std::list<property_type const*> cur_properties;
+		cur_properties.push_back(&first_elt.property(ir()));
+		property_type cur_property = first_elt.property(ir());
+
+		for (size_type i = 1; i < ir().size_elts(); i++) {
+			typename properties_ir::elt const& elt = ir().elt_at(i);
+			const bool action = ir().action_at(i);
+
+			_properties.add(interval_type(prev_value, elt.x), fdup(cur_property));
+			property_type const& pelt = elt.property(ir());
+			if (action) {
+				// Add the elt property to the list of current properties
+				cur_properties.push_back(&pelt);
+				// and merge it
+				fadd(cur_property, pelt);
+			}
+			else {
+				// Remove the elt property from the list of current properties
+				typename std::list<property_type const*>::iterator it_prop = std::find(cur_properties.begin(), cur_properties.end(), &pelt);
+				assert(it_prop != cur_properties.end());
+				cur_properties.erase(it_prop);
+				// And remerge everything
+				cur_property = std::move(merge_properties(cur_properties, fadd));
+			}
+			prev_value = elt.x;
+		}
+
+		// Free memory taken by the IR
+		ir().clear_storage();
+	}
+
 	property_type const* property_of(base_type const& v) const
 	{
 		// TODO: somehow factorize this code with list_intervals::contains
@@ -320,6 +370,23 @@ public:
 		}
 
 		return nullptr;
+	}
+
+private:
+	template <class FAdd>
+	LEELOO_LOCAL property_type merge_properties(std::list<property_type const*> const& props, FAdd const& fadd)
+	{
+		property_type ret;
+		if (props.size() == 0) {
+			return ret;
+		}
+		typename std::list<property_type const*>::const_iterator it = props.begin();
+		ret = *(*it);
+		it++;
+		for (; it != props.end(); it++) {
+			fadd(ret, *(*it));
+		}
+		return std::move(ret);
 	}
 
 private:

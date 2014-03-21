@@ -212,6 +212,17 @@ static void ip_list_intervals_with_properties_python_aggregate_properties(ip_lis
 		});
 }
 
+static void ip_list_intervals_with_properties_python_aggregate_properties_no_rem(ip_list_intervals_with_properties_python& l, object& fadd)
+{
+	const object copyMod = import("copy");
+	const object deepcopy = copyMod.attr("deepcopy");
+	l.aggregate_properties_no_rem(fadd,
+		[&deepcopy](property_python const& p)
+		{
+			return deepcopy(p);
+		});
+}
+
 static void ip_list_with_properties_python_random_sets_with_properties(ip_list_intervals_with_properties_python const& l, size_t const size_div, object& f_set)
 {
 	l.random_sets_with_properties(size_div, 
@@ -299,6 +310,7 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("add_property", ip_add_property2)
 		.def("aggregate", &ip_list_intervals_with_properties_python::aggregate)
 		.def("aggregate_properties", &ip_list_intervals_with_properties_python_aggregate_properties)
+		.def("aggregate_properties_no_rem", &ip_list_intervals_with_properties_python_aggregate_properties_no_rem)
 		.def("property_of", &ip_list_intervals_with_properties_python_property_of_wrapper)
 		.def("create_index_cache", &ip_list_intervals_with_properties_python::create_index_cache)
 		.def("size", &ip_list_intervals_with_properties_python::size)

@@ -112,6 +112,38 @@ int main(int argc, char** argv)
 	p = list.property_of(18);
 	print_property(18, *p);
 
+	list_intervals_properties list2;
+	list2.add_property(interval(5, 11), {1});
+	list2.add_property(interval(9, 14), {2});
+	list2.add_property(interval(12, 16), {4});
+	list2.add_property(interval(16, 20), {5});
+	list2.add_property(interval(1, 20), {6});
+	list2.aggregate_properties_no_rem(
+			[](property& org, property const& o)
+			{
+				for (int i: o) {
+					org.push_back(i);
+				}
+			});
+	for (size_t i = 0; i < 20; i++) {
+		property const* ref = list.property_of(i);
+		property const* cmp = list2.property_of(i);
+		if (ref == nullptr) {
+			if (cmp != nullptr) {
+				std::cerr << "error with " << i << std::endl;
+			}
+			continue;
+		}
+		else
+		if (cmp == nullptr) {
+			std::cerr << "error with " << i << std::endl;
+			continue;
+		}
+		if (*ref != *cmp) {
+			std::cerr << "error with " << i << std::endl;
+		}
+	}
+
 	leeloo::list_intervals_with_properties<leeloo::list_intervals<interval>, property> lip;
 	lip.add(0, 2);
 	lip.add(5, 9);

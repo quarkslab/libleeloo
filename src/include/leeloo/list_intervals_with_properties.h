@@ -85,6 +85,18 @@ public:
 		properties().aggregate_properties(fadd, fremove, fdup);
 	}
 
+	template <class FAdd>
+	inline void aggregate_properties_no_rem(FAdd const& fadd)
+	{
+		properties().aggregate_properties_no_rem(fadd);
+	}
+
+	template <class FAdd, class FDuplicate>
+	inline void aggregate_properties_no_rem(FAdd const& fadd, FDuplicate const& fdup)
+	{
+		properties().aggregate_properties_no_rem(fadd, fdup);
+	}
+
 	inline property_type const* property_of(base_type const& v) const
 	{
 		return properties().property_of(v);
