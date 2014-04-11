@@ -124,7 +124,6 @@ private:
 	void init_prime(integer_type const max)
 	{
 		_prime = find_previous_matching_prime(max);
-		assert(_prime != 0);
 		_max = max;
 	}
 
