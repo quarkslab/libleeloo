@@ -91,6 +91,7 @@ private:
 	size_t _size;
 };
 
+typedef set_read_only<uint16_t> u16_set_read_only;
 typedef set_read_only<uint32_t> u32_set_read_only;
 typedef set_read_only<uint64_t> u64_set_read_only;
 
@@ -124,6 +125,22 @@ static uint32_t python_ipv4toi1(const char* ip)
 static uint32_t python_ipv4toi2(const char* ip, bool& valid)
 {
 	return leeloo::ips_parser::ipv4toi(ip, strlen(ip), valid);
+}
+
+// uint16 intervals
+//
+
+typedef leeloo::interval<uint16_t> u16_interval;
+typedef leeloo::list_intervals<u16_interval> u16_list_intervals;
+
+void (u16_list_intervals::*u16_add1)(u16_list_intervals::base_type const, u16_list_intervals::base_type const) = &u16_list_intervals::add;
+void (u16_list_intervals::*u16_add2)(u16_list_intervals const&)                                                = &u16_list_intervals::add;
+
+static void u16_list_random_sets(u16_list_intervals const& l, size_t const size_div, object& f_set)
+{
+	l.random_sets(size_div,
+	              [&f_set](uint16_t const* buf, size_t const size) { f_set(u16_set_read_only(buf, size)); },
+				  leeloo::random_engine<uint16_t>(g_mt_rand));
 }
 
 // uint64 intervals
@@ -264,6 +281,13 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("set_lower", &leeloo::ip_interval::set_lower)
 		.def("set_upper", &leeloo::ip_interval::set_upper);
 
+	class_<u16_interval>("u16_interval")
+		.def("assign", &u16_interval::assign)
+		.def("lower", &u16_interval::lower)
+		.def("upper", &u16_interval::upper)
+		.def("set_lower", &u16_interval::set_lower)
+		.def("set_upper", &u16_interval::set_upper);
+
 	class_<u64_interval>("u64_interval")
 		.def("assign", &u64_interval::assign)
 		.def("lower", &u64_interval::lower)
@@ -292,6 +316,20 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("dump_to_file", &leeloo::ip_list_intervals::dump_to_file)
 		.def("read_from_file", &leeloo::ip_list_intervals::read_from_file)
 		.def("__iter__", iterator<leeloo::ip_list_intervals>());
+
+	class_<u16_list_intervals>("u16_list_intervals")
+		.def("add", u16_add1)
+		.def("add", u16_add2)
+		.def("aggregate", &u16_list_intervals::aggregate)
+		.def("create_index_cache", &u16_list_intervals::create_index_cache)
+		.def("size", &u16_list_intervals::size)
+		.def("reserve", &u16_list_intervals::reserve)
+		.def("clear", &u16_list_intervals::clear)
+		.def("at", &u16_list_intervals::at)
+		.def("random_sets", &u16_list_random_sets)
+		.def("dump_to_file", &u16_list_intervals::dump_to_file)
+		.def("read_from_file", &u16_list_intervals::read_from_file)
+		.def("__iter__", iterator<u16_list_intervals>());
 
 	class_<u64_list_intervals>("u64_list_intervals")
 		.def("add", u64_add1)
@@ -336,6 +374,11 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("dump_to_file", &ip_list_intervals_with_properties_python::dump_to_file)
 		.def("read_from_file", &ip_list_intervals_with_properties_python::read_from_file)
 		.def("__iter__", iterator<ip_list_intervals_with_properties_python>());
+
+	class_<u16_set_read_only>("u16_set_read_only")
+		.def("at", &u16_set_read_only::at)
+		.def("size", &u16_set_read_only::size)
+		.def("__iter__", iterator<u16_set_read_only>());
 
 	class_<u32_set_read_only>("u32_set_read_only")
 		.def("at", &u32_set_read_only::at)
