@@ -61,7 +61,7 @@ int main()
 	l.add("172.16.0/24");
 	l.add("10.1.1.1");
 
-	uint32_t intervals_before[] = {
+	uint32_t intervals_before[] = {
 		0xa010406, 0xa010408,   // 10.1.4.6-7
 		0xa010506, 0xa010508,   // 1O.1.5.6-7
 		0xa020406, 0xa020408,   // 10.2.4.6-7
