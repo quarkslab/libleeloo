@@ -1,3 +1,31 @@
+/* 
+ * Copyright (c) 2014, Quarkslab
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * - Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * - Neither the name of Quarkslab nor the names of its contributors may be used
+ * to endorse or promote products derived from this software without specific
+ * prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #include <leeloo/sort_permute.h>
 #include <leeloo/bit_field.h>
 #include <iostream>
@@ -7,7 +35,7 @@
 
 #define N 100007
 
-int main(int argc, char** argv)
+int main()
 {
 	srand(time(NULL));
 
@@ -30,16 +58,13 @@ int main(int argc, char** argv)
 	}
 
 	bf.set_random();
-	ssize_t idxes[] = {100, 67, -49, 62, 1000, -1007, 5000, -654, -50, -51, 90};
 	it = bf.begin();
-	ssize_t idx = 0;
-	size_t i = 0;
 	it += 167;
 	it -= 49;
 	it += 62;
 	leeloo::bit_field::iterator it_cmp = bf.begin()+(167-49+62);
 	if (it != it_cmp) {
-		std::cout << "LOL" << std::endl;
+		std::cerr << "error random access with iterators" << std::endl;
 	}
 	it = bf.begin();
 	for (size_t i = 0; i < N; i++) {
@@ -81,7 +106,7 @@ int main(int argc, char** argv)
 		std::cerr << "error iterator assignation iterator" << std::endl;
 	}
 
-	int n = atoi(argv[1]);
+	int n = 127;
 	int* ar1 = new int[n];
 	for (int i = 0; i < n; i++) {
 		ar1[i] = i;
@@ -99,20 +124,19 @@ int main(int argc, char** argv)
 	}
 
 	if (bf2_test != bf2_ref) {
-		std::cout << "error copy" << std::endl;
+		std::cerr << "error with copy" << std::endl;
 	}
 
 	bf2.set_random();
 	bf2_ref = bf2;
-	std::cout << "sort " << ar1 << std::endl;
 	std::sort(leeloo::make_sort_permute_iter(ar1, bf2.begin()), leeloo::make_sort_permute_iter(ar1+n, bf2.begin()+n), leeloo::sort_permute_iter_compare<int*, leeloo::bit_field::iterator>());
 	for (int i = 0; i < n; i++) {
 		if (ar1[i] != i) {
-			std::cout << "error array" << std::endl;
+			std::cerr << "error array at index " << i << std::endl;
 		}
 	}
 	if (bf2 != bf2_ref) {
-		std::cout << "error" << std::endl;
+		std::cerr << "error sort" << std::endl;
 	}
 
 	return ret;

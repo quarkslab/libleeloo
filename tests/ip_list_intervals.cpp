@@ -29,15 +29,29 @@
 #include <leeloo/ip_list_intervals.h>
 #include <iostream>
 
-void print_intervals(leeloo::ip_list_intervals const& l)
+int compare_intervals(leeloo::ip_list_intervals const& l, uint32_t const* const ref, size_t const ninter)
 {
-	for (auto const& i: l.intervals()) {
-		std::cout << std::hex << i.lower() << "\t" << i.upper() << std::endl;
+	if (l.intervals().size() != ninter) {
+		std::cerr << "bad number of intervals" << std::endl;
+		return 1;
 	}
+	int ret = 0;
+	size_t i = 0;
+	for (auto const& it: l.intervals()) {
+		if ((it.lower() != ref[2*i]) ||
+			(it.upper() != ref[2*i+1])) {
+			std::cerr << "invalid interval at index " << i << std::endl;
+			ret = 1;
+		}
+		i++;
+	}
+	return ret;
 }
 
 int main()
 {
+	int ret = 0;
+
 	leeloo::ip_list_intervals l;
 	l.add("10.1-2.4-5.6-7");
 	l.add("192.168.0.0/24");
@@ -47,13 +61,35 @@ int main()
 	l.add("172.16.0/24");
 	l.add("10.1.1.1");
 
-	print_intervals(l);
+	uint32_t intervals_before[] = {
+		0xa010406, 0xa010408,   // 10.1.4.6-7
+		0xa010506, 0xa010508,   // 1O.1.5.6-7
+		0xa020406, 0xa020408,   // 10.2.4.6-7
+		0xa020506, 0xa020508,   // 10.2.5.6-7
+		0xc0a80000, 0xc0a80100, // 192.168.0.0/24
+		0xa000001, 0xa000002,   // 10.0.0.1
+		0xa000002, 0xa000003,   // 10.0.0.2
+		0xc0a80001, 0xc0a80002, // 192.168.0.1
+		0xac100000, 0xac100100, // 172.16.0/24
+		0xa010101, 0xa010102    // 10.1.1.1
+	};
+
+	ret = compare_intervals(l, intervals_before, sizeof(intervals_before)/(2*sizeof(uint32_t)));
 
 	l.aggregate();
 
-	std::cout << "---------------" << std::endl;
+	uint32_t intervals_after[] = {
+		0xa000001, 0xa000003,
+		0xa010101, 0xa010102,
+		0xa010406, 0xa010408,
+		0xa010506, 0xa010508,
+		0xa020406, 0xa020408,
+		0xa020506, 0xa020508,
+		0xac100000, 0xac100100,
+		0xc0a80000, 0xc0a80100
+	};
 
-	print_intervals(l);
+	ret = compare_intervals(l, intervals_after, sizeof(intervals_after)/(2*sizeof(uint32_t)));
 
-	return 0;
+	return ret;
 }

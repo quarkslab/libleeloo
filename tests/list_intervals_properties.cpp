@@ -63,8 +63,41 @@ void print_property(int v, property const& p)
 	std::cout << std::endl;
 }
 
-int main(int argc, char** argv)
+
+template <size_t N, class O, class T>
+bool compare(O const& o, std::array<T, N> const& ref) 
 {
+    if (o.size() != N) {
+        return false;
+    }   
+    size_t i = 0;
+    for (T const& v: o) {
+        if (v != ref[i]) {
+            return false;
+        }   
+        i++;
+    }   
+    return true;
+
+}
+
+template <size_t N>
+int check_property(list_intervals_properties const& list, size_t idx, std::array<int, N> const& v)
+{
+	property const* p;
+	p = list.property_of(idx);
+	if (!compare<N>(*p, v)) {
+		std::cerr << "Error, expected:" << std::endl; 
+		print_property(idx, *p);
+		return 1;
+	}
+	return 0;
+}
+
+
+int main()
+{
+	int ret = 0;
 	srand(time(NULL));
 
 	list_intervals_properties list;
@@ -91,23 +124,14 @@ int main(int argc, char** argv)
 				}
 			});
 
-	property const* p;
-	p = list.property_of(1);
-	print_property(1, *p);
-	p = list.property_of(5);
-	print_property(5, *p);
-	p = list.property_of(6);
-	print_property(6, *p);
-	p = list.property_of(9);
-	print_property(9, *p);
-	p = list.property_of(12);
-	print_property(12, *p);
-	p = list.property_of(15);
-	print_property(15, *p);
-	p = list.property_of(16);
-	print_property(16, *p);
-	p = list.property_of(18);
-	print_property(18, *p);
+	ret = check_property<1>(list, 1, {{6}}); // double braces makes compiler happy!
+	ret = check_property<2>(list, 5, {{6, 1}});
+	ret = check_property<2>(list, 6, {{6, 1}});
+	ret = check_property<3>(list, 9, {{6, 1, 2}});
+	ret = check_property<3>(list, 12, {{6, 2, 4}});
+	ret = check_property<2>(list, 15, {{6, 4}});
+	ret = check_property<2>(list, 16, {{6, 5}});
+	ret = check_property<2>(list, 18, {{6, 5}});
 
 	list_intervals_properties list2;
 	list2.add_property(interval(5, 11), {1});
@@ -128,16 +152,19 @@ int main(int argc, char** argv)
 		if (ref == nullptr) {
 			if (cmp != nullptr) {
 				std::cerr << "error with " << i << std::endl;
+				ret = 1;
 			}
 			continue;
 		}
 		else
 		if (cmp == nullptr) {
 			std::cerr << "error with " << i << std::endl;
+			ret = 1;
 			continue;
 		}
 		if (*ref != *cmp) {
 			std::cerr << "error with " << i << std::endl;
+			ret = 1;
 		}
 	}
 
@@ -195,5 +222,5 @@ int main(int argc, char** argv)
 		},
 		leeloo::random_engine<uint32_t>(mt_rand));
 
-	return 0;
+	return ret;
 }

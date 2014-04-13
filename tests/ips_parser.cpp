@@ -41,65 +41,86 @@ void print_intervals(leeloo::ip_list_intervals const& l)
 	}
 }
 
+int test_dashes(const char* str, leeloo::ip_list_intervals const& ref)
+{
+	std::cout << "Test with " << str << std::endl;
+
+	leeloo::ip_list_intervals out;
+	leeloo::ips_parser::parse_ips(out, str);
+	if (out != ref) {
+		std::cerr << "Error parsing " << str << "..." << std::endl;
+		std::cerr << "got:" << std::endl;
+		print_intervals(out);
+		std::cerr << "expected:" << std::endl;
+		print_intervals(ref);
+		return 1;
+	}
+	return 0;
+}
+
 int main()
 {
 	bool valid;
-	uint32_t ret;
+	uint32_t ret = 0;
 
-#define TEST_IPV4I(str, res)\
-	ret = leeloo::ips_parser::ipv4toi(str, strlen(str), valid);\
-	std::cout << str << "\t" << valid << "\t" << std::hex << ret << std::endl;\
-	if (ret != res) {\
-		std::cerr << "Results is invalid: " << res << " expected." << std::endl;\
-		return 1;\
+	std::cerr << std::hex;
+
+#define TEST_IPV4I(str, res, valid_)\
+	ret = leeloo::ips_parser::ipv4toi(str, valid);\
+	std::cout << "Test with " << str << "\t" << valid << "\t" << std::hex << ret << std::endl;\
+	if (valid != valid_) {\
+		std::cerr << "Wrongly guessed whether it was valid or not for " << str << std::endl;\
+		ret = 1;\
+	}\
+	else\
+	if (valid && (ret != res)) {\
+		std::cerr << "Results is invalid for " << str << ": was expecting " << res << ", got " << ret << " instead." << std::endl;\
+		ret = 1;\
 	}
 
 #define TEST_IP_PARSER(str, is_valid, ip_start, ip_end)\
 	{\
-		std::cout << str << std::endl;\
+		std::cout << "Test with " << str << std::endl;\
 		leeloo::ip_list_intervals out;\
 		if (leeloo::ips_parser::parse_ips(out, str) != is_valid) {\
-			std::cerr << "Return code of parse_ips isn't valid!" << std::cerr;\
-			return 1;\
+			std::cerr << "Return code of parse_ips isn't valid for " << str << "!" << std::cerr;\
+			ret = 1;\
 		}\
 		out.aggregate();\
 		if (is_valid) {\
 			leeloo::ip_list_intervals ref;\
 			ref.add(leeloo::ips_parser::ipv4toi(ip_start, strlen(ip_start), valid), leeloo::ips_parser::ipv4toi(ip_end, strlen(ip_end), valid));\
 			if (ref != out) {\
-				std::cerr << "Interval computed is bad!" << std::endl;\
-				std::cerr << "out:" << std::endl;\
+				std::cerr << "Interval computed is bad for " << str << "!" << std::endl;\
+				std::cerr << "got:" << std::endl;\
 				print_intervals(out);\
-				std::cerr << "ref:" << std::endl;\
+				std::cerr << "expected:" << std::endl;\
 				print_intervals(ref);\
-				return 1;\
+				ret = 1;\
 			}\
 		}\
 	}
 
 	std::cout << "TEST_IPV4I ipv4toi..." << std::endl;
-	TEST_IPV4I("0.0.0.10", 0x0a);
-	TEST_IPV4I("0.0.10.0", 0x0a00);
-	TEST_IPV4I("0.10.0.0", 0x0a0000);
-	TEST_IPV4I("10.0.0.0", 0x0a000000);
-	TEST_IPV4I("10.10.10.10", 0x0a0a0a0a);
-	TEST_IPV4I("111.111.111.111", 0x6f6f6f6f);
-	TEST_IPV4I("1.11.111.1", 0x010b6f01);
-	TEST_IPV4I("255.255.255.255", 0xffffffff);
-	TEST_IPV4I("255.255..255", 0);
-	TEST_IPV4I("0.0.0.0", 0);
-	TEST_IPV4I("0", 0);
-	TEST_IPV4I("0.0.0.", 0);
-	TEST_IPV4I("0.0.0", 0);
-	TEST_IPV4I("0.1240.0.10", 0);
-	TEST_IPV4I("...", 0);
-	TEST_IPV4I("12.124.5.678", 0);
-	TEST_IPV4I("-12.124.5.678", 0);
-
-	ret = leeloo::ips_parser::ipv4toi("10", 2, valid, 0);
-	std::cout << std::hex;
-	std::cout << "10" << "\t" << valid << "\t" << ret << std::endl;
-
+	TEST_IPV4I("0.0.0.10", 0x0a, true);
+	TEST_IPV4I("0.0.10.0", 0x0a00, true);
+	TEST_IPV4I("0.10.0.0", 0x0a0000, true);
+	TEST_IPV4I("10.0.0.0", 0x0a000000, true);
+	TEST_IPV4I("10.10.10.10", 0x0a0a0a0a, true);
+	TEST_IPV4I("111.111.111.111", 0x6f6f6f6f, true);
+	TEST_IPV4I("1.11.111.1", 0x010b6f01, true);
+	TEST_IPV4I("255.255.255.255", 0xffffffff, true);
+	TEST_IPV4I("255.255..255", 0, false);
+	TEST_IPV4I("0.0.0.0", 0, true);
+	TEST_IPV4I("0", 0, false);
+	TEST_IPV4I("0.0.0.", 0, false);
+	TEST_IPV4I("0.0.0", 0, false);
+	TEST_IPV4I("0.1240.0.10", 0, false);
+	TEST_IPV4I("...", 0, false);
+	TEST_IPV4I("12.124.5.678", 0, false);
+	TEST_IPV4I("-12.124.5.678", 0, false);
+	TEST_IPV4I("10", 0, false);
+	TEST_IPV4I("google.com", 0, false);
 
 	std::cout << "Test ips parser..." << std::endl;
 	TEST_IP_PARSER("10.0.0.0-10.0.0.255", true, "10.0.0.0", "10.0.0.255");
@@ -110,26 +131,26 @@ int main()
 	TEST_IP_PARSER("192.168.10.1/24", true, "192.168.10.0", "192.168.10.255");
 	TEST_IP_PARSER("192.168.10.1/16", true, "192.168.0.0", "192.168.255.255");
 	TEST_IP_PARSER("10/2", true, "0.0.0.0", "63.255.255.255");
+	TEST_IP_PARSER("10--10.1.5.20----25", false, "", "");
 	{
-		std::cout << "10-10.1-1.5-5.20-19" << std::endl;
-		leeloo::ip_list_intervals out;
-		leeloo::ips_parser::parse_ips(out, "10-10.1-1.5-5.20-19");
-		print_intervals(out);
+		leeloo::ip_list_intervals ref;
+		ref.add(leeloo::ips_parser::ipv4toi("10.1.5.19", valid), leeloo::ips_parser::ipv4toi("10.1.5.20", valid));
+		ret = test_dashes("10-10.1-1.5-5.20-19", ref);
 	}
 	{
-		std::cout << "10-15.1-1.5-9.20-25" << std::endl;
-		leeloo::ip_list_intervals out;
-		leeloo::ips_parser::parse_ips(out, "10-15.1-4.5-9.20-25");
-		print_intervals(out);
-	}
-	{
-		std::cout << "10--10.1.5.20----25" << std::endl;
-		leeloo::ip_list_intervals out;
-		if (leeloo::ips_parser::parse_ips(out, "10--10.1.5.20----25")) {
-			std::cerr << "Parsing worked, shouldn't have!" << std::endl;
-			return 1;
+		leeloo::ip_list_intervals ref;
+		for (uint32_t a = 10; a <= 15; a++) {
+			for (uint32_t b = 1; b <= 4; b++) {
+				for (uint32_t c = 5; c <= 9; c++) {
+					const uint32_t ip_a = (a<<24) | (b<<16) | (c<<8) | 20;
+					const uint32_t ip_b = (a<<24) | (b<<16) | (c<<8) | 25;
+					ref.add(ip_a, ip_b);
+				}
+			}
 		}
+
+		ret = test_dashes("10-15.1-4.5-9.20-25", ref);
 	}
 
-	return 0;
+	return ret;
 }

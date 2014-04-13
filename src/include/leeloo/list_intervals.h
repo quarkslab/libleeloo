@@ -348,9 +348,8 @@ public:
 	}
 
 public:
-	void dump_to_file(const char* file)
+	void dump_to_fd(int fd)
 	{
-		int fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
 		if (fd == -1) {
 			throw file_exception();
 		}
@@ -361,6 +360,49 @@ public:
 		    (((size_t)w) != size_write)) {
 			throw file_exception();
 		}
+	}
+
+	void read_from_fd(int fd)
+	{
+		off_t size = lseek(fd, 0, SEEK_END);
+		if (size == -1) {
+			throw file_exception();
+		}
+		if (lseek(fd, 0, SEEK_SET) == -1) {
+			throw file_exception();
+		}
+
+		if (size % sizeof(interval_type) != 0) {
+			throw file_format_exception("invalid size");
+		}
+
+		size_t n = size/sizeof(interval_type);
+		clear();
+		intervals().resize(n);
+		ssize_t r = read(fd, &intervals()[0], size);
+		if (r < 0) {
+			throw file_exception();
+		}
+		if (r != size) {
+			throw file_exception();
+		}
+
+		for (interval_type const& i: intervals()) {
+			if (i.lower() >= i.upper()) {
+				throw file_format_exception("invalid interval");
+			}
+		}
+	}
+
+	void dump_to_file(const char* file)
+	{
+		int fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+		if (fd == -1) {
+			throw file_exception();
+		}
+
+		dump_to_fd(fd);
+
 		close(fd);
 	}
 
@@ -371,35 +413,9 @@ public:
 			throw file_exception();
 		}
 
-		off_t size_file = lseek(fd, 0, SEEK_END);
-		if (size_file == -1) {
-			throw file_exception();
-		}
-		if (lseek(fd, 0, SEEK_SET) == -1) {
-			throw file_exception();
-		}
+		read_from_fd(fd);
 
-		if (size_file % sizeof(interval_type) != 0) {
-			throw file_format_exception("invalid size");
-		}
-
-		size_t n = size_file/sizeof(interval_type);
-		clear();
-		intervals().resize(n);
-		ssize_t r = read(fd, &intervals()[0], size_file);
-		if (r < 0) {
-			throw file_exception();
-		}
-		if (((size_t)r) != size_file) {
-			throw file_exception();
-		}
 		close(fd);
-
-		for (interval_type const& i: intervals()) {
-			if (i.lower() >= i.upper()) {
-				throw file_format_exception("invalid interval");
-			}
-		}
 	}
 
 private:

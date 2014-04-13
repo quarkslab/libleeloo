@@ -79,12 +79,6 @@ static inline uint32_t atoi3(const char* str, const size_t len_int)
 	return cur_int;
 }
 
-static inline uint32_t cidr2size(const int cidr)
-{
-	assert(cidr > 0);
-	return 1U<<(32-cidr);
-}
-
 uint32_t leeloo::ips_parser::ipv4toi(const char* str, const size_t size, bool& valid, int min_dots)
 {
 	if (size == 0) {

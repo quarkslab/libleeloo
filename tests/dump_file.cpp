@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2013, Quarkslab
+ * Copyright (c) 2013-2014, Quarkslab
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -43,25 +43,35 @@ void print_intervals(Interval const& l)
 // Interval of type [a,b[
 typedef leeloo::list_intervals<leeloo::interval<uint32_t>, uint32_t> list_intervals;
 
-int main(int argc, char** argv)
+int main()
 {
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " file" << std::endl;
+	char tmpfile[] = "/tmp/leeloo-test-dump-XXXXXX";
+	int fd_tmp = mkstemp(tmpfile);
+
+	list_intervals ref;
+	ref.add(0, 2);
+	ref.add(5, 9);
+	ref.add(1, 5);
+	ref.add(8, 9);
+	ref.add(9, 15);
+	ref.add(19, 21);
+	ref.aggregate();
+	ref.dump_to_fd(fd_tmp);
+
+	if (lseek(fd_tmp, 0, SEEK_SET) == -1) {
+		perror("lseek");
 		return 1;
 	}
 
-	const char* file = argv[1];
-
 	list_intervals list;
-	list.add(0, 2);
-	list.add(5, 9);
-	list.add(1, 5);
-	list.add(8, 9);
-	list.add(9, 15);
-	list.add(19, 21);
-	list.aggregate();
-	print_intervals(list);
-	list.dump_to_file(file);
+	list.read_from_fd(fd_tmp);
+	if (ref != list) {
+		std::cerr << "Read after dump does not give the same result!" << std::endl;
+		return 1;
+	}
+
+	close(fd_tmp);
+	unlink(tmpfile);
 
 	return 0;
 }

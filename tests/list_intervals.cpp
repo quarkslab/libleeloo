@@ -46,16 +46,32 @@ void print_intervals(Interval const& l)
 	}
 }
 
+template <class Interval>
+int compare_intervals(Interval const& l, typename Interval::base_type const* const ref, size_t const ninter)
+{
+	if (l.intervals().size() != ninter) {
+		std::cerr << "bad number of intervals" << std::endl;
+		return 1;
+	}
+	int ret = 0;
+	size_t i = 0;
+	for (auto const& it: l.intervals()) {
+		if ((it.lower() != ref[2*i]) ||
+			(it.upper() != ref[2*i+1])) {
+			std::cerr << "invalid interval at index " << i << std::endl;
+			ret = 1;
+		}
+		i++;
+	}
+	return ret;
+}
+
 // Interval of type [a,b[
 typedef leeloo::list_intervals<leeloo::interval<uint32_t>, uint32_t> list_intervals;
 
 int main(int argc, char** argv)
 {
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " n" << std::endl;
-		return 1;
-	}
-
+	int ret = 0;
 	list_intervals list;
 	list.add(0, 2);
 	list.add(5, 9);
@@ -68,22 +84,42 @@ int main(int argc, char** argv)
 	std::cout << list.at(1) << " == 1" << std::endl;
 	std::cout << list.at(2) << " == 5" << std::endl;
 	std::cout << list.at(3) << " == 6" << std::endl;
-	std::cout << "contains 1 (true) == " << list.contains(1) << std::endl;
-	std::cout << "contains 2 (true) == " << list.contains(2) << std::endl;
-	std::cout << "contains 6 (true) == " << list.contains(6) << std::endl;
-	std::cout << "contains 19 (true) == " << list.contains(19) << std::endl;
-	std::cout << "contains 40 (false) == " << list.contains(40) << std::endl;
+#define CHECK_CONTAINS(i, v)\
+	{\
+		bool out = list.contains(i);\
+		std::cout << "contains " #i " (" #v ") == " << out;\
+		if (out != v) {\
+			std::cout << " wrong!";\
+			ret = 1;\
+		}\
+		std::cout << std::endl;\
+	}
 
-	print_intervals(list);
+	CHECK_CONTAINS(1, true);
+	CHECK_CONTAINS(2, true);
+	CHECK_CONTAINS(6, true);
+	CHECK_CONTAINS(19, true);
+	CHECK_CONTAINS(40, false);
 
 	list.aggregate();
 
 	std::cout << "After aggregate:" << std::endl;
-	
-	print_intervals(list);
-	std::cout << "size: " << list.size() << std::endl;
 
-	const size_t n = atoll(argv[1]);
+	CHECK_CONTAINS(1, true)
+	CHECK_CONTAINS(2, true)
+	CHECK_CONTAINS(6, true)
+	CHECK_CONTAINS(19, true)
+	CHECK_CONTAINS(40, false)
+
+	{
+		uint32_t intervals_agg[] = {
+			0, 15,
+			19, 21
+		};
+		ret = compare_intervals(list, intervals_agg, sizeof(intervals_agg)/(2*sizeof(uint32_t)));
+	}
+
+	const size_t n = argc >= 2 ? atoll(argv[1]) : 127;
 
 	list.clear();
 	list.reserve(n);
@@ -110,7 +146,7 @@ int main(int argc, char** argv)
 		const uint32_t vcontain2 = intervals[i].upper();
 		if (!list.contains(vcontain0) || !list.contains(vcontain1) || list.contains(vcontain2)) {
 			std::cerr << "Error: contains returns invalid results!" << std::endl; 
-			return 1;
+			ret = 1;
 		}
 	}
 
@@ -127,50 +163,87 @@ int main(int argc, char** argv)
 		const uint32_t v1 = list.at_cached(i);
 		if (v0 != v1) {
 			std::cerr << "Error in at_cached: i=" << i << ", got " << v1 << ", should be " << v0 << std::endl;
+			ret = 1;
 		}
 	}
+
+#define COMPARE()\
+		ret = compare_intervals(list, intervals_agg, sizeof(intervals_agg)/(2*sizeof(uint32_t)));\
+		if (ret != 0) {\
+			std::cerr << "error" << std::endl;\
+		}
 
 	std::cout << "[0,10[ - [20,21[" << std::endl;
 	list.clear();
 	list.add(0, 10);
 	list.remove(20, 21);
 	list.aggregate();
-	print_intervals(list);
+	{
+		uint32_t intervals_agg[] = {
+			0, 10
+		};
+		COMPARE()
+	}
 
 	std::cout << "[0,10[ - [5,6[" << std::endl;
 	list.clear();
 	list.add(0, 10);
 	list.remove(5, 6);
 	list.aggregate();
-	print_intervals(list);
+	{
+		uint32_t intervals_agg[] = {
+			0, 5,
+			6, 10
+		};
+		COMPARE()
+	}
 
 	std::cout << "[0,10[ - [0,10[" << std::endl;
 	list.clear();
 	list.add(0, 10);
 	list.remove(0, 10);
 	list.aggregate();
-	print_intervals(list);
+	{
+		uint32_t intervals_agg[] = {
+		};
+		COMPARE()
+	}
 
 	std::cout << "[10,50[ - [8,11[" << std::endl;
 	list.clear();
 	list.add(10, 50);
 	list.remove(8, 11);
 	list.aggregate();
-	print_intervals(list);
+	{
+		uint32_t intervals_agg[] = {
+			11, 50
+		};
+		COMPARE()
+	}
 
 	std::cout << "[10,50[ - [40,54[" << std::endl;
 	list.clear();
 	list.add(10, 50);
 	list.remove(40, 54);
 	list.aggregate();
-	print_intervals(list);
+	{
+		uint32_t intervals_agg[] = {
+			10, 40
+		};
+		COMPARE()
+	}
 
 	std::cout << "[10,50[ - [50,54[" << std::endl;
 	list.clear();
 	list.add(10, 50);
 	list.remove(50, 54);
 	list.aggregate();
-	print_intervals(list);
+	{
+		uint32_t intervals_agg[] = {
+			10, 50
+		};
+		COMPARE()
+	}
 
 	std::cout << "[0,10[ - ([5,6[,[7,8[,[3,4[" << std::endl;
 	list.clear();
@@ -179,7 +252,15 @@ int main(int argc, char** argv)
 	list.remove(7, 8);
 	list.remove(3, 4);
 	list.aggregate();
-	print_intervals(list);
+	{
+		uint32_t intervals_agg[] = {
+			0, 3,
+			4, 5,
+			6, 7,
+			8, 10
+		};
+		COMPARE()
+	}
 
 	std::cout << "([0,10[,[20,40[) - [5,29[" << std::endl;
 	list.clear();
@@ -187,7 +268,13 @@ int main(int argc, char** argv)
 	list.add(20, 40);
 	list.remove(5,29);
 	list.aggregate();
-	print_intervals(list);
+	{
+		uint32_t intervals_agg[] = {
+			0, 5,
+			29, 40
+		};
+		COMPARE()
+	}
 
 	std::cout << "([0,10[,[20,40[,[50,90[,[100,200[) - ([0,4[, [5,21[, [25,29[, [30,35[,[36,105[" << std::endl;
 	list.clear();
@@ -201,9 +288,16 @@ int main(int argc, char** argv)
 	list.remove(30, 35);
 	list.remove(36, 105);
 	list.aggregate();
-	print_intervals(list);
-
-	std::cout << "---------" << std::endl;
+	{
+		uint32_t intervals_agg[] = {
+			4, 5,
+			21, 25,
+			29, 30,
+			35, 36,
+			105, 200
+		};
+		COMPARE()
+	}
 
 	list.clear();
 	for (size_t i = 0; i < 20; i++) {
@@ -211,7 +305,32 @@ int main(int argc, char** argv)
 	}
 	list.remove(51,52);
 	list.aggregate();
-	print_intervals(list);
+	{
+		uint32_t intervals_agg[] = {
+			0, 9,
+			10, 19,
+			20, 29,
+			30, 39,
+			40, 49,
+			50, 51,
+			52, 59,
+			60, 69,
+			70, 79,
+			80, 89,
+			90, 99,
+			100, 109,
+			110, 119,
+			120, 129,
+			130, 139,
+			140, 149,
+			150, 159,
+			160, 169,
+			170, 179,
+			180, 189,
+			190, 199
+		};
+		COMPARE()
+	}
 
-	return 0;
+	return ret;
 }

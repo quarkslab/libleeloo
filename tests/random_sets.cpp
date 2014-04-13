@@ -53,17 +53,13 @@ typedef leeloo::list_intervals<leeloo::interval<uint32_t>> list_intervals;
 
 int main(int argc, char** argv)
 {
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " n" << std::endl;
-		return 1;
-	}
-
-	const size_t n = atoll(argv[1]);
+	const size_t n = argc >= 2 ? atoll(argv[1]) : 1031;
 
 	list_intervals list;
-	srand(time(NULL));
+	unsigned int seed = time(NULL);
+	srand(seed);
 
-	std::cout << "Generate random intervals..." << std::endl;
+	std::cout << "Generate random intervals with seed " << seed << "..." << std::endl;
 	// Generate random intervals
 	for (size_t i = 0; i < n; i++) {
 		uint32_t a = rand();
@@ -104,7 +100,13 @@ int main(int argc, char** argv)
 		leeloo::random_engine<uint32_t>(mt_rand));
 	BENCH_END(random_sets, "random_sets", 1, 1, sizeof(uint32_t), list.size());
 
-	std::cout << "Size all sets: " << size_sets << std::endl;
+	if (size_sets != list.size()) {
+		std::cerr << "Random sets returns " << size_sets << " results, expected " << list.size() << std::endl;
+		return 1;
+	}
+	else {
+		std::cout << "Size all sets: " << size_sets << std::endl;
+	}
 	               
 	return 0;
 }
