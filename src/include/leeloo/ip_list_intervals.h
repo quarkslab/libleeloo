@@ -64,7 +64,7 @@ public:
 	template <bool exclude = false>
 	inline void insert_cidr(uint32_t const base_ip, int const prefix_size)
 	{
-		assert(prefix_size > 0);
+		assert(prefix_size >= 0);
 		const uint32_t mask = cidr2mask(prefix_size);
 		insert<exclude>(base_ip & (~mask), base_ip|mask);
 	}

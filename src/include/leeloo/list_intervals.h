@@ -86,6 +86,8 @@ public:
 	typedef typename interval_type::base_type base_type;;
 	typedef list_intervals<Interval, SizeType> this_type;
 
+	static constexpr unsigned int interger_bits = sizeof(base_type)*CHAR_BIT;
+
 private:
 	struct cmp_f
 	{
@@ -206,6 +208,44 @@ public:
 		removed_intervals().clear();
 
 		intervals() = std::move(ret);
+	}
+
+	void aggregate_max_prefix(unsigned int const min_prefix)
+	{
+		if (min_prefix == 0) {
+			return;
+		}
+
+		aggregate();
+
+		const base_type mask = prefix2mask(min_prefix);
+		const base_type inv_mask = ~mask;
+		const base_type max_size = mask+1;
+
+		base_type prev_a = std::numeric_limits<base_type>::min();
+		base_type prev_b = std::numeric_limits<base_type>::max();
+		// Do not use iterator as we will append intervals, and thus modify the end!
+		const size_type org_size = intervals().size();
+		for (size_type i = 0; i < org_size; i++) {
+			interval_type const& it = intervals()[i];
+			base_type const a = it.lower() & inv_mask;
+			base_type const b = (it.upper() | mask) + 1;
+			if (a != prev_a || b != prev_b) {
+				add(a, b);
+				prev_a = a;
+				prev_b = b;
+			}
+		}
+
+		aggregate();
+	}
+
+	static inline base_type prefix2mask(const unsigned int prefix)
+	{
+		if (prefix == 0) {
+			return ~(base_type(0));
+		}
+		return (base_type(1)<<(interger_bits-prefix))-1;
 	}
 
 	size_type size() const
