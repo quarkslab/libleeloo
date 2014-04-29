@@ -228,12 +228,14 @@ public:
 		const size_type org_size = intervals().size();
 		for (size_type i = 0; i < org_size; i++) {
 			interval_type const& it = intervals()[i];
-			base_type const a = it.lower() & inv_mask;
-			base_type const b = (it.upper() | mask) + 1;
-			if (a != prev_a || b != prev_b) {
-				add(a, b);
-				prev_a = a;
-				prev_b = b;
+			if (it.width() < max_size) {
+				base_type const a = it.lower() & inv_mask;
+				base_type const b = (it.upper() | mask) + 1;
+				if (a != prev_a || b != prev_b) {
+					add(a, b);
+					prev_a = a;
+					prev_b = b;
+				}
 			}
 		}
 
