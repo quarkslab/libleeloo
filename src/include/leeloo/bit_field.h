@@ -146,7 +146,7 @@ public:
 
 		inline ssize_t distance_to(bit_reference const& o) const
 		{
-			return std::distance(_chunk, o._chunk)*bits_per_chunk + (((int)(o._bit) - (int)_bit)%bits_per_chunk);
+			return (std::distance(_chunk, o._chunk)<<ln2_bits_per_chunk) + ((int)(o._bit) - (int)_bit);
 		}
 
 	public:
@@ -316,7 +316,7 @@ public:
 		if (new_buf == nullptr) {
 			throw std::bad_alloc();
 		}
-		memcpy(new_buf, buffer(), size_chunks());
+		memcpy(new_buf, buffer(), size_chunks()*sizeof(integer_type));
 		allocator_type().deallocate(buffer(), size_chunks());
 		_size = new_size;
 		_buf = new_buf;

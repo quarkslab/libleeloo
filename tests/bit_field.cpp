@@ -35,6 +35,70 @@
 
 #define N 100007
 
+int test_random_access()
+{
+	int ret = 0;
+	for (size_t nbits = 1100; nbits <= 1111; nbits++) {
+		leeloo::bit_field bf(nbits);
+		bf.clear_all();
+		for (size_t j = 0; j < nbits; j++) {
+			for (size_t i = 0; i < nbits-j; i++) {
+				bf.set_bit(i+j);
+				leeloo::bit_field::iterator it = bf.begin();
+				it += j;
+				it += i;
+				leeloo::bit_field::iterator it2 = bf.begin();
+				it2 += i;
+				it2 += j;
+				if (*it != true || *it2 != true) {
+					std::cerr << "error forward random access with j=" << j << ", i=" << i << std::endl;
+					ret = 1;
+				}
+				bf.clear_bit(i+j);
+			}
+		}
+
+		leeloo::bit_field::iterator it_last = bf.begin()+(nbits-1);
+		for (size_t j = 0; j < nbits; j++) {
+			for (size_t i = 0; i < nbits-j; i++) {
+				const size_t bit = nbits-(i+j)-1;
+				bf.set_bit(bit);
+				leeloo::bit_field::iterator it = it_last;
+				it -= j;
+				it -= i;
+				leeloo::bit_field::iterator it2 = it_last;
+				it2 -= j;
+				it2 -= i;
+				if (*it != true || *it2 != true) {
+					std::cerr << "error reverse random access with j=" << j << ", i=" << i << std::endl;
+					ret = 1;
+				}
+				bf.clear_bit(bit);
+			}
+		}
+	}
+	return ret;
+}
+
+int test_reserve()
+{
+	// This was the root cause of https://github.com/quarkslab/libleeloo/issues/3
+	// Ridiculous bug, but still, the reserve function wasn't tested...
+	//
+	
+	leeloo::bit_field bf;
+	for (int i = 0; i < 100; i++) {
+		bf.set_bit(i);
+	}
+	for (int i = 0; i < 100; i++) {
+		if (!bf.get_bit(i)) {
+			std::cout << "potential error with the reserve function!" << std::endl;
+			return 1;
+		}
+	}
+	return 0;
+}
+
 int main()
 {
 	srand(time(NULL));
@@ -57,15 +121,35 @@ int main()
 		it++;
 	}
 
+	ret = test_reserve();
+	ret = test_random_access();
+
 	bf.set_random();
-	it = bf.begin();
-	it += 167;
-	it -= 49;
-	it += 62;
-	leeloo::bit_field::iterator it_cmp = bf.begin()+(167-49+62);
-	if (it != it_cmp) {
-		std::cerr << "error random access with iterators" << std::endl;
+
+	{
+		it = bf.begin();
+		it += 167;
+		it -= 49;
+		it += 62;
+		leeloo::bit_field::iterator it_cmp = bf.begin()+(167-49+62);
+		if (it != it_cmp) {
+			std::cerr << "error random access with iterators" << std::endl;
+		}
 	}
+
+	{
+		it = bf.begin();
+		it += 1245;
+		it -= 456;
+		it += 777;
+		it -= 17;
+		it += 2179;
+		leeloo::bit_field::iterator it_cmp = bf.begin()+(1245-456+777-17+2179);
+		if (it != it_cmp) {
+			std::cerr << "error random access with iterators" << std::endl;
+		}
+	}
+
 	it = bf.begin();
 	for (size_t i = 0; i < N; i++) {
 		leeloo::bit_field::iterator it_adv = it;
