@@ -172,9 +172,15 @@ static bool __parse_ips(leeloo::ip_list_intervals& l, const char* str)
 		if (!valid) {
 			return false;
 		}
-		uint32_t b = leeloo::ips_parser::ipv4toi(sep+1, size_str-(idx_sep+1), valid);
+		const size_t size_part2 = size_str-(idx_sep+1);
+		uint32_t b = leeloo::ips_parser::ipv4toi(sep+1, size_part2, valid);
 		if (!valid) {
-			return false;
+			// Check if this is just a number
+			b = atoi3(sep+1, size_part2);
+			if (b > 0xFF) {
+				return false;
+			}
+			b = (a & 0xFFFFFF00) | b;
 		}
 		if (a > b) {
 			std::swap(a, b);
