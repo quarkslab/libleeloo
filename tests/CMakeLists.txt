@@ -40,8 +40,13 @@ add_executable(bit_field bit_field.cpp)
 target_link_libraries(bit_field leeloo)
 add_test(bit_field bit_field)
 
-add_executable(aggregate_max_perfix aggregate_max_prefix.cpp)
-target_link_libraries(aggregate_max_perfix leeloo)
+add_executable(aggregate_max_prefix aggregate_max_prefix.cpp)
+target_link_libraries(aggregate_max_prefix leeloo)
+add_test(aggregate_max_prefix aggregate_max_prefix)
+
+add_executable(port_list_intervals port_list_intervals.cpp)
+target_link_libraries(port_list_intervals leeloo)
+add_test(port_list_intervals port_list_intervals)
 
 #add_executable(test_vli test_vli.cpp)
 #target_link_libraries(test_vli leeloo vli)
