@@ -607,7 +607,6 @@ private:
 	container_type _excluded_intervals;
 	std::vector<size_type> _index_cache;
 	size_t _cache_entry_size;
-	bool _cache_valid;
 };
 
 }
