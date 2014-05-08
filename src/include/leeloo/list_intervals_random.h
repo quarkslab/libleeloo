@@ -107,9 +107,14 @@ public:
 
 	base_type operator()(list_intervals_type const& li)
 	{
-		size_type const n = _uprng.get_step(*_it_steps);
-		++_it_steps;
-		return li.at_cached(n);
+		base_type const ret = get_current(li);
+		next();
+		return ret;
+	}
+
+	inline base_type get_current(list_intervals_type const& li) const
+	{
+		return li.at_cached(_uprng.get_step(*_it_steps));
 	}
 
 	void step_done(size_type const step)
@@ -140,6 +145,12 @@ public:
 		}
 		_steps_todo.aggregate();
 		_it_steps = _steps_todo.value_begin();
+	}
+
+	inline void next()
+	{
+		assert(!end());
+		++_it_steps;
 	}
 
 #ifdef LEELOO_BOOST_SERIALIZE
