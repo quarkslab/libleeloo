@@ -46,7 +46,8 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${TBB_INCLUDE_DIR})
 
 add_library(leeloo SHARED ${SRC_FILES})
-target_link_libraries(leeloo ${TBB_LIBRARIES})
+set(LINK_LIBRARIES ${TBB_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(leeloo ${LINK_LIBRARIES})
 
 install(TARGETS leeloo LIBRARY DESTINATION lib)
 install(FILES ${HEADER_DIST_FILES} DESTINATION include/leeloo)

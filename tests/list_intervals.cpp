@@ -371,6 +371,15 @@ int main(int argc, char** argv)
 		}
 		it++;
 	}
+	if (it != list.value_end()) {
+		std::cerr << "it should be equals to list.value_end()!" << std::endl;
+		ret = 1;
+	}
+
+	if (!(it == list.value_end())) {
+		std::cerr << "it should be equals to list.value_end()!" << std::endl;
+		ret = 1;
+	}
 
 	return ret;
 }

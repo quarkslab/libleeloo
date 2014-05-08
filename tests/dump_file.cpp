@@ -29,7 +29,13 @@
 #include <leeloo/interval.h>
 #include <leeloo/list_intervals.h>
 
+#ifdef LEELOO_BOOST_SERIALIZE
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#endif
+
 #include <iostream>
+#include <sstream>
 
 template <class Interval>
 void print_intervals(Interval const& l)
@@ -72,6 +78,22 @@ int main()
 
 	close(fd_tmp);
 	unlink(tmpfile);
+
+#ifdef LEELOO_BOOST_SERIALIZE
+	// Serialisation with boost::archive
+	std::stringstream ss;
+	boost::archive::text_oarchive oa(ss);
+	oa << ref;
+
+	list_intervals list_boost;
+	ss.seekg(0, std::stringstream::beg);
+	boost::archive::text_iarchive ia(ss);
+	ia >> list_boost;
+	if (ref != list_boost) {
+		std::cerr << "Deserialize after serialize do not give the same result!" << std::endl;
+		return 1;
+	}
+#endif
 
 	return 0;
 }

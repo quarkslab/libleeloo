@@ -45,6 +45,11 @@
 #include <leeloo/uni.h>
 #include <leeloo/utility.h>
 
+#ifdef LEELOO_BOOST_SERIALIZE
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/split_member.hpp>
+#endif
+
 namespace leeloo {
 
 class LEELOO_API file_exception: public std::exception
@@ -85,7 +90,7 @@ public:
 	typedef Interval interval_type;
 	typedef SizeType size_type;
 
-	typedef typename interval_type::base_type base_type;;
+	typedef typename interval_type::base_type base_type;
 	typedef list_intervals<Interval, SizeType> this_type;
 
 	static constexpr unsigned int interger_bits = sizeof(base_type)*CHAR_BIT;
@@ -113,6 +118,11 @@ public:
 	{
 		typedef std::iterator<std::forward_iterator_tag, base_type> iterator_base_type;
 	public:
+		value_iterator()
+		{
+			// undefined values
+		}
+
 		value_iterator(container_type const& v):
 			_iter(v.begin()),
 			_offset(0)
@@ -128,11 +138,11 @@ public:
 	public:
 		value_iterator& operator++()
 		{
-			if (_iter->first + _offset != _iter->second - 1) {
-				_offset++;
+			if (_iter->lower() + _offset != _iter->upper() - 1) {
+				++_offset;
 			}
 			else {
-				_iter++;
+				++_iter;
 				_offset = 0;
 			}
 			return *this;
@@ -141,13 +151,7 @@ public:
 		value_iterator operator++(int)
 		{
 			value_iterator ret = *this;
-			if (_iter->lower() + _offset != _iter->upper() - 1) {
-				_offset++;
-			}
-			else {
-				_iter++;
-				_offset = 0;
-			}
+			++*this;
 			return ret;
 		}
 
@@ -159,6 +163,11 @@ public:
 		bool operator!=(value_iterator const& other) const
 		{
 			return _iter != other._iter or _offset != other._offset;
+		}
+
+		bool operator==(value_iterator const& other) const
+		{
+			return _iter == other._iter and _offset == other._offset;
 		}
 
 	private:
@@ -524,6 +533,23 @@ public:
 
 		close(fd);
 	}
+
+#ifdef LEELOO_BOOST_SERIALIZE
+	template<class Archive>
+	void save(Archive& ar, unsigned int const /*version*/) const
+	{
+		ar & intervals();
+	}
+
+	template<class Archive>
+	void load(Archive& ar, unsigned int const /*version*/)
+	{
+		clear();
+		ar & intervals();
+	}
+
+	BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
 private:
 	LEELOO_LOCAL static void aggregate_container(container_type& ints)

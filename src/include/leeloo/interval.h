@@ -33,6 +33,10 @@
 
 #include <leeloo/exports.h>
 
+#ifdef LEELOO_BOOST_SERIALIZE
+#include <boost/serialization/version.hpp>
+#endif
+
 namespace leeloo {
 
 // interval is half-opened [lower,upper[
@@ -84,6 +88,15 @@ public:
 	{
 		return (v >= _lower) && (v < _upper);
 	}
+
+#ifdef LEELOO_BOOST_SERIALIZE
+	template<class Archive>
+	void serialize(Archive& ar, unsigned int const /*version*/)
+	{
+		ar & _lower;
+		ar & _upper;
+	}
+#endif
 
 public:
 	static interval empty()

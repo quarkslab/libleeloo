@@ -1,2 +1,7 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package(TBB REQUIRED)
+set(BOOST_COMPONENTS random)
+if(LEELOO_BOOST_SERIALIZE)
+	set(BOOST_COMPONENTS random serialization)
+endif()
+find_package(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
