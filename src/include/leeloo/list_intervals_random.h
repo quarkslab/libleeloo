@@ -158,10 +158,11 @@ public:
 		ar >> _seed;
 		ar >> _done_steps;
 
+		rand_engine.seed(_seed);
+		_uprng.init(li.size(), rand_engine);
 		set_done_steps(_done_steps);
 
 		rand_engine.seed(_seed);
-		_uprng.init(li.size(), rand_engine);
 	}
 #endif
 

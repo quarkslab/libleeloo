@@ -158,6 +158,39 @@ int main()
 		}
 	}
 
+#ifdef LEELOO_BOOST_SERIALIZE
+	lirp.init(list, leeloo::random_engine<uint32_t>(gen), seed);
+	for (uint32_t i = 0; i < lsize/2; i++) {
+		lirp(list);
+		if (i % 7 != 0) {
+			lirp.step_done(i);
+		}
+	}
+	std::stringstream ss2;
+	boost::archive::text_oarchive oa2(ss2);
+	lirp.save_state(oa2);
+
+	list_intervals_random_promise lirp_boost;
+	ss2.seekg(0, std::stringstream::beg);
+	boost::archive::text_iarchive ia2(ss2);
+	lirp_boost.restore_state(ia2, list, leeloo::random_engine<uint32_t>(gen));
+
+	for (uint32_t i = 0; i < lsize/2; i++) {
+		if (i % 7 == 0) {
+			if (lirp_boost(list) != ref[i]) {
+				std::cerr << "random_promies gave wrong results after reinitialisation at " << i << std::endl;
+				ret = 1;
+			}
+		}
+	}
+
+	for (uint32_t i = lsize/2; i < lsize; i++) {
+		if (lirp_boost(list) != ref[i]) {
+			std::cerr << "random_promies gave wrong results at " << i << std::endl;
+			ret = 1;
+		}
+	}
+#endif
 
 	return ret;
 }
