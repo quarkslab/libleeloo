@@ -332,5 +332,45 @@ int main(int argc, char** argv)
 		COMPARE()
 	}
 
+	list.clear();
+	list.add(10, 50);
+	list.add(1000, 1100);
+	list.add(4000, 4001);
+	list.add(8000, 8002);
+
+
+	list_intervals::value_iterator it = list.value_begin();
+	for (uint32_t i = 10; i < 50; i++) {
+		if (*it != i) {
+			std::cerr << "error with value_iterator at " << i << std::endl;
+			ret = 1;
+		}
+		it++;
+	}
+
+	for (uint32_t i = 1000; i < 1100; i++) {
+		if (*it != i) {
+			std::cerr << "error with value_iterator at " << i << std::endl;
+			ret = 1;
+		}
+		it++;
+	}
+
+	for (uint32_t i = 4000; i < 4001; i++) {
+		if (*it != i) {
+			std::cerr << "error with value_iterator at " << i << std::endl;
+			ret = 1;
+		}
+		it++;
+	}
+
+	for (uint32_t i = 8000; i < 8002; i++) {
+		if (*it != i) {
+			std::cerr << "error with value_iterator at " << i << std::endl;
+			ret = 1;
+		}
+		it++;
+	}
+
 	return ret;
 }

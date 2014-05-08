@@ -36,7 +36,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
 #include <exception>
+#include <iterator>
 
 #include <leeloo/bench.h>
 #include <leeloo/exports.h>
@@ -100,6 +102,69 @@ private:
 public:
 	typedef std::vector<interval_type> container_type;
 	typedef typename container_type::const_iterator iterator;
+
+private:
+	struct tag_vi_end
+	{ };
+
+public:
+	// Const value iterator
+	class value_iterator: std::iterator<std::forward_iterator_tag, base_type>
+	{
+		typedef std::iterator<std::forward_iterator_tag, base_type> iterator_base_type;
+	public:
+		value_iterator(container_type const& v):
+			_iter(v.begin()),
+			_offset(0)
+		{
+		}
+
+		value_iterator(container_type const& v, tag_vi_end):
+			_iter(v.end()),
+			_offset(0)
+		{
+		}
+
+	public:
+		value_iterator& operator++()
+		{
+			if (_iter->first + _offset != _iter->second - 1) {
+				_offset++;
+			}
+			else {
+				_iter++;
+				_offset = 0;
+			}
+			return *this;
+		}
+
+		value_iterator operator++(int)
+		{
+			value_iterator ret = *this;
+			if (_iter->lower() + _offset != _iter->upper() - 1) {
+				_offset++;
+			}
+			else {
+				_iter++;
+				_offset = 0;
+			}
+			return ret;
+		}
+
+		typename iterator_base_type::value_type operator*() const
+		{
+			return _iter->lower() + _offset;
+		}
+
+		bool operator!=(value_iterator const& other) const
+		{
+			return _iter != other._iter or _offset != other._offset;
+		}
+
+	private:
+		iterator _iter;
+		size_type _offset;
+	};
 
 public:
 	list_intervals():
@@ -596,6 +661,9 @@ private:
 public:
 	iterator begin() const { return intervals().begin(); }
 	iterator end() const { return intervals().end(); }
+
+	value_iterator value_begin() const { return value_iterator(_intervals); }
+	value_iterator value_end()   const { return value_iterator(_intervals, tag_vi_end()); }
 
 private:
 	LEELOO_LOCAL inline container_type& intervals() { return _intervals; }
