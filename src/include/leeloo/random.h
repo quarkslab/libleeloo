@@ -53,6 +53,12 @@ struct random
 		_eng(o._eng)
 	{ }
 
+	template <class UInt>
+	inline void seed(UInt seed)
+	{
+		_eng.seed(seed);
+	}
+
 	inline integer_type operator()(integer_type const a, integer_type const b) const
 	{
 		// between [a,b]

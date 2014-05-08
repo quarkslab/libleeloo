@@ -92,6 +92,7 @@ public:
 		init_final_perm(rand_eng);
 	}
 
+	inline integer_type max() const { return _max; }
 
 public:
 	integer_type operator()()

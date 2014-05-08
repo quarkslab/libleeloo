@@ -48,5 +48,9 @@ add_executable(port_list_intervals port_list_intervals.cpp)
 target_link_libraries(port_list_intervals leeloo)
 add_test(port_list_intervals port_list_intervals)
 
+add_executable(random_state random_state.cpp)
+target_link_libraries(random_state leeloo)
+add_test(random_state random_state)
+
 #add_executable(test_vli test_vli.cpp)
 #target_link_libraries(test_vli leeloo vli)
