@@ -117,6 +117,11 @@ public:
 		return li.at_cached(_uprng.get_step(*_it_steps));
 	}
 
+	inline size_type get_current_step() const
+	{
+		return *_it_steps;
+	}
+
 	void step_done(size_type const step)
 	{
 		assert(end() || (step < *_it_steps));
