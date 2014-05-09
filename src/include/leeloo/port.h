@@ -11,7 +11,8 @@ public:
 	enum class protocol_enum : uint16_t {
 		TCP =  0x0100,
 		UDP =  0x0200,
-		SCTP = 0x0300
+		SCTP = 0x0300,
+		UNSUPPORTED = 0xFFFF
 	};
 
 public:
@@ -35,6 +36,8 @@ public:
 
 	inline uint32_t as_u32() const { return _port.i32; }
 	inline operator uint32_t() const { return as_u32(); }
+
+	static protocol_enum protocol_from_socket_type(int type, int protocol);
 
 private:
 	union {

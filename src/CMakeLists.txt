@@ -12,6 +12,7 @@ set(SRC_FILES
 	ip_list_intervals.cpp
 	ips_parser.cpp
 	list_intervals.cpp
+	port.cpp
 )
 
 set(INSTANCES_EXPORTED_H ${CMAKE_CURRENT_BINARY_DIR}/include/leeloo/instances_exported.h)
