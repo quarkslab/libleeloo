@@ -24,3 +24,31 @@ leeloo::port::protocol_enum leeloo::port::protocol_from_socket_type(int type, in
 	}
 	return protocol_enum::UNSUPPORTED;
 }
+
+int leeloo::port::socket_type() const
+{
+	switch (protocol()) {
+		case static_cast<uint16_t>(protocol_enum::TCP):
+		case static_cast<uint16_t>(protocol_enum::SCTP):
+			return SOCK_STREAM;
+		case static_cast<uint16_t>(protocol_enum::UDP):
+			return SOCK_DGRAM;
+		default:
+			return -1;
+	}
+
+	return -1;
+}
+
+int leeloo::port::socket_proto() const
+{
+	switch (protocol()) {
+		case static_cast<uint16_t>(protocol_enum::TCP):
+		case static_cast<uint16_t>(protocol_enum::UDP):
+			return 0;
+		case static_cast<uint16_t>(protocol_enum::SCTP):
+			return IPPROTO_SCTP;
+	}
+
+	return -1;
+}
