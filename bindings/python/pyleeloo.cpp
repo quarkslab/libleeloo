@@ -38,6 +38,7 @@
 #include <leeloo/ip_list_intervals_with_properties.h>
 #include <leeloo/ips_parser.h>
 #include <leeloo/list_intervals.h>
+#include <leeloo/port_list_intervals.h>
 #include <leeloo/random.h>
 
 using namespace boost::python;
@@ -56,6 +57,14 @@ void (leeloo::ip_list_intervals::*ip_remove4)(leeloo::ip_list_intervals const&) 
 
 bool (leeloo::ip_list_intervals::*contains1)(uint32_t const) const = &leeloo::ip_list_intervals::contains;
 bool (leeloo::ip_list_intervals::*contains2)(const char*)    const = &leeloo::ip_list_intervals::contains;
+
+void (leeloo::port_list_intervals::*port_add1)(uint16_t const, uint16_t const, leeloo::port::protocol_enum) = &leeloo::port_list_intervals::add;
+void (leeloo::port_list_intervals::*port_add2)(leeloo::port const)                                          = &leeloo::port_list_intervals::add;
+
+void (leeloo::port_list_intervals::*port_remove1)(uint16_t const, uint16_t const, leeloo::port::protocol_enum) = &leeloo::port_list_intervals::remove;
+void (leeloo::port_list_intervals::*port_remove2)(leeloo::port const)                                          = &leeloo::port_list_intervals::remove;
+
+typedef uint16_t (leeloo::port::*get_port_const)() const;
 
 template <class Integer>
 class set_read_only
@@ -93,9 +102,15 @@ private:
 
 typedef set_read_only<uint16_t> u16_set_read_only;
 typedef set_read_only<uint32_t> u32_set_read_only;
-typedef set_read_only<uint64_t> u64_set_read_only;
 
 static void ip_list_random_sets(leeloo::ip_list_intervals const& l, size_t const size_div, object& f_set)
+{
+	l.random_sets(size_div,
+	              [&f_set](uint32_t const* buf, size_t const size) { f_set(u32_set_read_only(buf, size)); },
+				  leeloo::random_engine<uint32_t>(g_mt_rand));
+}
+
+static void port_list_random_sets(leeloo::port_list_intervals const& l, size_t const size_div, object& f_set)
 {
 	l.random_sets(size_div,
 	              [&f_set](uint32_t const* buf, size_t const size) { f_set(u32_set_read_only(buf, size)); },
@@ -141,22 +156,6 @@ static void u16_list_random_sets(u16_list_intervals const& l, size_t const size_
 	l.random_sets(size_div,
 	              [&f_set](uint16_t const* buf, size_t const size) { f_set(u16_set_read_only(buf, size)); },
 				  leeloo::random_engine<uint16_t>(g_mt_rand));
-}
-
-// uint64 intervals
-//
-
-typedef leeloo::interval<uint64_t> u64_interval;
-typedef leeloo::list_intervals<u64_interval> u64_list_intervals;
-
-void (u64_list_intervals::*u64_add1)(u64_list_intervals::base_type const, u64_list_intervals::base_type const) = &u64_list_intervals::add;
-void (u64_list_intervals::*u64_add2)(u64_list_intervals const&)                                                = &u64_list_intervals::add;
-
-static void u64_list_random_sets(u64_list_intervals const& l, size_t const size_div, object& f_set)
-{
-	l.random_sets(size_div,
-	              [&f_set](uint64_t const* buf, size_t const size) { f_set(u64_set_read_only(buf, size)); },
-				  leeloo::random_engine<uint64_t>(g_mt_rand));
 }
 
 // Properties
@@ -274,26 +273,35 @@ BOOST_PYTHON_MODULE(pyleeloo)
 {
 	init_rand_gen();
 
+	enum_<leeloo::port::protocol_enum>("protocol")
+		.value("TCP", leeloo::port::protocol_enum::TCP)
+		.value("UDP", leeloo::port::protocol_enum::UDP)
+		.value("SCTP", leeloo::port::protocol_enum::SCTP)
+		;
+
 	class_<leeloo::ip_interval>("ip_interval")
 		.def("assign", &leeloo::ip_interval::assign)
 		.def("lower", &leeloo::ip_interval::lower)
 		.def("upper", &leeloo::ip_interval::upper)
 		.def("set_lower", &leeloo::ip_interval::set_lower)
-		.def("set_upper", &leeloo::ip_interval::set_upper);
+		.def("set_upper", &leeloo::ip_interval::set_upper)
+		;
 
 	class_<u16_interval>("u16_interval")
 		.def("assign", &u16_interval::assign)
 		.def("lower", &u16_interval::lower)
 		.def("upper", &u16_interval::upper)
 		.def("set_lower", &u16_interval::set_lower)
-		.def("set_upper", &u16_interval::set_upper);
+		.def("set_upper", &u16_interval::set_upper)
+		;
 
-	class_<u64_interval>("u64_interval")
-		.def("assign", &u64_interval::assign)
-		.def("lower", &u64_interval::lower)
-		.def("upper", &u64_interval::upper)
-		.def("set_lower", &u64_interval::set_lower)
-		.def("set_upper", &u64_interval::set_upper);
+	class_<leeloo::port>("port")
+		.def(init<uint16_t, leeloo::port::protocol_enum>())
+		.def(init<uint32_t>())
+		.def("value", get_port_const(&leeloo::port::value))
+		.def("protocol", get_port_const(&leeloo::port::protocol))
+		.def("as_u32", &leeloo::port::as_u32)
+		;
 
 	class_<leeloo::ip_list_intervals>("ip_list_intervals")
 		.def("add", ip_add1)
@@ -316,7 +324,8 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("contains", contains2)
 		.def("dump_to_file", &leeloo::ip_list_intervals::dump_to_file)
 		.def("read_from_file", &leeloo::ip_list_intervals::read_from_file)
-		.def("__iter__", iterator<leeloo::ip_list_intervals>());
+		.def("__iter__", iterator<leeloo::ip_list_intervals>())
+		;
 
 	class_<u16_list_intervals>("u16_list_intervals")
 		.def("add", u16_add1)
@@ -331,22 +340,8 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("random_sets", &u16_list_random_sets)
 		.def("dump_to_file", &u16_list_intervals::dump_to_file)
 		.def("read_from_file", &u16_list_intervals::read_from_file)
-		.def("__iter__", iterator<u16_list_intervals>());
-
-	class_<u64_list_intervals>("u64_list_intervals")
-		.def("add", u64_add1)
-		.def("add", u64_add2)
-		.def("aggregate", &u64_list_intervals::aggregate)
-		.def("aggregate_max_prefix", &ip_list_intervals_with_properties_python::aggregate_max_prefix)
-		.def("create_index_cache", &u64_list_intervals::create_index_cache)
-		.def("size", &u64_list_intervals::size)
-		.def("reserve", &u64_list_intervals::reserve)
-		.def("clear", &u64_list_intervals::clear)
-		.def("at", &u64_list_intervals::at)
-		.def("random_sets", &u64_list_random_sets)
-		.def("dump_to_file", &u64_list_intervals::dump_to_file)
-		.def("read_from_file", &u64_list_intervals::read_from_file)
-		.def("__iter__", iterator<u64_list_intervals>());
+		.def("__iter__", iterator<u16_list_intervals>())
+		;
 
 	class_<ip_list_intervals_with_properties_python>("ip_list_intervals_with_properties")
 		.def("add", ip_add1)
@@ -377,27 +372,44 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("contains", contains2)
 		.def("dump_to_file", &ip_list_intervals_with_properties_python::dump_to_file)
 		.def("read_from_file", &ip_list_intervals_with_properties_python::read_from_file)
-		.def("__iter__", iterator<ip_list_intervals_with_properties_python>());
+		.def("__iter__", iterator<ip_list_intervals_with_properties_python>())
+		;
+
+	class_<leeloo::port_list_intervals>("port_list_intervals")
+		.def("add", port_add1)
+		.def("add", port_add2)
+		.def("remove", port_remove1)
+		.def("remove", port_remove2)
+		.def("aggregate", &leeloo::port_list_intervals::aggregate)
+		.def("create_index_cache", &leeloo::port_list_intervals::create_index_cache)
+		.def("size", &leeloo::port_list_intervals::size)
+		.def("reserve", &leeloo::port_list_intervals::reserve)
+		.def("clear", &leeloo::port_list_intervals::clear)
+		.def("at", &leeloo::port_list_intervals::at)
+		.def("random_sets", &port_list_random_sets)
+		.def("contains", &leeloo::port_list_intervals::contains)
+		.def("dump_to_file", &leeloo::port_list_intervals::dump_to_file)
+		.def("read_from_file", &leeloo::port_list_intervals::read_from_file)
+		.def("__iter__", iterator<leeloo::port_list_intervals>())
+		;
 
 	class_<u16_set_read_only>("u16_set_read_only")
 		.def("at", &u16_set_read_only::at)
 		.def("size", &u16_set_read_only::size)
-		.def("__iter__", iterator<u16_set_read_only>());
+		.def("__iter__", iterator<u16_set_read_only>())
+		;
 
 	class_<u32_set_read_only>("u32_set_read_only")
 		.def("at", &u32_set_read_only::at)
 		.def("size", &u32_set_read_only::size)
-		.def("__iter__", iterator<u32_set_read_only>());
+		.def("__iter__", iterator<u32_set_read_only>())
+		;
 
 	class_<u32_set_properties_read_only_python>("u32_set_properties_read_only_python")
 		.def("at", &u32_set_properties_read_only_python::at)
 		.def("property_at", &u32_set_properties_read_only_python_property_at_wrapper)
-		.def("size", &u32_set_properties_read_only_python::size);
-
-	class_<u64_set_read_only>("u64_set_read_only")
-		.def("at", &u64_set_read_only::at)
-		.def("size", &u64_set_read_only::size)
-		.def("__iter__", iterator<u64_set_read_only>());
+		.def("size", &u32_set_properties_read_only_python::size)
+		;
 
 	def("ipv4toi", python_ipv4toi1);
 	def("ipv4toi", python_ipv4toi2);
