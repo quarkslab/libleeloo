@@ -25,6 +25,7 @@ set(HEADER_DIST_FILES
 	include/leeloo/bits_permutation.h
 	include/leeloo/exports.h
 	include/leeloo/helpers.h
+	include/leeloo/integer_cast.h
 	include/leeloo/interval.h
 	include/leeloo/intrinsics.h
 	include/leeloo/ip_list_intervals.h
@@ -32,8 +33,11 @@ set(HEADER_DIST_FILES
 	include/leeloo/ips_parser.h
 	include/leeloo/list_intervals.h
 	include/leeloo/list_intervals_properties.h
+	include/leeloo/list_intervals_random.h
 	include/leeloo/list_intervals_with_properties.h
 	include/leeloo/math_helpers.h
+	include/leeloo/port.h
+	include/leeloo/port_list_intervals.h
 	include/leeloo/prime_helpers.h
 	include/leeloo/random.h
 	include/leeloo/sort_permute.h
