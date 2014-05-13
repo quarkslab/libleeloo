@@ -1,5 +1,5 @@
-#ifndef LEELOO_LIST_INTERVALS_RANDOM_STATE_H
-#define LEELOO_LIST_INTERVALS_RANDOM_STATE_H
+#ifndef LEELOO_LIST_INTERVALS_RANDOM_H
+#define LEELOO_LIST_INTERVALS_RANDOM_H
 
 #include <boost/random/random_device.hpp>
 
@@ -46,8 +46,9 @@ public:
 		return li.at_cached(n);
 	}
 
-	bool end() const { return _cur_step == size(); }
-	size_type size() const { return _uprng.max(); }
+	bool end() const { return _cur_step == size_todo(); }
+	size_type size_original() const { return _uprng.max(); }
+	size_type size_todo() const { return _uprng.max(); }
 	size_type cur_step() const { return _cur_step; }
 	seed_type seed() const { return _seed; }
 
@@ -124,7 +125,7 @@ public:
 
 	void step_done(size_type const step)
 	{
-		assert(end() || (step < *_it_steps));
+		assert(end() || (step <= *_it_steps));
 		_done_steps.add(interval<size_type>(step, step+1));
 		if (const_cast<steps_list_intervals const&>(_done_steps).intervals().size() >= 100) {
 			_done_steps.aggregate();
@@ -132,7 +133,8 @@ public:
 	}
 
 	bool end() const { return _it_steps == _steps_todo.value_end(); }
-	size_type size() const { return _steps_todo.size(); }
+	size_type size_original() const { return _uprng.max(); }
+	size_type size_todo() const { return _steps_todo.size(); }
 	size_type size_done() const { return _done_steps.size(); }
 
 	steps_list_intervals const& done_steps() const { return _done_steps; }
