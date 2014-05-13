@@ -44,6 +44,7 @@
 #include <leeloo/exports.h>
 #include <leeloo/uni.h>
 #include <leeloo/utility.h>
+#include <leeloo/integer_cast.h>
 
 #ifdef LEELOO_BOOST_SERIALIZE
 #include <boost/serialization/vector.hpp>
@@ -324,9 +325,9 @@ public:
 		return (base_type(1)<<(interger_bits-prefix))-1;
 	}
 
-	size_type size() const
+	base_type size() const
 	{
-		size_type ret(0);
+		base_type ret(0);
 		for (interval_type const& i: intervals()) {
 			ret += i.width();
 		}
@@ -339,8 +340,8 @@ public:
 		if (size_div <= 0) {
 			size_div = 1;
 		}
-		const size_type size_all = size();
-		UPRNG<size_type, false> uprng;
+		const base_type size_all = size();
+		UPRNG<base_type, false> uprng;
 		uprng.init(size_all, rand_eng);
 
 		base_type* interval_buf;
@@ -349,7 +350,7 @@ public:
 			return;
 		}
 
-		const size_type size_all_full = (size_all/size_div)*size_div;
+		const size_type size_all_full = strict_integer_cast<size_type>(size_all/base_type(size_div))*size_div;
 		for (size_type i = 0; i < size_all_full; i += size_div) {
 			for (size_t j = 0; j < size_div; j++) {
 				interval_buf[j] = at_cached(uprng());
@@ -357,7 +358,7 @@ public:
 			fset(interval_buf, size_div);
 		}
 
-		const size_type rem = size_all-size_all_full;
+		const size_type rem = integer_cast<size_type>(size_all-base_type(size_all_full));
 		if (rem > 0) {
 			for (size_type i = size_all_full; i < size_all; i++) {
 				interval_buf[i-size_all_full] = at_cached(uprng());
@@ -385,7 +386,7 @@ public:
 		return get_rth_value(r, 0, intervals().size());
 	}
 
-	base_type at_cached(size_type const r) const
+	base_type at_cached(base_type const r) const
 	{
 		assert(r < size() && _cache_entry_size > 0);
 		ssize_t cur;
@@ -630,16 +631,19 @@ private:
 		}
 	}
 
-	LEELOO_LOCAL size_type get_rth_value(size_type const r, size_t const interval_start, size_t const interval_end) const
+	LEELOO_LOCAL size_type get_rth_value(base_type const r, size_t const interval_start, size_t const interval_end) const
 	{
 		// [interval_start,interval_end[
-		ssize_t cur = r;
+		base_type cur = r;
 		for (size_t i = interval_start; i < interval_end; i++) {
 			const interval_type it = intervals()[i];
-			cur -= it.width();
-			if (cur < 0) {
+			const base_type it_width = it.width();
+			if (cur < it_width) {
 				// This is it!
-				return it.upper() + cur;
+				return it.upper() - (it_width - cur);
+			}
+			else {
+				cur -= it_width;
 			}
 		}
 		return -1;
