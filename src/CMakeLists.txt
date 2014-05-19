@@ -18,6 +18,9 @@ set(SRC_FILES
 set(INSTANCES_EXPORTED_H ${CMAKE_CURRENT_BINARY_DIR}/include/leeloo/instances_exported.h)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/leeloo/instances_exported.h.in ${INSTANCES_EXPORTED_H})
 
+set(CONFIG_H ${CMAKE_CURRENT_BINARY_DIR}/include/leeloo/config.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/leeloo/config.h.in ${CONFIG_H})
+
 set(HEADER_DIST_FILES
 	include/leeloo/atomic_helpers.h
 	include/leeloo/bench.h
@@ -45,6 +48,7 @@ set(HEADER_DIST_FILES
 	include/leeloo/uprng.h
 	include/leeloo/utility.h
 	${INSTANCES_EXPORTED_H}
+	${CONFIG_H}
 )
 
 include_directories(${Boost_INCLUDE_DIRS})

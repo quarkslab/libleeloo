@@ -3,10 +3,6 @@ project(leeloo)
 
 enable_testing()
 
-if(LEELOO_BOOST_SERIALIZE)
-	add_definitions(-DLEELOO_BOOST_SERIALIZE)
-endif()
-
 include(CMakeCompilers.txt)
 include(CMakeRequiredLibraries.txt)
 

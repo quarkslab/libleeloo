@@ -39,8 +39,10 @@
 
 #include <exception>
 #include <iterator>
+#include <iostream>
 
 #include <leeloo/bench.h>
+#include <leeloo/config.h>
 #include <leeloo/exports.h>
 #include <leeloo/uni.h>
 #include <leeloo/utility.h>
@@ -465,6 +467,22 @@ public:
 	}
 
 public:
+	void read_stream(std::istream& os)
+	{
+		uint32_t nintervals;
+		os >> nintervals;
+		clear();
+		intervals().resize(nintervals);
+		os.read((char*) &intervals()[0], nintervals*sizeof(interval_type));
+	}
+
+	void dump_stream(std::ostream& os)
+	{
+		uint32_t nintervals = strict_integer_cast<uint32_t>(intervals().size());
+		os << nintervals;
+		os.write((const char*) &intervals()[0], intervals().size()*sizeof(interval_type));
+	}
+
 	void dump_to_fd(int fd)
 	{
 		if (fd == -1) {
@@ -539,14 +557,14 @@ public:
 	template<class Archive>
 	void save(Archive& ar, unsigned int const /*version*/) const
 	{
-		ar & intervals();
+		ar & boost::serialization::make_nvp("intervals", intervals());
 	}
 
 	template<class Archive>
 	void load(Archive& ar, unsigned int const /*version*/)
 	{
 		clear();
-		ar & intervals();
+		ar & boost::serialization::make_nvp("intervals", intervals());
 	}
 
 	BOOST_SERIALIZATION_SPLIT_MEMBER()

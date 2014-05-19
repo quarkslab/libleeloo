@@ -1,0 +1,8 @@
+#ifndef LEELOO_CONFIG_H_IN
+#define LEELOO_CONFIG_H_IN
+
+#if @LEELOO_BOOST_SERIALIZE@
+#define LEELOO_BOOST_SERIALIZE
+#endif
+
+#endif

@@ -31,9 +31,11 @@
 
 #include <algorithm>
 
+#include <leeloo/config.h>
 #include <leeloo/exports.h>
 
 #ifdef LEELOO_BOOST_SERIALIZE
+#include <boost/serialization/nvp.hpp>
 #include <boost/serialization/version.hpp>
 #endif
 
@@ -93,8 +95,8 @@ public:
 	template<class Archive>
 	void serialize(Archive& ar, unsigned int const /*version*/)
 	{
-		ar & _lower;
-		ar & _upper;
+		ar & boost::serialization::make_nvp("lower", _lower);
+		ar & boost::serialization::make_nvp("upper", _upper);
 	}
 #endif
 

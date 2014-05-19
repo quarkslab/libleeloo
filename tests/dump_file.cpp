@@ -79,19 +79,35 @@ int main()
 	close(fd_tmp);
 	unlink(tmpfile);
 
+	{
+		std::stringstream ss;
+		ref.dump_stream(ss);
+
+		list_intervals list_ss;
+		ss.seekg(0, std::stringstream::beg);
+		list_ss.read_stream(ss);
+
+		if (ref != list_ss) {
+			std::cerr << "Deserialize after serialize with std::stream didn't give the same result!" << std::endl;
+			return 1;
+		}
+	}
+
 #ifdef LEELOO_BOOST_SERIALIZE
 	// Serialisation with boost::archive
-	std::stringstream ss;
-	boost::archive::text_oarchive oa(ss);
-	oa << ref;
+	{
+		std::stringstream ss;
+		boost::archive::text_oarchive oa(ss);
+		oa << ref;
 
-	list_intervals list_boost;
-	ss.seekg(0, std::stringstream::beg);
-	boost::archive::text_iarchive ia(ss);
-	ia >> list_boost;
-	if (ref != list_boost) {
-		std::cerr << "Deserialize after serialize do not give the same result!" << std::endl;
-		return 1;
+		list_intervals list_boost;
+		ss.seekg(0, std::stringstream::beg);
+		boost::archive::text_iarchive ia(ss);
+		ia >> list_boost;
+		if (ref != list_boost) {
+			std::cerr << "Deserialize after serialize didn't give the same result!" << std::endl;
+			return 1;
+		}
 	}
 #endif
 

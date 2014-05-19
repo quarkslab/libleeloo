@@ -3,10 +3,12 @@
 
 #include <boost/random/random_device.hpp>
 
+#include <leeloo/config.h>
 #include <leeloo/list_intervals.h>
 #include <leeloo/interval.h>
 
 #ifdef LEELOO_BOOST_SERIALIZE
+#include <boost/serialization/nvp.hpp>
 #include <boost/serialization/version.hpp>
 #endif
 
@@ -56,15 +58,15 @@ public:
 	template <class Archive>
 	void save_state(Archive& ar)
 	{
-		ar << _seed;
-		ar << _cur_step;
+		ar << boost::serialization::make_nvp("seed", _seed);
+		ar << boost::serialization::make_nvp("cur_step", _cur_step);
 	}
 
 	template <class Archive, class RandEngine>
 	void restore_state(Archive& ar, list_intervals_type const& li, RandEngine&& rand_engine)
 	{
-		ar >> _seed;
-		ar >> _cur_step;
+		ar >> boost::serialization::make_nvp("seed", _seed);
+		ar >> boost::serialization::make_nvp("cur_step", _cur_step);
 		rand_engine.seed(_seed);
 		_uprng.init(li.size(), rand_engine);
 	}
@@ -164,17 +166,17 @@ public:
 	template <class Archive>
 	void save_state(Archive& ar)
 	{
-		ar << _seed;
+		ar << boost::serialization::make_nvp("seed", _seed);
 
 		_done_steps.aggregate();
-		ar << _done_steps;
+		ar << boost::serialization::make_nvp("done_steps", _done_steps);
 	}
 
 	template <class Archive, class RandEngine>
 	void restore_state(Archive& ar, list_intervals_type const& li, RandEngine&& rand_engine)
 	{
-		ar >> _seed;
-		ar >> _done_steps;
+		ar >> boost::serialization::make_nvp("seed", _seed);
+		ar >> boost::serialization::make_nvp("done_steps", _done_steps);
 
 		rand_engine.seed(_seed);
 		_uprng.init(li.size(), rand_engine);
