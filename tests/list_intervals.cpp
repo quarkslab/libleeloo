@@ -156,9 +156,6 @@ int main(int argc, char** argv)
 	const uint32_t size_all = list.size();
 	std::cout << "Size all: " << size_all << std::endl;
 	for (uint32_t i = 0; i < size_all; i++) {
-		if (i == 34327) {
-			std::cerr << "bug here" << std::endl;
-		}
 		const uint32_t v0 = list.at(i);
 		const uint32_t v1 = list.at_cached(i);
 		if (v0 != v1) {
@@ -166,6 +163,23 @@ int main(int argc, char** argv)
 			ret = 1;
 		}
 	}
+
+	{
+		list_intervals l2;
+		l2.add(1, 200);
+		l2.add(400, 600);
+		l2.aggregate();
+		l2.create_index_cache(256);
+
+		for (uint32_t i = 0; i < l2.size(); i++) {
+			if (l2.at_cached(i) == 0xFFFFFFFF) {
+				std::cerr << "Error with cache when cache.size() == 1" << std::endl;
+				ret = 1;
+			}
+		}
+	}
+
+
 
 #define COMPARE()\
 		ret = compare_intervals(list, intervals_agg, sizeof(intervals_agg)/(2*sizeof(uint32_t)));\

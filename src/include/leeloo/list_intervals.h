@@ -409,7 +409,8 @@ public:
 		_index_cache.clear();
 		_index_cache.reserve((intervals_count+cache_entry_size-1)/cache_entry_size);
 		for (size_t i = 0; i < intervals_count; i += cache_entry_size) {
-			for (size_t j = i; j < i+cache_entry_size; j++) {
+			const size_t j_end = std::min(intervals_count, i+cache_entry_size);
+			for (size_t j = i; j < j_end; j++) {
 				cur_size += intervals()[j].width();
 			}
 			_index_cache.push_back(cur_size);
