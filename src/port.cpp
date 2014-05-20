@@ -52,3 +52,17 @@ int leeloo::port::socket_proto() const
 
 	return -1;
 }
+
+const char* leeloo::port::protocol_name(uint16_t proto)
+{
+	switch (proto) {
+		case static_cast<uint16_t>(protocol_enum::TCP):
+			return "TCP";
+		case static_cast<uint16_t>(protocol_enum::UDP):
+			return "UDP";
+		case static_cast<uint16_t>(protocol_enum::SCTP):
+			return "SCTP";
+	}
+
+	return "unknown";
+}

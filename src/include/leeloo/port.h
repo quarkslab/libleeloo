@@ -45,6 +45,11 @@ public:
 	int socket_proto() const;
 
 	static protocol_enum protocol_from_socket_type(int type, int protocol);
+	static const char* protocol_name(uint16_t proto);
+
+	inline bool operator==(port const& o) const { return as_u32() == o.as_u32(); }
+	inline bool operator!=(port const& o) const { return as_u32() != o.as_u32(); }
+	inline bool operator<(port const& o) const  { return as_u32() <  o.as_u32(); }
 
 private:
 	union {

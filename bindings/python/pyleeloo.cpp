@@ -269,6 +269,18 @@ static property_python ip_list_intervals_with_properties_python_property_of_wrap
 	return *p;
 }
 
+std::string port_repr(leeloo::port const& port)
+{
+	std::stringstream ss;
+	ss << "<Port " << port.value() << "/" << leeloo::port::protocol_name(port.protocol()) << ">";
+	return ss.str();
+}
+
+uint32_t port_hash(leeloo::port const& port)
+{
+	return port.as_u32();
+}
+
 BOOST_PYTHON_MODULE(pyleeloo)
 {
 	init_rand_gen();
@@ -301,6 +313,9 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("value", get_port_const(&leeloo::port::value))
 		.def("protocol", get_port_const(&leeloo::port::protocol))
 		.def("as_u32", &leeloo::port::as_u32)
+		.def("__repr__", &port_repr)
+		.def("__hash__", &port_hash)
+		.def("__eq__", &leeloo::port::operator==)
 		;
 
 	class_<leeloo::ip_list_intervals>("ip_list_intervals")
