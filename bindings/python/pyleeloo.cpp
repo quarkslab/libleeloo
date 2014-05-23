@@ -38,8 +38,10 @@
 #include <leeloo/ip_list_intervals_with_properties.h>
 #include <leeloo/ips_parser.h>
 #include <leeloo/list_intervals.h>
+#include <leeloo/list_intervals_random.h>
 #include <leeloo/port_list_intervals.h>
 #include <leeloo/random.h>
+#include <leeloo/uni.h>
 
 using namespace boost::python;
 
@@ -281,6 +283,13 @@ uint32_t port_hash(leeloo::port const& port)
 	return port.as_u32();
 }
 
+typedef leeloo::list_intervals_random<leeloo::ip_list_intervals, leeloo::uni> ip_list_intervals_random;
+
+void ip_list_intervals_random_init(ip_list_intervals_random& ipr, leeloo::ip_list_intervals const& ipl)
+{
+	ipr.init(ipl, leeloo::random_engine<uint32_t>(g_mt_rand));
+}
+
 BOOST_PYTHON_MODULE(pyleeloo)
 {
 	init_rand_gen();
@@ -334,6 +343,7 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("reserve", &leeloo::ip_list_intervals::reserve)
 		.def("clear", &leeloo::ip_list_intervals::clear)
 		.def("at", &leeloo::ip_list_intervals::at)
+		.def("at_cached", &leeloo::ip_list_intervals::at_cached)
 		.def("random_sets", &ip_list_random_sets)
 		.def("contains", contains1)
 		.def("contains", contains2)
@@ -352,6 +362,7 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("reserve", &u16_list_intervals::reserve)
 		.def("clear", &u16_list_intervals::clear)
 		.def("at", &u16_list_intervals::at)
+		.def("at_cached", &u16_list_intervals::at_cached)
 		.def("random_sets", &u16_list_random_sets)
 		.def("dump_to_file", &u16_list_intervals::dump_to_file)
 		.def("read_from_file", &u16_list_intervals::read_from_file)
@@ -381,6 +392,7 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("reserve", &ip_list_intervals_with_properties_python::reserve)
 		.def("clear", &ip_list_intervals_with_properties_python::clear)
 		.def("at", &ip_list_intervals_with_properties_python::at)
+		.def("at_cached", &ip_list_intervals_with_properties_python::at_cached)
 		.def("random_sets", &ip_list_random_sets)
 		.def("random_sets_with_properties", &ip_list_with_properties_python_random_sets_with_properties)
 		.def("contains", contains1)
@@ -424,6 +436,12 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("at", &u32_set_properties_read_only_python::at)
 		.def("property_at", &u32_set_properties_read_only_python_property_at_wrapper)
 		.def("size", &u32_set_properties_read_only_python::size)
+		;
+
+	class_<ip_list_intervals_random>("ip_list_intervals_random")
+		.def("init", &ip_list_intervals_random_init)
+		.def("__call__", &ip_list_intervals_random::operator())
+		.def("end", &ip_list_intervals_random::end)
 		;
 
 	def("ipv4toi", python_ipv4toi1);
