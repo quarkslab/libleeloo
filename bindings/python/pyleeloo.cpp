@@ -290,6 +290,11 @@ void ip_list_intervals_random_init(ip_list_intervals_random& ipr, leeloo::ip_lis
 	ipr.init(ipl, leeloo::random_engine<uint32_t>(g_mt_rand));
 }
 
+void ip_list_intervals_random_init_seed(ip_list_intervals_random& ipr, leeloo::ip_list_intervals const& ipl, ip_list_intervals_random::seed_type const seed, leeloo::ip_list_intervals::size_type const start)
+{
+	ipr.init(ipl, leeloo::random_engine<uint32_t>(g_mt_rand), seed, start);
+}
+
 BOOST_PYTHON_MODULE(pyleeloo)
 {
 	init_rand_gen();
@@ -440,6 +445,7 @@ BOOST_PYTHON_MODULE(pyleeloo)
 
 	class_<ip_list_intervals_random>("ip_list_intervals_random")
 		.def("init", &ip_list_intervals_random_init)
+		.def("init", &ip_list_intervals_random_init_seed)
 		.def("__call__", &ip_list_intervals_random::operator())
 		.def("end", &ip_list_intervals_random::end)
 		;
