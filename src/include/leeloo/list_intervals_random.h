@@ -83,22 +83,45 @@ class list_intervals_random_promise
 {
 	typedef ListIntervals list_intervals_type;
 	typedef typename ListIntervals::base_type base_type;
+public:
+	// TODO: should force the unsigned version of it
 	typedef typename ListIntervals::size_type size_type;
+
+private:
 	typedef UPRNG<size_type, atomic> uprng_type;
+	typedef list_intervals<interval<base_type>, base_type> steps_list_intervals;
+
+public:
 	typedef uint32_t seed_type;
-	typedef list_intervals<interval<size_type>, size_type> steps_list_intervals;
 
 public:
 	template <class RandEngine>
-	void init(list_intervals_type const& li, RandEngine&& rand_engine, seed_type const seed)
+	void init(list_intervals_type const& li, RandEngine&& rand_engine, seed_type const seed, size_type step_start, size_type step_end)
 	{
 		_seed = seed;
 		rand_engine.seed(_seed);
 		_uprng.init(li.size(), rand_engine);
+		step_end = std::min(step_end, _uprng.max());
+		step_start = std::min(step_start, _uprng.max());
+		if (step_start > step_end) {
+			std::swap(step_start, step_end);
+		}
+
 		_steps_todo.clear();
-		_steps_todo.add(0, _uprng.max());
+		_steps_todo.add(step_start, step_end);
+
 		_done_steps.clear();
+		_done_steps.add(0, step_start);
+		_done_steps.add(step_end, _uprng.max());
+		_done_steps.aggregate();
+
 		_it_steps = _steps_todo.value_begin();
+	}
+
+	template <class RandEngine>
+	void init(list_intervals_type const& li, RandEngine&& rand_engine, seed_type const seed)
+	{
+		init(li, rand_engine, seed, 0, li.size());
 	}
 
 	template <class RandEngine>

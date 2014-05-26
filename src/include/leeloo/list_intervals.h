@@ -178,6 +178,70 @@ public:
 		size_type _offset;
 	};
 
+	// Const value iterator
+	class range_value_iterator: std::iterator<std::forward_iterator_tag, base_type>
+	{
+		typedef std::iterator<std::forward_iterator_tag, base_type> iterator_base_type;
+	public:
+		range_value_iterator()
+		{
+			// undefined values
+		}
+
+		range_value_iterator(container_type const& v, base_type const range):
+			_iter(v.begin()),
+			_offset(0),
+			_range(range)
+		{
+		}
+
+		range_value_iterator(container_type const& v, tag_vi_end):
+			_iter(v.end()),
+			_offset(0)
+		{
+		}
+
+	public:
+		value_iterator& operator++()
+		{
+			if (_iter->lower() + _offset != _iter->upper() - 1) {
+				++_offset;
+			}
+			else {
+				++_iter;
+				_offset = 0;
+			}
+			return *this;
+		}
+
+		value_iterator operator++(int)
+		{
+			value_iterator ret = *this;
+			++*this;
+			return ret;
+		}
+
+		typename iterator_base_type::value_type operator*() const
+		{
+			return _iter->lower() + _offset;
+		}
+
+		bool operator!=(value_iterator const& other) const
+		{
+			return _iter != other._iter or _offset != other._offset;
+		}
+
+		bool operator==(value_iterator const& other) const
+		{
+			return _iter == other._iter and _offset == other._offset;
+		}
+
+	private:
+		iterator _iter;
+		size_type _offset;
+		base_type _range;
+	};
+
 public:
 	list_intervals():
 		_cache_entry_size(0)
@@ -466,6 +530,39 @@ public:
 
 		return false;
 	}
+
+	/*
+	std::vector<this_type> divide_by(size_type const n) const
+	{
+		std::vector<this_type> ret;
+		const base_type whole_size = size();
+		const size_type values_per_obj = strict_integer_cast<size_type>((whole_size+n-1)/n);
+
+		ret.resize(n);
+		std::vector<this_type>::iterator cur_obj;
+		size_type cur_count = 0;
+
+		for (interval_type const& it: intervals()) {
+			cur_count += it.size();
+			if (cur_count < values_per_obj) {
+				cur_obj->add(it);
+			}
+			else {
+				const size_t above = cur_count - values_per_obj;
+				cur_obj->add(interval_type(it.lower(), it.lower()+above));
+
+				++cur_obj;
+				if (cur_obj == ret.end()) {
+					return ret;
+				}
+				interval_type rem(interval_type(it.lower()+above, it.upper());
+				cur_obj.add(rem);
+				cur_count = rem.size();
+			}
+		}
+		return ret;
+
+	}*/
 
 public:
 	void read_stream(std::istream& os)
