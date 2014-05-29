@@ -336,6 +336,21 @@ void ip_list_intervals_random_promise_restore_state(ip_list_intervals_random_pro
 }
 #endif
 
+static leeloo::port tcp_port(uint16_t value)
+{
+	return leeloo::port(value, leeloo::port::protocol_enum::TCP);
+}
+
+static leeloo::port udp_port(uint16_t value)
+{
+	return leeloo::port(value, leeloo::port::protocol_enum::UDP);
+}
+
+static leeloo::port sctp_port(uint16_t value)
+{
+	return leeloo::port(value, leeloo::port::protocol_enum::SCTP);
+}
+
 BOOST_PYTHON_MODULE(pyleeloo)
 {
 	init_rand_gen();
@@ -509,4 +524,8 @@ BOOST_PYTHON_MODULE(pyleeloo)
 
 	def("ipv4toi", python_ipv4toi1);
 	def("ipv4toi", python_ipv4toi2);
+
+	def("tcp_port", tcp_port);
+	def("udp_port", udp_port);
+	def("sctp_port", sctp_port);
 }
