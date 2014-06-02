@@ -36,7 +36,7 @@ This project uses CMake. To compile it, follow these steps:
     $ cmake -DLEELOO_BOOST_SERIALIZE=1 -DCMAKE_BUILD_TYPE=Release ..
     $ make
 
-Use -DLEELOO_BOOST_SERIALIZE=1 if you want to support random state persistance through the ``list_intervals_random_state*`` classes (needed for [nodescan](https://github.com/quarkslab/nodescan)).
+Use -DLEELOO_BOOST_SERIALIZE=1 if you want to support random state persistance through the ``list_intervals_random*`` classes (needed for [nodescan](https://github.com/quarkslab/nodescan)).
 
 The supported build types are :
 
