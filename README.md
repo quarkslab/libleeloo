@@ -21,6 +21,7 @@ You need at least GCC 4.7 or Clang 3.4, a Linux-based system, and these librarie
  * Boost Random >= 1.49
  * Intel Threading Building Blocks (https://www.threadingbuildingblocks.org/) >= 4.0
  * Boost Python >= 1.49 for Python bindings (thus not necessary)
+ * Boost Serialization >= 1.49 for random state persistance (thus not necessary)
 
 Support for other OS-es and compilers may be provied in the future.
 
@@ -32,8 +33,10 @@ This project uses CMake. To compile it, follow these steps:
 
     $ cd /path/to/src
     $ mkdir build && cd build
-    $ cmake -DCMAKE_BUILD_TYPE=Release ..
+    $ cmake -DLEELOO_BOOST_SERIALIZE=1 -DCMAKE_BUILD_TYPE=Release ..
     $ make
+
+Use -DLEELOO_BOOST_SERIALIZE=1 if you want to support random state persistance through the ``list_intervals_random_state*`` classes (needed for [nodescan](https://github.com/quarkslab/nodescan)).
 
 The supported build types are :
 
