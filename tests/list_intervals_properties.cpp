@@ -31,6 +31,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <set>
+#include <array>
 
 #include <boost/random.hpp>
 
@@ -124,14 +125,14 @@ int main()
 				}
 			});
 
-	ret = check_property<1>(list, 1, {{6}}); // double braces makes compiler happy!
-	ret = check_property<2>(list, 5, {{6, 1}});
-	ret = check_property<2>(list, 6, {{6, 1}});
-	ret = check_property<3>(list, 9, {{6, 1, 2}});
-	ret = check_property<3>(list, 12, {{6, 2, 4}});
-	ret = check_property<2>(list, 15, {{6, 4}});
-	ret = check_property<2>(list, 16, {{6, 5}});
-	ret = check_property<2>(list, 18, {{6, 5}});
+	ret = check_property(list, 1, std::array<int, 1>{{6}}); // double braces makes compiler happy!
+	ret = check_property(list, 5, std::array<int, 2>{{6, 1}});
+	ret = check_property(list, 6, std::array<int, 2>{{6, 1}});
+	ret = check_property(list, 9, std::array<int, 3>{{6, 1, 2}});
+	ret = check_property(list, 12, std::array<int, 3>{{6, 2, 4}});
+	ret = check_property(list, 15, std::array<int, 2>{{6, 4}});
+	ret = check_property(list, 16, std::array<int, 2>{{6, 5}});
+	ret = check_property(list, 18, std::array<int, 2>{{6, 5}});
 
 	list_intervals_properties list2;
 	list2.add_property(interval(5, 11), {1});
