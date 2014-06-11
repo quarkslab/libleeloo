@@ -49,9 +49,9 @@ static void display(leeloo::ip_interval const& it)
 {
 	const uint32_t width = it.width();
 	const char* ip_a = ip2str(it.lower());
-	if (_popcnt32(width) == 1) {
+	if (__builtin_popcount(width) == 1) {
 		// CIDR prefix
-		const int prefix = 32-_bit_scan_forward(width);
+		const int prefix = 32-__builtin_ctz(width);
 		std::cout << ip_a << "/" << prefix << std::endl;
 	}
 	else {
