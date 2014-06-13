@@ -9,6 +9,8 @@
 #include <vli/integer.hpp>
 #endif
 
+#include <leeloo/integer_traits.h>
+
 namespace leeloo {
 
 class integer_overflow: public std::exception
@@ -69,6 +71,13 @@ inline To strict_integer_cast(vli::integer<N> const& vli)
 	return strict_integer_cast<To>(vli[0]);
 }
 #endif
+
+template <class T>
+typename integer_above<T>::type integer_cast_above(T const& v)
+{
+	typedef typename integer_above<T>::type above_type;
+	return integer_cast<above_type>(v);
+}
 
 }
 

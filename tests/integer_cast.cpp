@@ -67,5 +67,28 @@ int main()
 	}
 #endif
 
+
+	{
+		auto test = leeloo::integer_cast_above(static_cast<uint32_t>(4));
+		static_assert(std::is_same<decltype(test), uint64_t>::value, "integer_cast_above unsigned 32 bits failed");
+	}
+
+	{
+		auto test = leeloo::integer_cast_above(static_cast<int32_t>(4));
+		static_assert(std::is_same<decltype(test), int64_t>::value, "integer_cast_above signed 32 bits failed");
+	}
+
+#ifdef LEELOO_VLI_SUPPORT
+	{
+		auto test = leeloo::integer_cast_above(static_cast<uint64_t>(4));
+		static_assert(std::is_same<decltype(test), vli::integer<128>>::value, "integer_cast_above above 64 bits failed");
+	}
+
+	{
+		auto test = leeloo::integer_cast_above(vli::integer<128>(4));
+		static_assert(std::is_same<decltype(test), vli::integer<256>>::value, "integer_cast_above vli 128 bits failed");
+	}
+#endif
+
 	return 0;
 }

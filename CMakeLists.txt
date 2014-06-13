@@ -7,6 +7,10 @@ if (NOT LEELOO_BOOST_SERIALIZE)
 	set(LEELOO_BOOST_SERIALIZE 0)
 endif()
 
+if (NOT LEELOO_VLI_SUPPORT)
+	set(LEELOO_VLI_SUPPORT 0)
+endif()
+
 include(CMakeCompilers.txt)
 include(CMakeRequiredLibraries.txt)
 

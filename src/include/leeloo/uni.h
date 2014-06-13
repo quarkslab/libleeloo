@@ -45,6 +45,7 @@
 #include <leeloo/atomic_helpers.h>
 #include <leeloo/intrinsics.h>
 #include <leeloo/prime_helpers.h>
+#include <leeloo/integer_cast.h>
 
 namespace leeloo {
 
@@ -117,7 +118,7 @@ private:
 			// Use the final permutation
 			return _rem_perm[v-prime];
 		}
-		const integer_type residue = ((uint64_t) v * (uint64_t) v) % prime;
+		const integer_type residue = (integer_cast_above(v) * integer_cast_above(v)) % prime;
 		return (v <= (prime / 2)) ? residue : prime - residue;
 	}
 
