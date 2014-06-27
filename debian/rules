@@ -7,4 +7,4 @@
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/cmake.mk
 
-export DEB_CMAKE_EXTRA_FLAGS = -DCMAKE_BUILD_TYPE=relwithdebinfo -DNO_TESTS=1 -DNO_TOOLS=1 '-DLEELOO_INCLUDE=32;64'
+export DEB_CMAKE_EXTRA_FLAGS = -DCMAKE_BUILD_TYPE=relwithdebinfo -DNO_TESTS=1 '-DLEELOO_INCLUDE=32;64'
