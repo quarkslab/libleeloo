@@ -776,8 +776,4 @@ LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::list_intervals<leeloo::
 LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::list_intervals<leeloo::interval<uint32_t>>;
 #endif
 
-#ifdef LEELOO_INCLUDE_U64
-LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::list_intervals<leeloo::interval<uint64_t>>;
-#endif
-
 #endif

@@ -18,8 +18,4 @@
 #define LEELOO_INCLUDE_U32
 #endif
 
-#if @LEELOO_INCLUDE_U64@
-#define LEELOO_INCLUDE_U64
-#endif
-
 #endif
