@@ -605,7 +605,7 @@ public:
 #endif
 
 private:
-	LEELOO_LOCAL static void aggregate_container(container_type& ints)
+	static void aggregate_container(container_type& ints)
 	{
 		if (ints.size() <= 1) {
 			return;
@@ -636,7 +636,7 @@ private:
 		ints = std::move(ret);
 	}
 
-	LEELOO_LOCAL void split_merged_interval_removed(interval_type const& cur_merge_, container_type& ret, typename container_type::const_iterator& it_removed)
+	void split_merged_interval_removed(interval_type const& cur_merge_, container_type& ret, typename container_type::const_iterator& it_removed)
 	{
 		bool notend;
 		while (((notend = it_removed != removed_intervals().end())) &&
@@ -683,7 +683,7 @@ private:
 		}
 	}
 
-	LEELOO_LOCAL size_type get_rth_value(base_type const r, size_t const interval_start, size_t const interval_end) const
+	size_type get_rth_value(base_type const r, size_t const interval_start, size_t const interval_end) const
 	{
 		// [interval_start,interval_end[
 		base_type cur = r;
@@ -701,7 +701,7 @@ private:
 		return -1;
 	}
 
-	LEELOO_LOCAL size_t get_cached_interval_idx(size_type const r, ssize_t& rem) const
+	size_t get_cached_interval_idx(size_type const r, ssize_t& rem) const
 	{
 		// Dichotomy!
 		size_t a = 0;
