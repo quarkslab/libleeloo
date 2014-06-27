@@ -1,11 +1,5 @@
-libleeloo (1.1) unstable; urgency=medium
+libleeloo (1.0) stable; urgency=low
 
-  * Support CIDR /0
+  * First stable release.
 
- -- Adrien Guinet <aguinet@quarkslab.com>  Fri, 10 Jan 2014 14:12:34 +0100
-
-libleeloo (1.0) unstable; urgency=low
-
-  * Initial release
-
- -- Adrien Guinet <aguinet@quarkslab.com>  Fri, 15 Nov 2013 10:44:43 +0100
+ -- Adrien Guinet <aguinet@quarkslab.com>  Fri, 27 Jun 2014 14:35:29 +0200

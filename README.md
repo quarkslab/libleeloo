@@ -71,6 +71,29 @@ After building the library, just run as root:
 
 This will install the library to /usr/local, and the Python module to the current Python installation.
 
+
+Debian packages
+---------------
+
+Debian packages can be downloaded on Quarkslab's public debian repository.
+Packages for the stable (wheezy) and unstable (sid) versions are available.
+
+Instructions are available [here](http://apt.quarkslab.com/readme.txt) to add this repository to your system.
+
+Then, you simply have to do:
+
+    # apt-get update
+    # apt-get install libleeloo
+
+Development packages are also available:
+
+    # apt-get install libleeloo-dev
+
+Python 2.7 and 3 bindings are also available as debian packages:
+
+    # apt-get install python-pyleeloo python3-pyleeloo
+
+
 Usage examples
 --------------
 
