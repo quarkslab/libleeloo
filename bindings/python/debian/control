@@ -2,14 +2,15 @@ Source: pyleeloo
 Maintainer: Adrien Guinet <aguinet@quarkslab.com>
 Section: python
 Priority: optional
-Build-Depends: python-all-dev (>= 2.6.6-3), python3-all-dev, debhelper (>= 7), libleeloo-dev, libboost-python-dev
+Build-Depends: python-all-dev (>= 2.6.6-3), python3-all-dev, debhelper (>= 7), libleeloo-dev (= 1.0), libboost-python-dev
 X-Python-Version: >= 2.7
 X-Python3-Version: >= 3.1
 Standards-Version: 3.9.1
 
 Package: python-pyleeloo
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}, libleeloo
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}, libleeloo (= 1.0)
+XB-Python-Version: ${python:Versions}
 Description: Library to manage big sets of integers - Python bindings
  Python bindings for libleeloo
  .
@@ -25,7 +26,8 @@ Description: Library to manage big sets of integers - Python bindings
 
 Package: python3-pyleeloo
 Architecture: all
-Depends: ${misc:Depends}, ${python3:Depends}, libleeloo
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python3:Depends}, libleeloo (= 1.0)
+XB-Python-Version: ${python3:Versions}
 Description: Library to manage big sets of integers - Python3 bindings
  Python3 bindings for libleeloo
  .
