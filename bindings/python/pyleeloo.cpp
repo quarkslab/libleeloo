@@ -167,6 +167,22 @@ static void u16_list_random_sets(u16_list_intervals const& l, size_t const size_
 				  leeloo::random_engine<uint16_t>(g_mt_rand));
 }
 
+// uint32 intervals
+//
+
+typedef leeloo::interval<uint32_t> u32_interval;
+typedef leeloo::list_intervals<u32_interval> u32_list_intervals;
+
+void (u32_list_intervals::*u32_add1)(u32_list_intervals::base_type const, u32_list_intervals::base_type const) = &u32_list_intervals::add;
+void (u32_list_intervals::*u32_add2)(u32_list_intervals const&)                                                = &u32_list_intervals::add;
+
+static void u32_list_random_sets(u32_list_intervals const& l, size_t const size_div, object& f_set)
+{
+	l.random_sets(size_div,
+	              [&f_set](uint32_t const* buf, size_t const size) { f_set(u32_set_read_only(buf, size)); },
+				  leeloo::random_engine<uint32_t>(g_mt_rand));
+}
+
 // Properties
 typedef object property_python;
 
@@ -427,7 +443,26 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("random_sets", &u16_list_random_sets)
 		.def("dump_to_file", &u16_list_intervals::dump_to_file)
 		.def("read_from_file", &u16_list_intervals::read_from_file)
+		.def("contains", &u16_list_intervals::contains)
 		.def("__iter__", iterator<u16_list_intervals>())
+		;
+
+	class_<u32_list_intervals>("u32_list_intervals")
+		.def("add", u32_add1)
+		.def("add", u32_add2)
+		.def("aggregate", &u32_list_intervals::aggregate)
+		.def("aggregate_max_prefix", &ip_list_intervals_with_properties_python::aggregate_max_prefix)
+		.def("create_index_cache", &u32_list_intervals::create_index_cache)
+		.def("size", &u32_list_intervals::size)
+		.def("reserve", &u32_list_intervals::reserve)
+		.def("clear", &u32_list_intervals::clear)
+		.def("at", &u32_list_intervals::at)
+		.def("at_cached", &u32_list_intervals::at_cached)
+		.def("random_sets", &u32_list_random_sets)
+		.def("dump_to_file", &u32_list_intervals::dump_to_file)
+		.def("read_from_file", &u32_list_intervals::read_from_file)
+		.def("contains", &u32_list_intervals::contains)
+		.def("__iter__", iterator<u32_list_intervals>())
 		;
 
 	class_<ip_list_intervals_with_properties_python>("ip_list_intervals_with_properties")
