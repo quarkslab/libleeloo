@@ -30,3 +30,4 @@ override_dh_install:
 
 	# Continue with regular dh_install
 	dh_install
+	dh_shlibdeps
