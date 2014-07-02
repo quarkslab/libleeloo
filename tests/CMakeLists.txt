@@ -54,6 +54,7 @@ add_test(random_state random_state)
 
 add_executable(integer_cast integer_cast.cpp)
 target_link_libraries(integer_cast leeloo)
+add_test(integer_cast integer_cast)
 
 #add_executable(test_vli vli.cpp)
 #target_link_libraries(test_vli leeloo vli)
