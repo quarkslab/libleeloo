@@ -80,9 +80,10 @@ int main()
 	print_intervals(list);
 
 #define COMPARE()\
-	ret = compare_intervals(list, intervals_agg, sizeof(intervals_agg)/(2*sizeof(uint32_t)));\
-	if (ret != 0) {\
+	int ret_ = compare_intervals(list, intervals_agg, sizeof(intervals_agg)/(2*sizeof(uint32_t)));\
+	if (ret_ != 0) {\
 		std::cerr << "error" << std::endl;\
+		ret = ret_;\
 	}
 
 	{
@@ -95,10 +96,42 @@ int main()
 	}
 
 	list.clear();
+	list.add("10.0.0.4-10.0.0.25");
+	list.add("10.0.0.46-10.0.0.125");
+	list.add("10.0.0.76-10.0.1.4");
+	list.add("10.0.2.0-10.0.4.4");
+	list.add("10.0.7.0-10.0.7.4");
+
+	list.aggregate_max_prefix_strict(24);
+	print_intervals(list);
+
+	{
+		uint32_t intervals_agg[] = {
+			0x0a000000, 0x0a000405, // 10.0.0.0->10.0.4.5
+			0x0a000700, 0x0a000800, // 10.0.7.0/24
+		};
+		COMPARE()
+	}
+
+	list.clear();
 	list.add("10.0.1.0/24");
 	list.add("10.0.5.0/24");
 
 	list.aggregate_max_prefix(30);
+	print_intervals(list);
+	{
+		uint32_t intervals_agg[] = {
+			0x0a000100, 0x0a000200, // 10.0.1.0/24
+			0x0a000500, 0x0a000600, // 10.0.5.0/24
+		};
+		COMPARE()
+	}
+
+	list.clear();
+	list.add("10.0.1.0/24");
+	list.add("10.0.5.0/24");
+
+	list.aggregate_max_prefix_strict(30);
 	print_intervals(list);
 	{
 		uint32_t intervals_agg[] = {

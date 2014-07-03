@@ -287,36 +287,14 @@ public:
 		intervals() = std::move(ret);
 	}
 
-	void aggregate_max_prefix(unsigned int const min_prefix)
+	inline void aggregate_max_prefix(unsigned int const min_prefix)
 	{
-		if (min_prefix == 0) {
-			return;
-		}
+		aggregate_max_prefix_impl<false>(min_prefix);
+	}
 
-		aggregate();
-
-		const base_type mask = prefix2mask(min_prefix);
-		const base_type inv_mask = ~mask;
-		const base_type max_size = mask+1;
-
-		base_type prev_a = std::numeric_limits<base_type>::min();
-		base_type prev_b = std::numeric_limits<base_type>::max();
-		// Do not use iterator as we will append intervals, and thus modify the end!
-		const size_type org_size = intervals().size();
-		for (size_type i = 0; i < org_size; i++) {
-			interval_type const& it = intervals()[i];
-			if (it.width() < max_size) {
-				base_type const a = it.lower() & inv_mask;
-				base_type const b = (it.upper() | mask) + 1;
-				if (a != prev_a || b != prev_b) {
-					add(a, b);
-					prev_a = a;
-					prev_b = b;
-				}
-			}
-		}
-
-		aggregate();
+	inline void aggregate_max_prefix_strict(unsigned int const min_prefix)
+	{
+		aggregate_max_prefix_impl<true>(min_prefix);
 	}
 
 	static inline base_type prefix2mask(const unsigned int prefix)
@@ -605,6 +583,35 @@ public:
 #endif
 
 private:
+	template <bool strict>
+	void aggregate_max_prefix_impl(unsigned int const min_prefix)
+	{
+		if (min_prefix == 0) {
+			return;
+		}
+
+		aggregate();
+
+		const base_type mask = prefix2mask(min_prefix);
+		const base_type inv_mask = ~mask;
+		const base_type max_size = mask+1;
+
+		base_type prev_a = std::numeric_limits<base_type>::min();
+		base_type prev_b = std::numeric_limits<base_type>::max();
+		// Do not use iterator as we will append intervals, and thus modify the end!
+		const size_type org_size = intervals().size();
+		for (size_type i = 0; i < org_size; i++) {
+			interval_type& it = intervals()[i];
+			if ((it.width() < max_size) || (!strict && ((it.upper() & mask) != 0))) {
+				base_type const a = it.lower() & inv_mask;
+				base_type const b = (it.upper() | mask) + 1;
+				it = interval_type(a, b);
+			}
+		}
+
+		aggregate();
+	}
+
 	static void aggregate_container(container_type& ints)
 	{
 		if (ints.size() <= 1) {
