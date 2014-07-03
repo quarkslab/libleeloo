@@ -132,6 +132,9 @@ private:
 	void init_final_perm(Engine const& rand_eng)
 	{
 		// Generate a random permutation for the final numbers
+		if (_rem_perm) {
+			free(_rem_perm);
+		}
 		const integer_type rem = size_rem();
 		posix_memalign((void**) &_rem_perm, 16, rem*sizeof(integer_type));
 		assert(_rem_perm);
