@@ -407,6 +407,9 @@ private:
 private:
 	LEELOO_LOCAL void copy(bit_field const& o)
 	{
+		if (_buf) {
+			allocator_type().deallocate(_buf, _size);
+		}
 		_buf = allocator_type().allocate(o.size_chunks());
 		if (_buf == nullptr) {
 			throw std::bad_alloc();
