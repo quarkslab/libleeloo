@@ -242,12 +242,14 @@ public:
 		}
 	}
 
-	bit_field(bit_field const& o)
+	bit_field(bit_field const& o):
+		_buf(nullptr)
 	{
 		copy(o);
 	}
 
-	bit_field(bit_field&& o)
+	bit_field(bit_field&& o):
+		_buf(nullptr)
 	{
 		move(std::move(o));
 	}
@@ -420,6 +422,9 @@ private:
 
 	LEELOO_LOCAL void move(bit_field&& o)
 	{
+		if (_buf) {
+			allocator_type().deallocate(_buf, _size);
+		}
 		_buf = o._buf;
 		_size = o._size;
 		o._buf = nullptr;
