@@ -93,6 +93,9 @@ Python 2.7 and 3 bindings are also available as debian packages:
 
     # apt-get install python-pyleeloo python3-pyleeloo
 
+The "leeloo-aggregate" and "leeloo-ip-ranges-rand" tools are available in a separate "leeloo-tools" package:
+
+    # apt-get install leeloo-tools
 
 Usage examples
 --------------
@@ -101,8 +104,8 @@ Some examples can be found in the ``tools/`` and ``tests/`` directory.
 
 One tool is provided for randomizing IP ranges :
 
-    $ ./ip_ranges_rand
-    Usage: ./ip_ranges_rand range1 [-][range2] [-][range3] ...
+    $ ./leeloo-ip-ranges-rand
+    Usage: ./leeloo-ip-ranges-rand range1 [-][range2] [-][range3] ...
     
     This tool will aggregate all the given ranges and will write a random order of the corresponding IP.
     
