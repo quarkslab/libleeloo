@@ -53,7 +53,7 @@ In order to install the python bindings, do the following :
     $ cd /path/to/src
     $ cd bindings/python
     $ mkdir build && cd build
-    $ cmake -DCMAKE_BUILD_TYPE=Release -DPYHON_VERSION=3.3 ..
+    $ cmake -DCMAKE_BUILD_TYPE=Release -DPYTHON_VERSION=3.3 ..
     $ make
 
 Then, as root :
