@@ -107,6 +107,34 @@ int main(int argc, char** argv)
 	else {
 		std::cout << "Size all sets: " << size_sets << std::endl;
 	}
+
+	size_sets = 0;
+	const size_t ninters = list.intervals_count();
+	list.random_sets<leeloo::uprng>(
+		[ninters](size_t i)
+		{
+			if (i < 10) {
+				return 4;
+			}
+			if (i > (ninters-4)) {
+				return 7;
+			}
+			return 16;
+		},
+		16,
+		[&size_sets](uint32_t const* /*ints*/, const ssize_t size)
+		{
+			size_sets += size;
+		},
+		leeloo::random_engine<uint32_t>(mt_rand));
+
+	if (size_sets != list.size()) {
+		std::cerr << "Random sets returns " << size_sets << " results, expected " << list.size() << std::endl;
+		return 1;
+	}
+	else {
+		std::cout << "Size all sets: " << size_sets << std::endl;
+	}
 	               
 	return 0;
 }

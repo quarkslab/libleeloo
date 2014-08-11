@@ -314,6 +314,11 @@ public:
 		return ret;
 	}
 
+	size_t intervals_count() const
+	{
+		return intervals().size();
+	}
+
 	template <template <class T_, bool atomic_> class UPRNG, class Fset, class RandEngine>
 	void random_sets(size_type size_div, Fset const& fset, RandEngine const& rand_eng) const
 	{
@@ -344,6 +349,41 @@ public:
 				interval_buf[i-size_all_full] = at_cached(uprng());
 			}
 			fset(interval_buf, rem);
+		}
+
+		free(interval_buf);
+	}
+
+	template <template <class T_, bool atomic_> class UPRNG, class Fset, class Fsize_div, class RandEngine>
+	void random_sets(Fsize_div const& fsize_div, const size_t size_max, Fset const& fset, RandEngine const& rand_eng) const
+	{
+		if (size_max == 0) {
+			return;
+		}
+
+		base_type size_rem = size();
+		UPRNG<base_type, false> uprng;
+		uprng.init(size_rem, rand_eng);
+
+		base_type* interval_buf;
+		posix_memalign((void**) &interval_buf, 16, sizeof(base_type)*size_max);
+		if (interval_buf == nullptr) {
+			return;
+		}
+
+		size_t i = 0;
+		while (size_rem > 0) {
+			const size_t size = std::min(integer_cast<size_t>(fsize_div(i)), integer_cast<size_t>(size_rem));
+			if ((size > size_max) || (size == 0)) {
+				break;
+			}
+			for (size_type j = 0; j < size; j++) {
+				interval_buf[j] = at_cached(uprng());
+			}
+			fset(interval_buf, size);
+
+			i++;
+			size_rem -= size;
 		}
 
 		free(interval_buf);
