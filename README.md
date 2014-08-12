@@ -20,14 +20,20 @@ You need at least GCC 4.7.3 (4.7.2 crashes) or Clang 3.4, a Linux-based system, 
 
  * Boost Random >= 1.49
  * Intel Threading Building Blocks (https://www.threadingbuildingblocks.org/) >= 4.0
- * Boost Python >= 1.49 for Python bindings (thus not necessary)
  * Boost Serialization >= 1.49 for random state persistance (thus not necessary)
+
+These tools are also needed:
+ * cmake
 
 Support for other OS-es and compilers may be provied in the future.
 
 Under Debian-based systems, this can be installed thanks to:
 
-    # aptitude install libtbb-dev libboost-random-dev libboost-python-dev
+    # aptitude install cmake libtbb-dev libboost-random-dev libboost-serialization-dev
+
+Under Fedora, this can be done thanks to:
+
+    # yum install cmake tbb-devel boost-devel
 
 This project uses CMake. To compile it, follow these steps:
 
@@ -48,19 +54,33 @@ This will compile the library. Then, as root, you can install it :
 
     # make install
 
-In order to install the python bindings, do the following :
+In order to install the python bindings, you need these dependencies:
+ * Python development environment
+ * Boost Python >= 1.49 for Python bindings (thus not necessary)
+ 
+Under Debian-based system, this can be installed like this:
+
+    # aptitude install libboost-python-dev python-dev
+
+Under Fedora, you can do:
+
+    # yum install boost-python-devel python-devel
+
+Then, do the following :
 
     $ cd /path/to/src
     $ cd bindings/python
     $ mkdir build && cd build
-    $ cmake -DCMAKE_BUILD_TYPE=Release -DPYTHON_VERSION=3.3 ..
+    $ cmake -DCMAKE_BUILD_TYPE=Release -DPYTHON_VERSION=2.7 ..
     $ make
 
 Then, as root :
 
     # make install
 
-The PYTHON_VERSION variable tells CMake for which Python version the bindings must be compiled.
+The PYTHON_VERSION variable tells CMake for which Python version the bindings
+must be compiled. Fedora systems need to manually specify the boost python
+library name with the -DPYTHON_BOOST=python argument to the cmake command line.
 
 Installation
 ------------
