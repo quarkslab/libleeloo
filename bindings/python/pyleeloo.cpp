@@ -119,6 +119,18 @@ static void ip_list_random_sets(leeloo::ip_list_intervals const& l, size_t const
 				  leeloo::random_engine<uint32_t>(g_mt_rand));
 }
 
+static void ip_list_random_sets_func(leeloo::ip_list_intervals const& l, object& f_size_div, size_t const size_max, object& f_set)
+{
+	l.random_sets(
+			[&f_size_div](size_t const i) -> size_t
+			{
+				return extract<size_t>(f_size_div(i));
+			},
+		    size_max,
+		    [&f_set](uint32_t const* buf, size_t const size) { f_set(u32_set_read_only(buf, size)); },
+		    leeloo::random_engine<uint32_t>(g_mt_rand));
+}
+
 static void port_list_random_sets(leeloo::port_list_intervals const& l, size_t const size_div, object& f_set)
 {
 	l.random_sets(size_div,
@@ -165,6 +177,18 @@ static void u16_list_random_sets(u16_list_intervals const& l, size_t const size_
 	l.random_sets(size_div,
 	              [&f_set](uint16_t const* buf, size_t const size) { f_set(u16_set_read_only(buf, size)); },
 				  leeloo::random_engine<uint16_t>(g_mt_rand));
+}
+
+static void u16_list_random_sets_func(u16_list_intervals const& l, object& f_size_div, size_t const size_max, object& f_set)
+{
+	l.random_sets(
+			[&f_size_div](size_t const i) -> size_t
+			{
+				return extract<size_t>(f_size_div(i));
+			},
+	        size_max,
+	        [&f_set](uint16_t const* buf, size_t const size) { f_set(u16_set_read_only(buf, size)); },
+			leeloo::random_engine<uint16_t>(g_mt_rand));
 }
 
 // uint32 intervals
@@ -274,6 +298,22 @@ static void ip_list_with_properties_python_random_sets_with_properties(ip_list_i
 		}
 		,
 		leeloo::random_engine<uint64_t>(g_mt_rand));
+}
+
+static void ip_list_with_properties_python_random_sets_with_properties_func(ip_list_intervals_with_properties_python const& l, object& f_size_div, size_t const size_max, object& f_set)
+{
+	l.random_sets_with_properties(
+		[&f_size_div](size_t const i) -> size_t
+		{
+			return extract<size_t>(f_size_div(i));
+		},
+		size_max,
+		[&f_set](uint32_t const* buf, property_python const* const* props, size_t const size)
+		{
+			f_set(u32_set_properties_read_only_python(buf, props, size));
+		}
+		,
+		leeloo::random_engine<uint32_t>(g_mt_rand));
 }
 
 static property_python ip_list_intervals_with_properties_python_property_of_wrapper(ip_list_intervals_with_properties_python const& l, uint32_t v)
@@ -422,6 +462,7 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("at", &leeloo::ip_list_intervals::at)
 		.def("at_cached", &leeloo::ip_list_intervals::at_cached)
 		.def("random_sets", &ip_list_random_sets)
+		.def("random_sets", &ip_list_random_sets_func)
 		.def("contains", contains1)
 		.def("contains", contains2)
 		.def("dump_to_file", &leeloo::ip_list_intervals::dump_to_file)
@@ -441,6 +482,7 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("at", &u16_list_intervals::at)
 		.def("at_cached", &u16_list_intervals::at_cached)
 		.def("random_sets", &u16_list_random_sets)
+		.def("random_sets", &u16_list_random_sets_func)
 		.def("dump_to_file", &u16_list_intervals::dump_to_file)
 		.def("read_from_file", &u16_list_intervals::read_from_file)
 		.def("contains", &u16_list_intervals::contains)
@@ -490,7 +532,9 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("at", &ip_list_intervals_with_properties_python::at)
 		.def("at_cached", &ip_list_intervals_with_properties_python::at_cached)
 		.def("random_sets", &ip_list_random_sets)
+		.def("random_sets", &ip_list_random_sets_func)
 		.def("random_sets_with_properties", &ip_list_with_properties_python_random_sets_with_properties)
+		.def("random_sets_with_properties", &ip_list_with_properties_python_random_sets_with_properties_func)
 		.def("contains", contains1)
 		.def("contains", contains2)
 		.def("dump_to_file", &ip_list_intervals_with_properties_python::dump_to_file)

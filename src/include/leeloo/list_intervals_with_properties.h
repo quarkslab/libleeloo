@@ -71,10 +71,40 @@ public:
 			rand_eng);
 	}
 
+	template <template <class T_, bool atomic_> class UPRNG, class Fsize_div, class Fset, class RandEngine>
+	void random_sets_with_properties(Fsize_div const& fsize_div, size_t const size_max, Fset const& fset, RandEngine const& rand_eng) const
+	{
+		// There might be a more efficient way to do this
+		if (size_max <= 0) {
+			return;
+		}
+
+		std::vector<property_type const*> properties;
+		properties.resize(size_max);
+
+		// AG: 'this' is necessary because the compiler can't know (before
+		// instantiation) that random_sets will be part of ListIntervals
+		this->template random_sets<UPRNG>(fsize_div, size_max,
+			[this, &properties, &fset](base_type* set, size_type const size)
+			{
+				for (size_type i = 0; i < size; i++) {
+					properties[i] = property_of(set[i]);
+				}
+				fset(set, &properties[0], size);
+			},
+			rand_eng);
+	}
+
 	template <class Fset, class RandEngine>
 	inline void random_sets_with_properties(size_type size_div, Fset const& fset, RandEngine const& rand_eng) const
 	{
 		random_sets_with_properties<uni>(size_div, fset, rand_eng);
+	}
+
+	template <class Fsize_div, class Fset, class RandEngine>
+	inline void random_sets_with_properties(Fsize_div const& fsize_div, size_t const size_max, Fset const& fset, RandEngine const& rand_eng) const
+	{
+		random_sets_with_properties<uni>(fsize_div, size_max, fset, rand_eng);
 	}
 
 	

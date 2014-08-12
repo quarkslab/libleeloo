@@ -395,6 +395,12 @@ public:
 		random_sets<uni>(size_div, fset, rand_eng);
 	}
 
+	template <class Fset, class Fsize_div, class RandEngine>
+	void random_sets(Fsize_div const& fsize_div, const size_t size_max, Fset const& fset, RandEngine const& rand_eng) const
+	{
+		random_sets<uni>(fsize_div, size_max, fset, rand_eng);
+	}
+
 	inline void reserve(size_type n) { intervals().reserve(n); }
 	inline void clear() { intervals().clear(); removed_intervals().clear(); }
 
