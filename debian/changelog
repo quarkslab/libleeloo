@@ -1,3 +1,9 @@
+libleeloo (1.0.1-0) stable; urgency=low
+
+  * Add random_sets with variable set size
+
+ -- Adrien Guinet <aguinet@quarkslab.com>  Tue, 12 Aug 2014 09:19:04 +0200
+
 libleeloo (1.0-0) stable; urgency=low
 
   * First stable release.

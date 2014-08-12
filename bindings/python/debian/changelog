@@ -1,3 +1,10 @@
+pyleeloo (1.0.1-0) stable; urgency=low
+
+  * Python bindings for the new random_sets functions
+  * Python bindings for intervals_count 
+
+ -- Adrien Guinet <aguinet@quarkslab.com>  Tue, 12 Aug 2014 09:20:09 +0200
+
 pyleeloo (1.0-0) stable; urgency=low
 
   * Initial release.
