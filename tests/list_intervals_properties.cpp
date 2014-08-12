@@ -223,6 +223,30 @@ int main()
 		},
 		leeloo::random_engine<uint32_t>(mt_rand));
 
+	lip.random_sets_with_properties(
+		[](size_t const i)
+		{
+			return (rand()+i)%7;
+		},
+		6,
+		[](uint32_t const* ints, property const* const* properties, size_t n)
+		{
+			for (size_t i = 0; i < n; i++) {
+				std::cout << ints[i] << ": ";
+				property const* p = properties[i];
+				if (p == nullptr) {
+					std::cout << "no properties";
+				}
+				else {
+					for (int i: *p) {
+						std::cout << i << ",";
+					}
+				}
+				std::cout << std::endl;
+			}
+		},
+		leeloo::random_engine<uint32_t>(mt_rand));
+
 	{
 		// Test case for #3
 		leeloo::list_intervals_with_properties<leeloo::list_intervals<interval>, property> lip;
