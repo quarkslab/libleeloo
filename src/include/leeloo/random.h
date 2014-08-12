@@ -36,6 +36,8 @@ namespace leeloo {
 template <class Integer, class RandEng>
 struct random
 {
+	template <class Integer_, class RandEng_> friend class random;
+
 	typedef Integer integer_type;
 
 	template <class U>
