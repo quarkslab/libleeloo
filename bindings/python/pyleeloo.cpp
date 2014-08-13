@@ -444,6 +444,11 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("__eq__", &leeloo::port::operator==)
 		;
 
+	class_<leeloo::port_interval>("port_interval")
+		.def("port_lower", &leeloo::port_interval::port_lower)
+		.def("port_upper", &leeloo::port_interval::port_upper)
+		;
+
 	class_<leeloo::ip_list_intervals>("ip_list_intervals")
 		.def("add", ip_add1)
 		.def("add", ip_add2)
