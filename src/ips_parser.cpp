@@ -67,7 +67,7 @@ static inline uint32_t atoi3(const char* str, const size_t len_int)
 
 	if (len_int == 0 || len_int >= 4) {
 		return -1;
-	}   
+	}
 	uint32_t cur_int = 0;
 	for (size_t j = 0; j < len_int; j++) {
 		const char c = str[j];
@@ -75,7 +75,7 @@ static inline uint32_t atoi3(const char* str, const size_t len_int)
 			return -1;
 		}
 		cur_int += (c-'0')*pow10[len_int-j-1];
-	}   
+	}
 	return cur_int;
 }
 
@@ -105,6 +105,10 @@ uint32_t leeloo::ips_parser::ipv4toi(const char* str, const size_t size, bool& v
 			ret |= cur_int << (8*cur_idx);
 			cur_idx--;
 			start_idx = i+1;
+			continue;
+		}
+
+		if (isspace(c)) {
 			continue;
 		}
 

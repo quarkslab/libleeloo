@@ -108,6 +108,9 @@ int main()
 	TEST_IPV4I("10.0.0.0", 0x0a000000, true);
 	TEST_IPV4I("10.10.10.10", 0x0a0a0a0a, true);
 	TEST_IPV4I("111.111.111.111", 0x6f6f6f6f, true);
+	TEST_IPV4I("   111.111.111.111   ", 0x6f6f6f6f, true);
+	TEST_IPV4I("   111  .  111 . 111  . 111   ", 0x6f6f6f6f, true);
+	TEST_IPV4I("1.11.111.1", 0x010b6f01, true);
 	TEST_IPV4I("1.11.111.1", 0x010b6f01, true);
 	TEST_IPV4I("255.255.255.255", 0xffffffff, true);
 	TEST_IPV4I("255.255..255", 0, false);
@@ -124,6 +127,10 @@ int main()
 
 	std::cout << "Test ips parser..." << std::endl;
 	TEST_IP_PARSER("10.0.0.0-10.0.0.255", true, "10.0.0.0", "10.0.0.255");
+	TEST_IP_PARSER("10.0.0.0 -10.0.0.255", true, "10.0.0.0", "10.0.0.255");
+	TEST_IP_PARSER("10.0.0.0- 10.0.0.255", true, "10.0.0.0", "10.0.0.255");
+	TEST_IP_PARSER("10.0.0.0 - 10.0.0.255", true, "10.0.0.0", "10.0.0.255");
+	TEST_IP_PARSER("  10.0.0.0  -   10.0.0.255    ", true, "10.0.0.0", "10.0.0.255");
 	TEST_IP_PARSER("127.0.0.1", true, "127.0.0.1", "127.0.0.1");
 	TEST_IP_PARSER("blabla", false, "", "");
 	TEST_IP_PARSER("google.com", false, "", "");
@@ -135,7 +142,7 @@ int main()
 	{
 		leeloo::ip_list_intervals ref;
 		ref.add(leeloo::ips_parser::ipv4toi("10.1.5.19", valid), leeloo::ips_parser::ipv4toi("10.1.5.20", valid));
-		ret = test_dashes("10-10.1-1.5-5.20-19", ref);
+		ret |= test_dashes("10-10.1-1.5-5.20-19", ref);
 	}
 	{
 		leeloo::ip_list_intervals ref;
@@ -149,13 +156,13 @@ int main()
 			}
 		}
 
-		ret = test_dashes("10-15.1-4.5-9.20-25", ref);
+		ret |= test_dashes("10-15.1-4.5-9.20-25", ref);
 	}
 
 	{
 		leeloo::ip_list_intervals ref;
 		ref.add(leeloo::ips_parser::ipv4toi("10.4.5.8", valid), leeloo::ips_parser::ipv4toi("10.4.5.20", valid));
-		ret = test_dashes("10.4.5.8-20", ref);
+		ret |= test_dashes("10.4.5.8-20", ref);
 	}
 
 	return ret;
