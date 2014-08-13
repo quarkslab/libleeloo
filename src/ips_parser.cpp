@@ -79,6 +79,32 @@ static inline uint32_t atoi3(const char* str, const size_t len_int)
 	return cur_int;
 }
 
+static inline uint32_t atoi3_trim(const char* str, const size_t len_int)
+{
+	if (len_int == 0) {
+		return -1;
+	}
+
+	size_t i;
+	size_t new_len = len_int;
+	for (i = 0; i < len_int; i++) {
+		if (!isspace(str[i])) {
+			break;
+		}
+		new_len--;
+	}
+
+	for (size_t j = len_int-1; j > i; j--) {
+		if (!isspace(str[j])) {
+			break;
+		}
+		new_len--;
+	}
+
+	return atoi3(&str[i], new_len);
+}
+
+
 uint32_t leeloo::ips_parser::ipv4toi(const char* str, const size_t size, bool& valid, int min_dots)
 {
 	if (size == 0) {
@@ -88,8 +114,14 @@ uint32_t leeloo::ips_parser::ipv4toi(const char* str, const size_t size, bool& v
 
 	uint32_t ret = 0;
 	int cur_idx = 3;
-	size_t start_idx = 0;
-	for (size_t i = 0; i <= size; i++) {
+	size_t i;
+	for (i = 0; i <= size; i++) {
+		if (!isspace(str[i])) {
+			break;
+		}
+	}
+	size_t start_idx = i;
+	for (; i <= size; i++) {
 		const char c = str[i];
 		if (c == '.' || (i == size)) {
 			if (cur_idx < 0) {
@@ -97,7 +129,7 @@ uint32_t leeloo::ips_parser::ipv4toi(const char* str, const size_t size, bool& v
 				return 0;
 			}
 
-			const uint32_t cur_int = atoi3(&str[start_idx], i-start_idx);
+			const uint32_t cur_int = atoi3_trim(&str[start_idx], i-start_idx);
 			if (cur_int > 0xFF) {
 				valid = false;
 				return 0;
@@ -230,15 +262,15 @@ static bool __parse_ips(leeloo::ip_list_intervals& l, const char* str)
 		}*/
 		const char* dash = (const char*) memchr(cur, '-', (uintptr_t)dot-(uintptr_t)cur);
 		if (dash) {
-			const int32_t byte_min = atoi3(cur, (uintptr_t)dash-(uintptr_t)cur);
-			const int32_t byte_max = atoi3(dash+1, (uintptr_t)dot-(uintptr_t)(dash+1));
+			const int32_t byte_min = atoi3_trim(cur, (uintptr_t)dash-(uintptr_t)cur);
+			const int32_t byte_max = atoi3_trim(dash+1, (uintptr_t)dot-(uintptr_t)(dash+1));
 			if (byte_min == -1 || byte_max == -1) {
 				return false;
 			}
 			intervals[cur_interval].set(byte_min, byte_max);
 		}
 		else {
-			const int32_t byte = atoi3(cur, (uintptr_t)dot-(uintptr_t)cur);
+			const int32_t byte = atoi3_trim(cur, (uintptr_t)dot-(uintptr_t)cur);
 			if (byte == -1) {
 				return false;
 			}
@@ -256,15 +288,15 @@ static bool __parse_ips(leeloo::ip_list_intervals& l, const char* str)
 	// Last one
 	const char* dash = strchr(cur, '-');
 	if (dash) {
-		const int32_t byte_min = atoi3(cur, (uintptr_t)dash-(uintptr_t)cur);
-		const int32_t byte_max = atoi3(dash+1, size_str-((uintptr_t)(dash+1)-(uintptr_t)str));
+		const int32_t byte_min = atoi3_trim(cur, (uintptr_t)dash-(uintptr_t)cur);
+		const int32_t byte_max = atoi3_trim(dash+1, size_str-((uintptr_t)(dash+1)-(uintptr_t)str));
 		if (byte_min == -1 || byte_max == -1) {
 			return false;
 		}
 		intervals[cur_interval].set(byte_min, byte_max);
 	}
 	else {
-		const int32_t byte = atoi3(cur, (uintptr_t)dot-(uintptr_t)cur);
+		const int32_t byte = atoi3_trim(cur, (uintptr_t)dot-(uintptr_t)cur);
 		if (byte == -1) {
 			return false;
 		}
