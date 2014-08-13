@@ -40,6 +40,7 @@ set(HEADER_DIST_FILES
 	include/leeloo/list_intervals_with_properties.h
 	include/leeloo/math_helpers.h
 	include/leeloo/port.h
+	include/leeloo/port_interval.h
 	include/leeloo/port_list_intervals.h
 	include/leeloo/prime_helpers.h
 	include/leeloo/random.h

@@ -2,15 +2,14 @@
 #define LEELOO_PORT_LIST_INTERVAL_H
 
 #include <leeloo/exports.h>
-#include <leeloo/port.h>
-#include <leeloo/interval.h>
 #include <leeloo/list_intervals.h>
+#include <leeloo/port_interval.h>
 
 namespace leeloo {
 
-class LEELOO_API port_list_intervals: public list_intervals<interval<uint32_t>>
+class LEELOO_API port_list_intervals: public list_intervals<port_interval>
 {
-	typedef list_intervals<interval<uint32_t>> intervals_base_type;
+	typedef list_intervals<port_interval> intervals_base_type;
 
 public:
 	inline void add(uint16_t a, uint16_t b, port::protocol_enum protocol)
