@@ -12,6 +12,6 @@ endif()
 find_package(PythonLibs ${PYTHON_VERSION} REQUIRED)
 set(PythonInterp_FIND_VERSION ${PYTHON_VERSION})
 find_package(PythonInterp)
-find_package(Boost COMPONENTS ${PYTHON_BOOST} REQUIRED)
+find_package(Boost COMPONENTS ${PYTHON_BOOST} random serialization REQUIRED)
 
 find_package(leeloo)

@@ -219,4 +219,12 @@ private:
 
 }
 
+#ifdef leeloo_EXPORTS
+
+#ifdef LEELOO_INCLUDE_U32
+extern template class LEELOO_API leeloo::list_intervals_random<leeloo::list_intervals<leeloo::interval<uint32_t>>, leeloo::uni, false>;
+#endif
+
+#endif
+
 #endif

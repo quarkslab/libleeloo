@@ -817,16 +817,20 @@ private:
 // Common exported instanciations (outside of any namespace)
 //
 
+#ifdef leeloo_EXPORTS
+
 #ifdef LEELOO_INCLUDE_U8
-LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::list_intervals<leeloo::interval<uint8_t>>;
+extern template class LEELOO_API leeloo::list_intervals<leeloo::interval<uint8_t>>;
 #endif
 
 #ifdef LEELOO_INCLUDE_U16
-LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::list_intervals<leeloo::interval<uint16_t>>;
+extern template class LEELOO_API leeloo::list_intervals<leeloo::interval<uint16_t>>;
 #endif
 
 #ifdef LEELOO_INCLUDE_U32
-LEELOO_TEMPLATE_EXPIMP template class LEELOO_API leeloo::list_intervals<leeloo::interval<uint32_t>>;
+extern template class LEELOO_API leeloo::list_intervals<leeloo::interval<uint32_t>>;
+#endif
+
 #endif
 
 #endif
