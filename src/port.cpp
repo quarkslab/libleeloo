@@ -13,7 +13,7 @@ leeloo::port::protocol_enum leeloo::port::protocol_from_socket_type(int type, in
 			switch (proto) {
 				case IPPROTO_SCTP:
 					return protocol_enum::SCTP;
-				case 0:
+				case IPPROTO_TCP:
 					return protocol_enum::TCP;
 				default:
 					return protocol_enum::UNSUPPORTED;
