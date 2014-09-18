@@ -1,3 +1,13 @@
+libleeloo (1.0.2-0) stable; urgency=low
+
+  * closes #4, ip parser now support spaces at different places of the input
+    string
+  * port_list_intervals now manages port_interval objects, with specific methods
+  * fix compilation so that it works with system with ld option --only-needed by
+    default (like ubuntu)
+
+ -- Adrien Guinet <aguinet@quarkslab.com>  Mon, 15 Sep 2014 15:32:29 +0200
+
 libleeloo (1.0.1-0) stable; urgency=low
 
   * Add random_sets with variable set size
