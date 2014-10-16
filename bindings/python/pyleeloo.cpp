@@ -347,6 +347,7 @@ uint32_t port_hash(leeloo::port const& port)
 }
 
 typedef leeloo::list_intervals_random<leeloo::ip_list_intervals, leeloo::uni> ip_list_intervals_random;
+typedef leeloo::list_intervals_random<u32_list_intervals, leeloo::uni> u32_list_intervals_random;
 
 void ip_list_intervals_random_init(ip_list_intervals_random& ipr, leeloo::ip_list_intervals const& ipl)
 {
@@ -356,6 +357,16 @@ void ip_list_intervals_random_init(ip_list_intervals_random& ipr, leeloo::ip_lis
 void ip_list_intervals_random_init_seed(ip_list_intervals_random& ipr, leeloo::ip_list_intervals const& ipl, ip_list_intervals_random::seed_type const seed, leeloo::ip_list_intervals::size_type const start)
 {
 	ipr.init(ipl, leeloo::random_engine<uint32_t>(g_mt_rand), seed, start);
+}
+
+void u32_list_intervals_random_init(u32_list_intervals_random& u32r, u32_list_intervals const& u32l)
+{
+	u32r.init(u32l, leeloo::random_engine<uint32_t>(g_mt_rand));
+}
+
+void u32_list_intervals_random_init_seed(u32_list_intervals_random& u32r, u32_list_intervals const& u32l, u32_list_intervals_random::seed_type const seed, u32_list_intervals::size_type const start)
+{
+	u32r.init(u32l, leeloo::random_engine<uint32_t>(g_mt_rand), seed, start);
 }
 
 
@@ -586,6 +597,14 @@ BOOST_PYTHON_MODULE(pyleeloo)
 		.def("at", &u32_set_properties_read_only_python::at)
 		.def("property_at", &u32_set_properties_read_only_python_property_at_wrapper)
 		.def("size", &u32_set_properties_read_only_python::size)
+		;
+
+	class_<u32_list_intervals_random>("u32_list_intervals_random")
+		.def("init", &u32_list_intervals_random_init)
+		.def("init", &u32_list_intervals_random_init_seed)
+		.def("__call__", &u32_list_intervals_random::operator())
+		.def("end", &u32_list_intervals_random::end)
+		.def("cur_step", &u32_list_intervals_random::cur_step)
 		;
 
 	class_<ip_list_intervals_random>("ip_list_intervals_random")
