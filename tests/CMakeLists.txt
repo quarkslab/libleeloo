@@ -58,5 +58,6 @@ add_executable(integer_cast integer_cast.cpp)
 target_link_libraries(integer_cast ${LINK_LIBRARIES})
 add_test(integer_cast integer_cast)
 
-#add_executable(test_vli vli.cpp)
-#target_link_libraries(test_vli leeloo vli)
+add_executable(test_diffs test_diffs.cpp)
+target_link_libraries(test_diffs ${LINK_LIBRARIES})
+add_test(test_diffs test_diffs)

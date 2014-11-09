@@ -19,15 +19,15 @@ class list_intervals_random
 {
 	typedef ListIntervals list_intervals_type;
 	typedef typename ListIntervals::base_type base_type;
-	typedef typename ListIntervals::size_type size_type;
-	typedef UPRNG<size_type, atomic> uprng_type;
+	typedef typename ListIntervals::difference_type difference_type;
+	typedef UPRNG<difference_type, atomic> uprng_type;
 
 public:
 	typedef uint32_t seed_type;
 
 public:
 	template <class RandEngine>
-	void init(list_intervals_type const& li, RandEngine&& rand_engine, seed_type const seed_, size_type const step = 0)
+	void init(list_intervals_type const& li, RandEngine&& rand_engine, seed_type const seed_, difference_type const step = 0)
 	{
 		_seed = seed_;
 		rand_engine.seed(_seed);
@@ -43,15 +43,15 @@ public:
 
 	base_type operator()(list_intervals_type const& li)
 	{
-		size_type const n = _uprng.get_step(_cur_step);
+		difference_type const n = _uprng.get_step(_cur_step);
 		_cur_step++;
 		return li.at_cached(n);
 	}
 
 	bool end() const { return _cur_step == size_todo(); }
-	size_type size_original() const { return _uprng.max(); }
-	size_type size_todo() const { return _uprng.max(); }
-	size_type cur_step() const { return _cur_step; }
+	difference_type size_original() const { return _uprng.max(); }
+	difference_type size_todo() const { return _uprng.max(); }
+	difference_type cur_step() const { return _cur_step; }
 	seed_type seed() const { return _seed; }
 
 #ifdef LEELOO_BOOST_SERIALIZE
@@ -74,7 +74,7 @@ public:
 
 private:
 	uprng_type _uprng;
-	size_type _cur_step;
+	difference_type _cur_step;
 	seed_type _seed;
 };
 
@@ -85,10 +85,10 @@ class list_intervals_random_promise
 	typedef typename ListIntervals::base_type base_type;
 public:
 	// TODO: should force the unsigned version of it
-	typedef typename ListIntervals::size_type size_type;
+	typedef typename ListIntervals::difference_type difference_type;
 
 private:
-	typedef UPRNG<size_type, atomic> uprng_type;
+	typedef UPRNG<difference_type, atomic> uprng_type;
 	typedef list_intervals<interval<base_type>, base_type> steps_list_intervals;
 
 public:
@@ -96,7 +96,7 @@ public:
 
 public:
 	template <class RandEngine>
-	void init(list_intervals_type const& li, RandEngine&& rand_engine, seed_type const seed, size_type step_start, size_type step_end)
+	void init(list_intervals_type const& li, RandEngine&& rand_engine, seed_type const seed, difference_type step_start, difference_type step_end)
 	{
 		_seed = seed;
 		rand_engine.seed(_seed);
@@ -143,24 +143,24 @@ public:
 		return li.at_cached(_uprng.get_step(*_it_steps));
 	}
 
-	inline size_type get_current_step() const
+	inline difference_type get_current_step() const
 	{
 		return *_it_steps;
 	}
 
-	void step_done(size_type const step)
+	void step_done(difference_type const step)
 	{
 		assert(end() || (step <= *_it_steps));
-		_done_steps.add(interval<size_type>(step, step+1));
+		_done_steps.add(interval<difference_type>(step, step+1));
 		if (const_cast<steps_list_intervals const&>(_done_steps).intervals().size() >= 100) {
 			_done_steps.aggregate();
 		}
 	}
 
 	bool end() const { return _it_steps == _steps_todo.value_end(); }
-	size_type size_original() const { return _uprng.max(); }
-	size_type size_todo() const { return _steps_todo.size(); }
-	size_type size_done() const { return _done_steps.size(); }
+	difference_type size_original() const { return _uprng.max(); }
+	difference_type size_todo() const { return _steps_todo.size(); }
+	difference_type size_done() const { return _done_steps.size(); }
 
 	steps_list_intervals const& done_steps() const { return _done_steps; }
 
@@ -172,7 +172,7 @@ public:
 		_steps_todo.clear();
 		_steps_todo.add(0, _uprng.max());
 		_done_steps.aggregate();
-		for (interval<size_type> const& i: _done_steps) {
+		for (interval<difference_type> const& i: _done_steps) {
 			_steps_todo.remove(i);
 		}
 		_steps_todo.aggregate();

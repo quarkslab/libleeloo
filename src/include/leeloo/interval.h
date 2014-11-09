@@ -33,6 +33,7 @@
 
 #include <leeloo/config.h>
 #include <leeloo/exports.h>
+#include <leeloo/integer_cast.h>
 
 #ifdef LEELOO_BOOST_SERIALIZE
 #include <boost/serialization/nvp.hpp>
@@ -42,11 +43,12 @@
 namespace leeloo {
 
 // interval is half-opened [lower,upper[
-template <class Integer>
+template <class Integer, class DiffType = Integer>
 class interval
 {
 public:
 	typedef Integer base_type;
+	typedef DiffType difference_type;
 
 public:
 	interval()
@@ -76,7 +78,8 @@ public:
 	inline void set_lower(base_type const lower) { _lower = lower; }
 	inline void set_upper(base_type const upper) { _upper = upper; }
 
-	inline base_type width() const { return upper()-lower(); }
+	inline difference_type width() const { return integer_cast<difference_type>(upper()-lower()); }
+	inline difference_type width_strict() const { return strict_integer_cast<difference_type>(upper()-lower()); }
 
 	inline interval& operator=(interval const& o)
 	{

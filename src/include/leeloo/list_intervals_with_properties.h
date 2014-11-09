@@ -41,14 +41,15 @@ class list_intervals_with_properties: public ListInterval
 public:
 	typedef ListInterval list_intervals_type;
 	typedef typename list_intervals_type::interval_type interval_type;
-	typedef typename list_intervals_type::size_type size_type;
+	typedef typename list_intervals_type::difference_type difference_type;
+	typedef typename list_intervals_type::count_type count_type;
 	typedef typename interval_type::base_type base_type;
 	typedef Property property_type;
-	typedef list_intervals_properties<interval_type, property_type, size_type, PropertiesStorage> list_intervals_properties_type;
+	typedef list_intervals_properties<interval_type, property_type, count_type, PropertiesStorage> list_intervals_properties_type;
 
 public:
 	template <template <class T_, bool atomic_> class UPRNG, class Fset, class RandEngine>
-	void random_sets_with_properties(size_type size_div, Fset const& fset, RandEngine const& rand_eng) const
+	void random_sets_with_properties(difference_type size_div, Fset const& fset, RandEngine const& rand_eng) const
 	{
 		// There might be a more efficient way to do this
 		if (size_div <= 0) {
@@ -61,9 +62,9 @@ public:
 		// AG: 'this' is necessary because the compiler can't know (before
 		// instantiation) that random_sets will be part of ListIntervals
 		this->template random_sets<UPRNG>(size_div,
-			[this, &properties, &fset](base_type* set, size_type size)
+			[this, &properties, &fset](base_type* set, count_type size)
 			{
-				for (size_type i = 0; i < size; i++) {
+				for (count_type i = 0; i < size; i++) {
 					properties[i] = property_of(set[i]);
 				}
 				fset(set, &properties[0], size);
@@ -85,9 +86,9 @@ public:
 		// AG: 'this' is necessary because the compiler can't know (before
 		// instantiation) that random_sets will be part of ListIntervals
 		this->template random_sets<UPRNG>(fsize_div, size_max,
-			[this, &properties, &fset](base_type* set, size_type const size)
+			[this, &properties, &fset](base_type* set, count_type const size)
 			{
-				for (size_type i = 0; i < size; i++) {
+				for (count_type i = 0; i < size; i++) {
 					properties[i] = property_of(set[i]);
 				}
 				fset(set, &properties[0], size);
@@ -96,7 +97,7 @@ public:
 	}
 
 	template <class Fset, class RandEngine>
-	inline void random_sets_with_properties(size_type size_div, Fset const& fset, RandEngine const& rand_eng) const
+	inline void random_sets_with_properties(count_type size_div, Fset const& fset, RandEngine const& rand_eng) const
 	{
 		random_sets_with_properties<uni>(size_div, fset, rand_eng);
 	}

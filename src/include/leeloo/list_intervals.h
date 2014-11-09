@@ -86,15 +86,18 @@ private:
 	const char* _msg;
 };
 
-template <class Interval, class SizeType = uint32_t>
+template <class Interval, class DiffType = typename Interval::difference_type, class CountType = uint32_t>
 class list_intervals 
 {
+	// CountType is the type for the *number* of intervals
 public:
 	typedef Interval interval_type;
-	typedef SizeType size_type;
+	typedef DiffType difference_type;
+	typedef CountType count_type;
+
 
 	typedef typename interval_type::base_type base_type;
-	typedef list_intervals<Interval, SizeType> this_type;
+	typedef list_intervals<Interval, DiffType, CountType> this_type;
 
 	static constexpr unsigned int interger_bits = sizeof(base_type)*CHAR_BIT;
 
@@ -175,7 +178,7 @@ public:
 
 	private:
 		iterator _iter;
-		size_type _offset;
+		difference_type _offset;
 	};
 
 public:
@@ -305,28 +308,42 @@ public:
 		return (base_type(1)<<(interger_bits-prefix))-1;
 	}
 
-	base_type size() const
+	difference_type size() const
 	{
-		base_type ret(0);
+		difference_type ret(0);
 		for (interval_type const& i: intervals()) {
-			ret += i.width();
+			ret += integer_cast<difference_type>(i.width());
 		}
 		return ret;
 	}
 
-	size_t intervals_count() const
+	difference_type size_strict() const
 	{
-		return intervals().size();
+		difference_type ret(0);
+		for (interval_type const& i: intervals()) {
+			ret += strict_integer_cast<difference_type>(i.width());
+		}
+		return ret;
+	}
+
+	count_type intervals_count() const
+	{
+		return integer_cast<count_type>(intervals().size());
+	}
+
+	count_type intervals_count_strict() const
+	{
+		return strict_integer_cast<count_type>(intervals().size());
 	}
 
 	template <template <class T_, bool atomic_> class UPRNG, class Fset, class RandEngine>
-	void random_sets(size_type size_div, Fset const& fset, RandEngine const& rand_eng) const
+	void random_sets(count_type size_div, Fset const& fset, RandEngine const& rand_eng) const
 	{
 		if (size_div <= 0) {
 			size_div = 1;
 		}
-		const base_type size_all = size();
-		UPRNG<base_type, false> uprng;
+		const difference_type size_all = size_strict();
+		UPRNG<difference_type, false> uprng;
 		uprng.init(size_all, rand_eng);
 
 		base_type* interval_buf;
@@ -335,17 +352,17 @@ public:
 			return;
 		}
 
-		const size_type size_all_full = strict_integer_cast<size_type>(size_all/base_type(size_div))*size_div;
-		for (size_type i = 0; i < size_all_full; i += size_div) {
+		const count_type size_all_full = strict_integer_cast<count_type>(size_all/base_type(size_div))*size_div;
+		for (count_type i = 0; i < size_all_full; i += size_div) {
 			for (size_t j = 0; j < size_div; j++) {
 				interval_buf[j] = at_cached(uprng());
 			}
 			fset(interval_buf, size_div);
 		}
 
-		const size_type rem = integer_cast<size_type>(size_all-base_type(size_all_full));
+		const count_type rem = integer_cast<count_type>(size_all-base_type(size_all_full));
 		if (rem > 0) {
-			for (size_type i = size_all_full; i < size_all; i++) {
+			for (count_type i = size_all_full; i < size_all; i++) {
 				interval_buf[i-size_all_full] = at_cached(uprng());
 			}
 			fset(interval_buf, rem);
@@ -361,8 +378,8 @@ public:
 			return;
 		}
 
-		base_type size_rem = size();
-		UPRNG<base_type, false> uprng;
+		difference_type size_rem = size();
+		UPRNG<difference_type, false> uprng;
 		uprng.init(size_rem, rand_eng);
 
 		base_type* interval_buf;
@@ -373,11 +390,11 @@ public:
 
 		size_t i = 0;
 		while (size_rem > 0) {
-			const size_t size = std::min(integer_cast<size_t>(fsize_div(i)), integer_cast<size_t>(size_rem));
+			const difference_type size = std::min(integer_cast<difference_type>(fsize_div(i)), size_rem);
 			if ((size > size_max) || (size == 0)) {
 				break;
 			}
-			for (size_type j = 0; j < size; j++) {
+			for (count_type j = 0; j < size; j++) {
 				interval_buf[j] = at_cached(uprng());
 			}
 			fset(interval_buf, size);
@@ -390,33 +407,33 @@ public:
 	}
 
 	template <class Fset, class RandEngine>
-	inline void random_sets(size_type size_div, Fset const& fset, RandEngine const& rand_eng) const
+	inline void random_sets(difference_type size_div, Fset const& fset, RandEngine const& rand_eng) const
 	{
 		random_sets<uni>(size_div, fset, rand_eng);
 	}
 
 	template <class Fset, class Fsize_div, class RandEngine>
-	void random_sets(Fsize_div const& fsize_div, const size_t size_max, Fset const& fset, RandEngine const& rand_eng) const
+	void random_sets(Fsize_div const& fsize_div, const difference_type size_max, Fset const& fset, RandEngine const& rand_eng) const
 	{
 		random_sets<uni>(fsize_div, size_max, fset, rand_eng);
 	}
 
-	inline void reserve(size_type n) { intervals().reserve(n); }
+	inline void reserve(count_type n) { intervals().reserve(n); }
 	inline void clear() { intervals().clear(); removed_intervals().clear(); }
 
 	inline container_type const& intervals() const { return _intervals; }
 
-	inline base_type at(size_type const r) const
+	inline base_type at(difference_type const r) const
 	{
-		assert(r < size());
+		assert(r < size_strict());
 		return get_rth_value(r, 0, intervals().size());
 	}
 
-	base_type at_cached(base_type const r) const
+	base_type at_cached(difference_type const r) const
 	{
-		assert(r < size() && _cache_entry_size > 0);
-		ssize_t cur;
-		const size_t interval_idx = get_cached_interval_idx(r, cur);
+		assert(r < size_strict() && _cache_entry_size > 0);
+		difference_type cur;
+		const count_type interval_idx = get_cached_interval_idx(r, cur);
 		if (cur == 0) {
 			return intervals()[interval_idx].lower();
 		}
@@ -424,17 +441,17 @@ public:
 	}
 
 	// cache_entry_size defines the number of intervals that represent a cache entry
-	void create_index_cache(size_t const cache_entry_size)
+	void create_index_cache(count_type const cache_entry_size)
 	{
 		assert(cache_entry_size > 0);
 		_cache_entry_size = cache_entry_size;
-		const size_t intervals_count = intervals().size();
-		size_type cur_size(0);
+		const count_type intervals_count = intervals().size();
+		difference_type cur_size(0);
 		_index_cache.clear();
 		_index_cache.reserve((intervals_count+cache_entry_size-1)/cache_entry_size);
-		for (size_t i = 0; i < intervals_count; i += cache_entry_size) {
-			const size_t j_end = std::min(intervals_count, i+cache_entry_size);
-			for (size_t j = i; j < j_end; j++) {
+		for (count_type i = 0; i < intervals_count; i += cache_entry_size) {
+			const count_type j_end = std::min(intervals_count, i+cache_entry_size);
+			for (count_type j = i; j < j_end; j++) {
 				cur_size += intervals()[j].width();
 			}
 			_index_cache.push_back(cur_size);
@@ -447,7 +464,7 @@ public:
 			return false;
 		}
 
-		for (size_t i = 0; i < _intervals.size(); i++) {
+		for (count_type i = 0; i < _intervals.size(); i++) {
 			if ((_intervals[i].lower() != o._intervals[i].lower()) ||
 				(_intervals[i].upper() != o._intervals[i].upper())) {
 				return false;
@@ -465,11 +482,11 @@ public:
 	bool contains(base_type const v) const
 	{
 		// Suppose that intervals have been aggregated! (and are thus sorted)
-		size_type a(0);
-		size_type b = intervals().size(); 
+		count_type a(0);
+		count_type b = intervals().size(); 
 
 		while ((b-a) > 4) {
-			const size_type mid = (b+a)/2;
+			const count_type mid = (b+a)/2;
 			interval_type const& it = intervals()[mid];
 			if (it.contains(v)) {
 				return true;
@@ -482,7 +499,7 @@ public:
 			}
 		}
 
-		for (size_type i = a; i < b; i++) {
+		for (count_type i = a; i < b; i++) {
 			if (intervals()[i].contains(v)) {
 				return true;
 			}
@@ -492,15 +509,15 @@ public:
 	}
 
 	/*
-	std::vector<this_type> divide_by(size_type const n) const
+	std::vector<this_type> divide_by(count_type const n) const
 	{
 		std::vector<this_type> ret;
 		const base_type whole_size = size();
-		const size_type values_per_obj = strict_integer_cast<size_type>((whole_size+n-1)/n);
+		const count_type values_per_obj = strict_integer_cast<count_type>((whole_size+n-1)/n);
 
 		ret.resize(n);
 		std::vector<this_type>::iterator cur_obj;
-		size_type cur_count = 0;
+		count_type cur_count = 0;
 
 		for (interval_type const& it: intervals()) {
 			cur_count += it.size();
@@ -527,7 +544,7 @@ public:
 public:
 	void read_stream(std::istream& os)
 	{
-		uint32_t nintervals;
+		count_type nintervals;
 		os >> nintervals;
 		clear();
 		intervals().resize(nintervals);
@@ -536,7 +553,7 @@ public:
 
 	void dump_stream(std::ostream& os)
 	{
-		uint32_t nintervals = strict_integer_cast<uint32_t>(intervals().size());
+		count_type nintervals = strict_integer_cast<count_type>(intervals().size());
 		os << nintervals;
 		os.write((const char*) &intervals()[0], intervals().size()*sizeof(interval_type));
 	}
@@ -645,8 +662,8 @@ private:
 		base_type prev_a = std::numeric_limits<base_type>::min();
 		base_type prev_b = std::numeric_limits<base_type>::max();
 		// Do not use iterator as we will append intervals, and thus modify the end!
-		const size_type org_size = intervals().size();
-		for (size_type i = 0; i < org_size; i++) {
+		const count_type org_size = intervals().size();
+		for (count_type i = 0; i < org_size; i++) {
 			interval_type& it = intervals()[i];
 			if ((it.width() < max_size) || (!strict && ((it.upper() & mask) != 0))) {
 				base_type const a = it.lower() & inv_mask;
@@ -736,13 +753,13 @@ private:
 		}
 	}
 
-	size_type get_rth_value(base_type const r, size_t const interval_start, size_t const interval_end) const
+	count_type get_rth_value(difference_type const r, count_type const interval_start, count_type const interval_end) const
 	{
 		// [interval_start,interval_end[
-		base_type cur = r;
-		for (size_t i = interval_start; i < interval_end; i++) {
+		difference_type cur = r;
+		for (count_type i = interval_start; i < interval_end; i++) {
 			const interval_type it = intervals()[i];
-			const base_type it_width = it.width();
+			const difference_type it_width = it.width();
 			if (cur < it_width) {
 				// This is it!
 				return it.upper() - (it_width - cur);
@@ -754,16 +771,16 @@ private:
 		return -1;
 	}
 
-	size_t get_cached_interval_idx(size_type const r, ssize_t& rem) const
+	count_type get_cached_interval_idx(difference_type const r, difference_type& rem) const
 	{
 		// Dichotomy!
-		size_t a = 0;
-		size_t b = _index_cache.size();
+		count_type a = 0;
+		count_type b = _index_cache.size();
 
 		// Tradeoff
 		while ((b-a) > 4) {
-			const size_t mid = (b+a)/2;
-			const size_type vmid = _index_cache[mid];
+			const count_type mid = (b+a)/2;
+			const difference_type vmid = _index_cache[mid];
 			if (vmid == r) {
 				// You get lucky
 				rem = 0;
@@ -778,13 +795,13 @@ private:
 		}
 
 		// Finish this!
-		size_type v;
+		difference_type v;
 		while ((v = _index_cache[a]) < r) {
 			a++;
 		}
 
 		if (a > 0) {
-			rem = (ssize_t)r-(ssize_t)_index_cache[a-1];
+			rem = (difference_type)r-(difference_type)_index_cache[a-1];
 		}
 		else {
 			rem = r;
@@ -808,8 +825,8 @@ private:
 private:
 	container_type _intervals;
 	container_type _excluded_intervals;
-	std::vector<size_type> _index_cache;
-	size_t _cache_entry_size;
+	std::vector<difference_type> _index_cache;
+	count_type _cache_entry_size;
 };
 
 }
