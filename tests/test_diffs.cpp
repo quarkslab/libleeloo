@@ -17,5 +17,10 @@ int main()
 		},
 		leeloo::random_engine<uint32_t>(rd));
 
+	if (size_sets != l64.size()) {
+		std::cerr << "error: size_sets != real size" << std::endl;
+		return 1;
+	}
+
 	return 0;
 }
