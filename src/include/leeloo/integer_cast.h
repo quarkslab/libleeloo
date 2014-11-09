@@ -5,8 +5,8 @@
 #include <type_traits>
 #include <limits>
 
-#ifdef LEELOO_VLI_SUPPORT
-#include <vli/integer.hpp>
+#ifdef LEELOO_MP_SUPPORT
+#include <boost/multiprecision/cpp_int.hpp>
 #endif
 
 namespace leeloo {
@@ -49,24 +49,29 @@ inline typename std::enable_if<sizeof(To) < sizeof(From), To>::type strict_integ
 	return integer_cast<To>(from);
 }
 
-#ifdef LEELOO_VLI_SUPPORT
-template <class To, size_t N>
-inline To integer_cast(vli::integer<N> const& vli)
+#ifdef LEELOO_MP_SUPPORT
+template <size_t N> using sint_mp = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<N, N, boost::multiprecision::signed_magnitude,   boost::multiprecision::unchecked, void>>;
+template <size_t N> using uint_mp = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<N, N, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void>>;
+
+template <size_t N, bool is_signed> using int_mp = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<N, N, std::conditional<is_signed, typename boost::multiprecision::signed_magnitude, boost::multiprecision::unsigned_magnitude>::type, boost::multiprecision::unchecked, void>>;
+
+template <class To, size_t N, bool is_signed>
+inline To integer_cast(int_mp<N, is_signed> const& v)
 {
 	static_assert(std::is_integral<To>::value, "To must be an integer class");
-	return integer_cast<To>(vli[0]);
+	return integer_cast<To>(v[0]);
 }
 
-template <class To, size_t N>
-inline To strict_integer_cast(vli::integer<N> const& vli)
+template <class To, size_t N, bool is_signed>
+inline To strict_integer_cast(int_mp<N, is_signed> const& v)
 {
 	static_assert(std::is_integral<To>::value, "To must be an integer class");
-	for (size_t i = 1; i < vli::integer<N>::numwords; i++) {
-		if (vli[i] != 0) {
+	for (size_t i = 1; i < N/8; i++) {
+		if (v[i] != 0) {
 			throw integer_overflow();
 		}
 	}
-	return strict_integer_cast<To>(vli[0]);
+	return strict_integer_cast<To>(v[0]);
 }
 #endif
 

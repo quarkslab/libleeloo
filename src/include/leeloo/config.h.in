@@ -5,4 +5,8 @@
 #define LEELOO_BOOST_SERIALIZE
 #endif
 
+#if @LEELOO_MP_SUPPORT@
+#define LEELOO_MP_SUPPORT
+#endif
+
 #endif

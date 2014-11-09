@@ -60,3 +60,6 @@ add_test(integer_cast integer_cast)
 
 #add_executable(test_vli vli.cpp)
 #target_link_libraries(test_vli leeloo vli)
+
+add_executable(test_mp test_mp.cpp)
+target_link_libraries(test_mp leeloo)
