@@ -61,3 +61,6 @@ add_test(integer_cast integer_cast)
 add_executable(test_diffs test_diffs.cpp)
 target_link_libraries(test_diffs ${LINK_LIBRARIES})
 add_test(test_diffs test_diffs)
+
+add_executable(test_mp test_mp.cpp)
+target_link_libraries(test_mp leeloo)
