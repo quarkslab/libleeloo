@@ -3,6 +3,7 @@
 #include <leeloo/list_intervals.h>
 #include <leeloo/random.h>
 #include <leeloo/uprng.h>
+#include <leeloo/integer_cast.h>
 
 #include <random>
 

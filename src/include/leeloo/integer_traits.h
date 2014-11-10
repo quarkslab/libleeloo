@@ -1,0 +1,101 @@
+#ifndef LEELOO_INTEGER_TRAITS_H
+#define LEELOO_INTEGER_TRAITS_H
+
+#include <leeloo/config.h>
+#include <leeloo/integer_cast.h>
+
+#include <boost/integer.hpp> 
+
+#include <type_traits>
+#include <limits>
+
+namespace leeloo {
+
+template <class T>
+class integer_bits
+{
+	static_assert(std::is_integral<T>::value, "T must be an integer");
+
+	template <size_t N_>
+	struct static_N
+	{
+		static constexpr size_t N = N_;
+	};
+
+public:
+	static constexpr bool is_signed = std::numeric_limits<T>::is_signed;
+	static constexpr size_t N = std::conditional<is_signed,
+					 static_N<std::numeric_limits<T>::digits+1>,
+					 static_N<std::numeric_limits<T>::digits>>::type::N;
+};
+
+#ifdef LEELOO_MP_SUPPORT
+template <unsigned N_>
+struct integer_bits<uint_mp<N_>>
+{
+	static constexpr size_t N = N_;
+	static constexpr bool is_signed = true;
+};
+
+template <unsigned N_>
+struct integer_bits<sint_mp<N_>>
+{
+	static constexpr size_t N = N_;
+	static constexpr bool is_signed = false;
+};
+#endif
+
+namespace __impl {
+
+template <class T>
+class integer_above
+{
+	static_assert(std::numeric_limits<T>::is_integer, "T must be an integer");
+	typedef integer_bits<T> integer_bits_type;
+
+public:
+	typedef typename std::conditional<
+				integer_bits_type::is_signed,
+				typename boost::int_t<integer_bits_type::N*2>::exact,
+				typename boost::uint_t<integer_bits_type::N*2>::exact>::type type;
+};
+
+template <>
+struct integer_above<int64_t>
+{
+#ifdef LEELOO_MP_SUPPORT
+	typedef sint_mp<128> type;
+#endif
+};
+
+template <>
+struct integer_above<uint64_t>
+{
+#ifdef LEELOO_MP_SUPPORT
+	typedef uint_mp<128> type;
+#endif
+};
+
+#ifdef LEELOO_MP_SUPPORT
+template <unsigned N>
+struct integer_above<uint_mp<N>>
+{
+	typedef uint_mp<N*2> type;
+};
+
+template <unsigned N>
+struct integer_above<sint_mp<N>>
+{
+	typedef sint_mp<N*2> type;
+};
+#endif
+
+} // __impl
+
+template <class T>
+struct integer_above: public __impl::integer_above<T>
+{ };
+
+} // leeloo
+
+#endif
