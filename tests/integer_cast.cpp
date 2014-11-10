@@ -21,51 +21,61 @@ bool check_throw(Func const& f)
 int main()
 {
 	int ret = 0;
+	int tmp;
 	
-	ret = !check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<char>(10000); });
-	if (ret == 1) {
+	tmp = !check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<char>(10000); });
+	if (tmp == 1) {
 		std::cerr << "strict_integer_cast<char>(10000) should throw!" << std::endl;
+		ret = 1;
 	}
 
-	ret = check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<char>(5); });
-	if (ret == 1) {
+	tmp = check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<char>(5); });
+	if (tmp == 1) {
 		std::cerr << "strict_integer_cast<char>(5) shouldn't throw!" << std::endl;
+		ret = 1;
 	}
 
-	ret = check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<char>(-5); });
-	if (ret == 1) {
+	tmp = check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<char>(-5); });
+	if (tmp == 1) {
 		std::cerr << "strict_integer_cast<char>(-5) shouldn't throw!" << std::endl;
+		ret = 1;
 	}
 
-	ret = !check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<char>(-200000); });
-	if (ret == 1) {
+	tmp = !check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<char>(-200000); });
+	if (tmp == 1) {
 		std::cerr << "strict_integer_cast<char>(-200000) should throw!" << std::endl;
+		ret = 1;
 	}
 
-	ret = check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<size_t>(200000); });
-	if (ret == 1) {
+	tmp = check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<size_t>(200000); });
+	if (tmp == 1) {
 		std::cerr << "strict_integer_cast<size_t>(200000) shouldn't throw!" << std::endl;
+		ret = 1;
 	}
 
-	ret = check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<ssize_t>(200000); });
-	if (ret == 1) {
+	tmp = check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<ssize_t>(200000); });
+	if (tmp == 1) {
 		std::cerr << "strict_integer_cast<ssize_t>(-200000) shouldn't throw!" << std::endl;
+		ret = 1;
 	}
 
-#ifdef LEELOO_VLI_SUPPORT
-	ret = check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<int>(vli::integer<128>(10)); });
-	if (ret == 1) {
-		std::cerr << "strict_integer_cast<int>(vli(10)) shouldn't throw!" << std::endl;
+#ifdef LEELOO_MP_SUPPORT
+	typedef leeloo::uint_mp<128> uint128_t;
+
+	tmp = check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<ssize_t>(uint128_t(200000)); });
+	if (tmp == 1) {
+		std::cerr << "strict_integer_cast<size_t>(uint128_t(1000)) shouldn't throw!" << std::endl;
+		ret = 1;
 	}
 
-	vli::integer<128> bigint;
-	bigint[0] = 0xFFFFFFFFULL;
-	bigint[1] = 0xFFFFFFFFULL;
-	ret = !check_throw<leeloo::integer_overflow>([&bigint] { leeloo::strict_integer_cast<unsigned int>(bigint); });
-	if (ret == 1) {
-		std::cerr << "strict_integer_cast<int>(vli(10)) should throw!" << std::endl;
+	uint128_t bigint(0xFFFFFFFFFFFFFFFFULL);
+	bigint *= 4;
+	tmp = !check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<size_t>(bigint); });
+	if (tmp == 1) {
+		std::cerr << "strict_integer_cast<size_t>(uint128_t(1000)) should throw!" << std::endl;
+		ret = 1;
 	}
 #endif
 
-	return 0;
+	return ret;
 }

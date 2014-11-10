@@ -90,8 +90,6 @@ public:
 		_c = random_prime_with(_prime-1, rand_eng);
 		_n = rand_eng(1, 4);
 
-		std::cout << max << " " << _prime << " " << _a << " " << _b << " " << _c << " " << _n << std::endl;
-
 		_cur_step = 0;
 	}
 

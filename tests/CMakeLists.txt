@@ -64,3 +64,4 @@ add_test(test_diffs test_diffs)
 
 add_executable(test_mp test_mp.cpp)
 target_link_libraries(test_mp leeloo)
+add_test(test_mp test_mp)

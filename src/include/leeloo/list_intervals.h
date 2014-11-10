@@ -753,7 +753,7 @@ private:
 		}
 	}
 
-	count_type get_rth_value(difference_type const r, count_type const interval_start, count_type const interval_end) const
+	base_type get_rth_value(difference_type const r, count_type const interval_start, count_type const interval_end) const
 	{
 		// [interval_start,interval_end[
 		difference_type cur = r;
