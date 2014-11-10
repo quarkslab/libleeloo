@@ -31,14 +31,14 @@ public:
 
 #ifdef LEELOO_MP_SUPPORT
 template <unsigned N_>
-struct integer_bits<uint_mp<N_>>
+struct integer_bits<boost_uint_mp<N_>>
 {
 	static constexpr size_t N = N_;
 	static constexpr bool is_signed = true;
 };
 
 template <unsigned N_>
-struct integer_bits<sint_mp<N_>>
+struct integer_bits<boost_sint_mp<N_>>
 {
 	static constexpr size_t N = N_;
 	static constexpr bool is_signed = false;
@@ -77,16 +77,31 @@ struct integer_above<uint64_t>
 };
 
 #ifdef LEELOO_MP_SUPPORT
-template <unsigned N>
-struct integer_above<uint_mp<N>>
+// In case int_mp<128, *> is promoted to a special intrinsic type!
+template <>
+struct integer_above<sint_mp<128>>
 {
-	typedef uint_mp<N*2> type;
+	typedef sint_mp<256> type;
+};
+
+template <>
+struct integer_above<uint_mp<128>>
+{
+	typedef uint_mp<256> type;
+};
+#endif
+
+#ifdef LEELOO_MP_SUPPORT
+template <unsigned N>
+struct integer_above<boost_uint_mp<N>>
+{
+	typedef boost_uint_mp<N*2> type;
 };
 
 template <unsigned N>
-struct integer_above<sint_mp<N>>
+struct integer_above<boost_sint_mp<N>>
 {
-	typedef sint_mp<N*2> type;
+	typedef boost_sint_mp<N*2> type;
 };
 #endif
 

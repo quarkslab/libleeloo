@@ -18,7 +18,36 @@ public:
 };
 
 #ifdef LEELOO_MP_SUPPORT
-template <unsigned N, boost::multiprecision::cpp_integer_type int_type> using int_mp = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<N, N, int_type,  boost::multiprecision::unchecked, void>>;
+template <unsigned N, boost::multiprecision::cpp_integer_type int_type> using boost_int_mp = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<N, N, int_type,  boost::multiprecision::unchecked, void>>;
+template <unsigned N> using boost_sint_mp = boost_int_mp<N, boost::multiprecision::signed_magnitude>;
+template <unsigned N> using boost_uint_mp = boost_int_mp<N, boost::multiprecision::unsigned_magnitude>;
+
+namespace __impl {
+
+template <unsigned N, boost::multiprecision::cpp_integer_type int_type>
+struct mp_chooser
+{
+	typedef boost_int_mp<N, int_type> type;
+};
+
+#if 0
+template <>
+struct mp_chooser<128, boost::multiprecision::signed_magnitude>
+{
+	typedef __int128_t type;
+};
+
+template <>
+struct mp_chooser<128, boost::multiprecision::unsigned_magnitude>
+{
+	typedef __uint128_t type;
+};
+#endif
+
+
+} // __impl
+
+template <unsigned N, boost::multiprecision::cpp_integer_type int_type> using int_mp = typename __impl::mp_chooser<N, int_type>::type;
 
 template <unsigned N> using sint_mp = int_mp<N, boost::multiprecision::signed_magnitude>;
 template <unsigned N> using uint_mp = int_mp<N, boost::multiprecision::unsigned_magnitude>;
@@ -75,16 +104,12 @@ struct integer_cast_impl<To, From, false>: public integer_cast_impl_base<To, Fro
 	}
 };
 
-template <class To, class From>
-struct integer_cast: public integer_cast_impl<To, From, sizeof(To) >= sizeof(From)>
-{ };
-
 #ifdef LEELOO_MP_SUPPORT
 template <class To, unsigned N, boost::multiprecision::cpp_integer_type int_type>
-struct integer_cast<To, int_mp<N, int_type>>
+struct integer_cast_impl<To, boost_int_mp<N, int_type>, false>
 {
 	typedef int_mp<N, int_type> from_type;
-	static_assert(std::is_integral<To>::value, "To must be an integer class");
+	//static_assert(std::is_integral<To>::value, "To must be an integer class");
 
 	inline static To cast(from_type const& v)
 	{
@@ -106,6 +131,21 @@ struct integer_cast<To, int_mp<N, int_type>>
 		}
 		return cast(from);
 	}
+};
+#endif
+
+template <class To, class From>
+struct integer_cast: public integer_cast_impl<To, From, sizeof(To) >= sizeof(From)>
+{ };
+
+#ifdef LEELOO_MP_SUPPORT
+template <unsigned N, boost::multiprecision::cpp_integer_type int_type>
+struct integer_cast<boost_int_mp<N, int_type>, boost_int_mp<N, int_type>>
+{
+	typedef boost_int_mp<N, int_type> integer_type;
+
+	inline static integer_type const& cast(integer_type const& v) { return v; }
+	inline static integer_type const& strict_cast(integer_type const& v) { return v; }
 };
 #endif
 

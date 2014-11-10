@@ -45,6 +45,7 @@
 #include <leeloo/atomic_helpers.h>
 #include <leeloo/intrinsics.h>
 #include <leeloo/prime_helpers.h>
+#include <leeloo/integer_traits.h>
 
 namespace leeloo {
 
@@ -52,7 +53,7 @@ template <class Integer, bool atomic = false>
 class uni
 {
 	static_assert(std::is_signed<Integer>::value == false, "Integer must be an unsigned integer type.");
-	static_assert(sizeof(Integer) <= 4, "Integers wider than 32-bit integers aren't supported.");
+	//static_assert(sizeof(Integer) <= 4, "Integers wider than 32-bit integers aren't supported.");
 
 public:
 	typedef Integer integer_type;
@@ -65,7 +66,8 @@ public:
 	}
 
 	template <class Engine>
-	uni(integer_type const max, Engine const& rand_eng)
+	uni(integer_type const max, Engine const& rand_eng):
+		_rem_perm(nullptr)
 	{
 		init(max, rand_eng);
 	}
@@ -111,13 +113,15 @@ public:
 private:
 	integer_type residue(integer_type const v) const
 	{
+		typedef typename integer_above<integer_type>::type integer_above_type;
 		assert(v < _max);
 		const integer_type prime = _prime;
 		if (v >= prime) {
 			// Use the final permutation
-			return _rem_perm[v-prime];
+			return _rem_perm[integer_cast<size_t>(v-prime)];
 		}
-		const integer_type residue = ((uint64_t) v * (uint64_t) v) % prime;
+		const integer_above_type vabove(v);
+		const integer_type residue = integer_cast<integer_type>((vabove * vabove) % prime);
 		return (v <= (prime / 2)) ? residue : prime - residue;
 	}
 
@@ -135,18 +139,18 @@ private:
 		if (_rem_perm) {
 			free(_rem_perm);
 		}
-		const integer_type rem = size_rem();
+		const size_t rem = size_rem();
 		posix_memalign((void**) &_rem_perm, 16, rem*sizeof(integer_type));
 		assert(_rem_perm);
-		for (integer_type i = 0; i < rem; i++) {
+		for (size_t i = 0; i < rem; i++) {
 			_rem_perm[i] = _prime + i;
 		}
 
 		std::random_shuffle(&_rem_perm[0], &_rem_perm[rem],
-		                    [&rand_eng](integer_type n) { return rand_eng(0, n-1); });
+		                    [&rand_eng](size_t n) -> size_t { return integer_cast<size_t>(rand_eng(0, n-1)); });
 	}
 	
-	inline integer_type size_rem() const { return _max-_prime; }
+	inline size_t size_rem() const { return integer_cast<size_t>(_max-_prime); }
 
 private:
 	integer_type _prime;

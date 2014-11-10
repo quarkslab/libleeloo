@@ -29,7 +29,11 @@
 #ifndef LEELOO_RANDOM_H
 #define LEELOO_RANDOM_H
 
+#ifdef LEELOO_MP_SUPPORT
+#include <boost/multiprecision/random.hpp>
+#else
 #include <boost/random.hpp>
+#endif
 
 namespace leeloo {
 
@@ -63,8 +67,8 @@ struct random
 
 	inline integer_type operator()(integer_type const a, integer_type const b) const
 	{
-		// between [a,b]
-		return boost::random::detail::generate_uniform_int(_eng, a, b);
+		boost::random::uniform_int_distribution<integer_type> d(a, b);
+		return d(_eng);
 	}
 
 private:
