@@ -71,3 +71,11 @@ endif()
 add_executable(integer_traits integer_traits.cpp)
 target_link_libraries(integer_traits ${LINK_LIBRARIES})
 add_test(integer_traits integer_traits)
+
+add_executable(invert invert.cpp)
+target_link_libraries(invert ${LINK_LIBRARIES})
+add_test(invert invert)
+
+add_executable(intersect intersect.cpp)
+target_link_libraries(intersect ${LINK_LIBRARIES})
+add_test(intersect intersect)

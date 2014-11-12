@@ -248,6 +248,21 @@ public:
 		add(a, b);
 	}
 
+	this_type invert() const
+	{
+		this_type ret;
+		invert(ret.intervals(), intervals());
+		return ret;
+	}
+
+	void intersect(this_type const& o)
+	{
+		// Suppose o is aggregated
+		aggregate();
+		invert(removed_intervals(), o.intervals());
+		aggregate();
+	}
+
 	void aggregate()
 	{
 		if (removed_intervals().size() == 0) {
@@ -808,6 +823,33 @@ private:
 		}
 
 		return a*_cache_entry_size;
+	}
+
+	static void invert(container_type& dst, container_type const& src)
+	{
+		static constexpr base_type min = std::numeric_limits<base_type>::min();
+		static constexpr base_type max = std::numeric_limits<base_type>::max();
+
+		dst.clear();
+		if (src.size() == 0) {
+			dst.emplace_back(min, max);
+			return;
+		}
+		typename container_type::const_iterator src_it = src.begin();
+		dst.reserve(src.size()+1);
+		const base_type prev_lower = src_it->lower();
+		if (prev_lower != min) {
+			dst.emplace_back(min, prev_lower);
+		}
+		base_type prev_end = src_it->upper();
+		++src_it;
+		for (; src_it != src.end(); src_it++) {
+			dst.emplace_back(prev_end, src_it->lower());
+			prev_end = src_it->upper();
+		}
+		if (prev_end != max) {
+			dst.emplace_back(prev_end, max);
+		}
 	}
 
 public:
