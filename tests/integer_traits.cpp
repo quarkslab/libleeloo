@@ -1,8 +1,10 @@
 #include <leeloo/integer_traits.h>
 #include <iostream>
 
+#ifdef LEELOO_MP_SUPPORT
 typedef leeloo::uint_mp<128> uint128_t;
 typedef leeloo::sint_mp<128> int128_t;
+#endif
 
 int main()
 {
