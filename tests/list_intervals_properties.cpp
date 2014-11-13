@@ -225,7 +225,6 @@ int main()
 		},
 		rd);
 
-	/*
 	lip.random_sets_with_properties(
 		[](size_t const i)
 		{
@@ -248,7 +247,7 @@ int main()
 				std::cout << std::endl;
 			}
 		},
-		std::random_device());*/
+		rd);
 
 	{
 		// Test case for #3

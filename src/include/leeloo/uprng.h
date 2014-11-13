@@ -45,11 +45,40 @@
 #include <leeloo/intrinsics.h>
 #include <leeloo/atomic_helpers.h>
 #include <leeloo/prime_helpers.h>
+#include <leeloo/random.h>
 
 namespace leeloo {
 
+namespace __impl {
+
+template <class IntegerType>
+struct seed_type_uprng
+{
+	typedef IntegerType integer_type;
+
+	integer_type a;
+	integer_type b;
+	integer_type c;
+	integer_type n;
+
+	template <class Engine>
+	static seed_type_uprng random(integer_type const max, Engine& eng)
+	{
+		seed_type_uprng ret;
+		auto rand_eng = leeloo::random_engine(eng);
+		_a = rand_eng(1, max-1);
+		_b = rand_eng(0, max-1);
+
+		init_prime(max);
+		_c = random_prime_with(_prime-1, rand_eng);
+		_n = rand_eng(1, 4);
+	}
+};
+
+}
+
 template <class Integer, bool atomic = false>
-class uprng
+class uprng: public uprng_base<uprng<Integer, atomic>, Integer, >
 {
 	static_assert(std::is_signed<Integer>::value == false, "Integer must be an unsigned integer type.");
 	static_assert(sizeof(Integer) <= 4, "Integers wider than 32-bit integers aren't supported.");
@@ -59,21 +88,8 @@ public:
 	typedef typename std::conditional<atomic, tbb::atomic<integer_type>, integer_type>::type pos_integer_type;
 
 public:
-	uprng()
-	{
-	}
+	void init_base() { }
 
-	template <class Engine>
-	uprng(integer_type const max, Engine& rand_eng)
-	{
-		init(max, rand_eng);
-	}
-
-	~uprng()
-	{
-	}
-
-public:
 	/*! Construct a UPRNG object.
 	 *
 	 * \param max defines the interval of the generated integers. max isn't included (between [0,max[).

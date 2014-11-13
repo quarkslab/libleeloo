@@ -67,8 +67,8 @@ public:
 		ar << boost::serialization::make_nvp("cur_step", _cur_step);
 	}
 
-	template <class Archive, class RandEngine>
-	void restore_state(Archive& ar, list_intervals_type const& li, RandEngine&& rand_engine)
+	template <class Archive>
+	void restore_state(Archive& ar, list_intervals_type const& li)
 	{
 		ar >> boost::serialization::make_nvp("seed", _seed);
 		ar >> boost::serialization::make_nvp("cur_step", _cur_step);
@@ -101,6 +101,7 @@ public:
 public:
 	void init(list_intervals_type const& li, seed_type const& seed, difference_type step_start, difference_type step_end)
 	{
+		_seed = seed;
 		_uprng.init(li.size(), seed);
 		step_end = std::min(step_end, _uprng.max());
 		step_start = std::min(step_start, _uprng.max());
@@ -201,8 +202,8 @@ public:
 		ar << boost::serialization::make_nvp("done_steps", _done_steps);
 	}
 
-	template <class Archive, class RandEngine>
-	void restore_state(Archive& ar, list_intervals_type const& li, RandEngine&& rand_engine)
+	template <class Archive>
+	void restore_state(Archive& ar, list_intervals_type const& li)
 	{
 		ar >> boost::serialization::make_nvp("seed", _seed);
 		ar >> boost::serialization::make_nvp("done_steps", _done_steps);

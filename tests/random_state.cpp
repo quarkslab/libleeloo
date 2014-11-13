@@ -173,12 +173,12 @@ int main()
 	list_intervals_random_promise lirp_boost;
 	ss2.seekg(0, std::stringstream::beg);
 	boost::archive::text_iarchive ia2(ss2);
-	lirp_boost.restore_state(ia2);
+	lirp_boost.restore_state(ia2, list);
 
 	for (uint32_t i = 0; i < lsize/2; i++) {
 		if (i % 7 == 0) {
 			if (lirp_boost(list) != ref[i]) {
-				std::cerr << "random_promies gave wrong results after reinitialisation at " << i << std::endl;
+				std::cerr << "random_promises gave wrong results after reinitialisation at " << i << std::endl;
 				ret = 1;
 			}
 		}
@@ -186,7 +186,7 @@ int main()
 
 	for (uint32_t i = lsize/2; i < lsize; i++) {
 		if (lirp_boost(list) != ref[i]) {
-			std::cerr << "random_promies gave wrong results at " << i << std::endl;
+			std::cerr << "random_promises gave wrong results at " << i << std::endl;
 			ret = 1;
 		}
 	}

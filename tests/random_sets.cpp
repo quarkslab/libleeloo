@@ -108,10 +108,9 @@ int main(int argc, char** argv)
 		std::cout << "Size all sets: " << size_sets << std::endl;
 	}
 
-#if 0
 	size_sets = 0;
 	const size_t ninters = list.intervals_count();
-	list.random_sets<leeloo::uprng>(
+	list.random_sets<leeloo::uni>(
 		[ninters](size_t i)
 		{
 			if (i < 10) {
@@ -136,7 +135,6 @@ int main(int argc, char** argv)
 	else {
 		std::cout << "Size all sets: " << size_sets << std::endl;
 	}
-#endif
 	               
 	return 0;
 }

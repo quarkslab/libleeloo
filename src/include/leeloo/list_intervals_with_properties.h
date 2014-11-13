@@ -72,8 +72,8 @@ public:
 			std::forward<UPRNGInit>(uprng_init));
 	}
 
-	/*template <template <class T_, bool atomic_> class UPRNG, class Fsize_div, class Fset, class RandEngine>
-	void random_sets_with_properties(Fsize_div const& fsize_div, size_t const size_max, Fset const& fset, RandEngine const& rand_eng) const
+	template <template <class T_, bool atomic_> class UPRNG, class Fsize_div, class Fset, class UPRNGInit>
+	void random_sets_with_properties(Fsize_div const& fsize_div, size_t const size_max, Fset const& fset, UPRNGInit&& uprng_init) const
 	{
 		// There might be a more efficient way to do this
 		if (size_max <= 0) {
@@ -93,8 +93,8 @@ public:
 				}
 				fset(set, &properties[0], size);
 			},
-			rand_eng);
-	}*/
+			std::forward<UPRNGInit>(uprng_init));
+	}
 
 	template <class Fset, class UPRNGInit>
 	inline void random_sets_with_properties(count_type size_div, Fset const& fset, UPRNGInit&& uprng_init) const
@@ -102,11 +102,11 @@ public:
 		random_sets_with_properties<uni>(size_div, fset, std::forward<UPRNGInit>(uprng_init));
 	}
 
-	/*template <class Fsize_div, class Fset, class RandEngine>
-	inline void random_sets_with_properties(Fsize_div const& fsize_div, size_t const size_max, Fset const& fset, RandEngine const& rand_eng) const
+	template <class Fsize_div, class Fset, class UPRNGInit>
+	inline void random_sets_with_properties(Fsize_div const& fsize_div, size_t const size_max, Fset const& fset, UPRNGInit&& rand_eng) const
 	{
-		random_sets_with_properties<uni>(fsize_div, size_max, fset, rand_eng);
-	}*/
+		random_sets_with_properties<uni>(fsize_div, size_max, fset, std::forward<UPRNGInit>(rand_eng));
+	}
 
 	
 public:

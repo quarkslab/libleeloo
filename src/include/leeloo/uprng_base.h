@@ -28,7 +28,7 @@ public:
 	}
 	
 	template <class Engine>
-	void init(integer_type const max, Engine& eng)
+	void init(typename std::enable_if<std::is_same<Engine, seed_type>::value == false, integer_type>::type const max, Engine& eng)
 	{
 		init(max, seed_type::random(max, eng));
 	}

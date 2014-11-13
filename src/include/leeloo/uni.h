@@ -48,6 +48,10 @@
 #include <leeloo/integer_traits.h>
 #include <leeloo/uprng_base.h>
 
+#ifdef LEELOO_BOOST_SERIALIZE
+#include <boost/serialization/nvp.hpp>
+#endif
+
 namespace leeloo {
 
 namespace __impl {
@@ -70,6 +74,18 @@ struct seed_type_uni
 		ret.seed_perm = rand.template uniform<uint32_t>();
 		return ret;
 	}
+
+#ifdef LEELOO_BOOST_SERIALIZE
+	friend class boost::serialization::access;
+
+	template<class Archive>
+	void serialize(Archive& ar, const unsigned int)
+	{
+		ar & boost::serialization::make_nvp("off", off);
+		ar & boost::serialization::make_nvp("pos", pos);
+		ar & boost::serialization::make_nvp("seed_perm", seed_perm);
+	}
+#endif
 };
 
 }

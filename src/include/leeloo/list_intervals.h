@@ -399,8 +399,8 @@ public:
 		random_sets<uni>(size_div, fset, std::forward<UPRNGInit>(uprng_init));
 	}
 
-	/*template <template <class T_, bool atomic_> class UPRNG, class Fset, class Fsize_div, class RandEngine>
-	void random_sets(Fsize_div const& fsize_div, const size_t size_max, Fset const& fset, RandEngine const& rand_eng) const
+	template <template <class T_, bool atomic_> class UPRNG, class Fset, class Fsize_div, class UPRNGInit>
+	void random_sets(Fsize_div const& fsize_div, const size_t size_max, Fset const& fset, UPRNGInit&& rand_eng) const
 	{
 		if (size_max == 0) {
 			return;
@@ -408,7 +408,7 @@ public:
 
 		difference_type size_rem = size();
 		UPRNG<difference_type, false> uprng;
-		uprng.init(size_rem, rand_eng);
+		uprng.init(size_rem, std::forward<UPRNGInit>(rand_eng));
 
 		base_type* interval_buf;
 		posix_memalign((void**) &interval_buf, 16, sizeof(base_type)*size_max);
@@ -435,11 +435,11 @@ public:
 	}
 
 
-	template <class Fset, class Fsize_div, class RandEngine>
-	void random_sets(Fsize_div const& fsize_div, const difference_type size_max, Fset const& fset, RandEngine const& rand_eng) const
+	template <class Fset, class Fsize_div, class UPRNGInit>
+	void random_sets(Fsize_div const& fsize_div, const difference_type size_max, Fset const& fset, UPRNGInit&& uprng_init) const
 	{
-		random_sets<uni>(fsize_div, size_max, fset, rand_eng);
-	}*/
+		random_sets<uni>(fsize_div, size_max, fset, std::forward<UPRNGInit>(uprng_init));
+	}
 
 	inline void reserve(count_type n) { intervals().reserve(n); }
 	inline void clear() { intervals().clear(); removed_intervals().clear(); }
