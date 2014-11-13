@@ -146,8 +146,7 @@ public:
 		}
 	}
 
-	inline bool contains(uint32_t const ip) const { return intervals_base_type::contains(ip); }
-
+	using intervals_base_type::contains;
 	bool contains(const char* ip_str) const;
 
 	static inline uint32_t cidr2mask(const int cidr)

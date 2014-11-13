@@ -65,6 +65,9 @@ struct integer_above<int64_t>
 {
 #ifdef LEELOO_MP_SUPPORT
 	typedef sint_mp<128> type;
+#else
+	// LEELOO_MP_SUPPORt must be activated to support integers above 64-bits!
+	typedef void type;
 #endif
 };
 
@@ -73,6 +76,9 @@ struct integer_above<uint64_t>
 {
 #ifdef LEELOO_MP_SUPPORT
 	typedef uint_mp<128> type;
+#else
+	// LEELOO_MP_SUPPORt must be activated to support integers above 64-bits!
+	typedef void type;
 #endif
 };
 

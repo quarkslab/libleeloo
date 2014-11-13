@@ -30,6 +30,7 @@ struct mp_chooser
 	typedef boost_int_mp<N, int_type> type;
 };
 
+// TODO: use __int128_t when possible
 #if 0
 template <>
 struct mp_chooser<128, boost::multiprecision::signed_magnitude>
@@ -61,6 +62,7 @@ struct integer_cast_impl_base
 	static_assert(std::is_integral<From>::value, "From must be an integer class");
 	static_assert(std::is_integral<To>::value,   "To must be an integer class");
 
+	// "natural" cast used when possible (i.e. if From==To)
 	inline static To cast(From const from)
 	{
 		return static_cast<To>(from);
@@ -68,8 +70,7 @@ struct integer_cast_impl_base
 };
 
 template <class To, class From, bool to_bigger_from>
-struct integer_cast_impl
-{ };
+struct integer_cast_impl;
 
 template <class To, class From>
 struct integer_cast_impl<To, From, true>: public integer_cast_impl_base<To, From>
