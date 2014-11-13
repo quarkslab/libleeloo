@@ -41,8 +41,20 @@ typedef interval<uint32_t> ip_interval;
 
 class LEELOO_API ip_list_intervals: public list_intervals<ip_interval>
 {
+	typedef list_intervals<ip_interval> intervals_base_type;
+
 public:
-	typedef list_intervals<ip_interval> interval_base_type;
+	ip_list_intervals():
+		intervals_base_type()
+	{ }
+
+	ip_list_intervals(intervals_base_type const& o):
+		intervals_base_type(o)
+	{ }
+
+	ip_list_intervals(intervals_base_type&& o):
+		intervals_base_type(std::move(o))
+	{ }
 
 public:
 	bool add(const char* str_interval);
@@ -76,19 +88,19 @@ public:
 		if (b_ != 0xFFFFFFFF) {
 			b_++;
 		}
-		interval_base_type::add(a, b_);
+		intervals_base_type::add(a, b_);
 	}
 
 	inline void add(uint32_t const a)
 	{
 		if (a != 0xFFFFFFFF) {
-			interval_base_type::add(a, a+1);
+			intervals_base_type::add(a, a+1);
 		}
 	}
 
 	inline void add(leeloo::ip_list_intervals const& o)
 	{
-		interval_base_type::add(o);
+		intervals_base_type::add(o);
 	}
 
 	inline void remove(uint32_t const a, uint32_t const b)
@@ -97,19 +109,19 @@ public:
 		if (b_ != 0xFFFFFFFF) {
 			b_++;
 		}
-		interval_base_type::remove(a, b_);
+		intervals_base_type::remove(a, b_);
 	}
 
 	inline void remove(uint32_t const a)
 	{
 		if (a != 0xFFFFFFFF) {
-			interval_base_type::remove(a, a+1);
+			intervals_base_type::remove(a, a+1);
 		}
 	}
 
 	inline void remove(leeloo::ip_list_intervals const& o)
 	{
-		interval_base_type::remove(o);
+		intervals_base_type::remove(o);
 	}
 
 	template <bool exclude = false>
@@ -134,7 +146,7 @@ public:
 		}
 	}
 
-	inline bool contains(uint32_t const ip) const { return interval_base_type::contains(ip); }
+	inline bool contains(uint32_t const ip) const { return intervals_base_type::contains(ip); }
 
 	bool contains(const char* ip_str) const;
 
@@ -145,6 +157,16 @@ public:
 			return 0xFFFFFFFF;
 		}
 		return (1U<<(32-cidr))-1;
+	}
+
+	inline ip_list_intervals invert() const
+	{
+		return intervals_base_type::invert();
+	}
+
+	inline void intersect(ip_list_intervals const& o)
+	{
+		intervals_base_type::intersect(o);
 	}
 };
 

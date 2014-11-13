@@ -186,6 +186,43 @@ public:
 		_cache_entry_size(0)
 	{ }
 
+	list_intervals(list_intervals const& o):
+		_intervals(o._intervals),
+		_excluded_intervals(o._excluded_intervals),
+		_index_cache(o._index_cache),
+		_cache_entry_size(o._cache_entry_size)
+	{ }
+
+	list_intervals(list_intervals&& o):
+		_intervals(std::move(o._intervals)),
+		_excluded_intervals(std::move(o._excluded_intervals)),
+		_index_cache(std::move(o._index_cache)),
+		_cache_entry_size(std::move(o._cache_entry_size))
+	{ }
+
+public:
+	list_intervals& operator=(list_intervals const& o)
+	{
+		if (&o != this) {
+			_intervals = o._intervals;
+			_excluded_intervals = o._excluded_intervals;
+			_index_cache = o._index_cache;
+			_cache_entry_size = o._cache_entry_size;
+		}
+		return *this;
+	}
+
+	list_intervals& operator=(list_intervals&& o)
+	{
+		if (&o != this) {
+			_intervals = std::move(o._intervals);
+			_excluded_intervals = std::move(o._excluded_intervals);
+			_index_cache = std::move(o._index_cache);
+			_cache_entry_size = o._cache_entry_size;
+		}
+		return *this;
+	}
+
 public:
 	inline void add(base_type const a, base_type const b)
 	{
@@ -251,7 +288,7 @@ public:
 	this_type invert() const
 	{
 		this_type ret;
-		invert(ret.intervals(), intervals());
+		invert_containers(ret.intervals(), intervals());
 		return ret;
 	}
 
@@ -259,7 +296,7 @@ public:
 	{
 		// Suppose o is aggregated
 		aggregate();
-		invert(removed_intervals(), o.intervals());
+		invert_containers(removed_intervals(), o.intervals());
 		aggregate();
 	}
 
@@ -825,7 +862,7 @@ private:
 		return a*_cache_entry_size;
 	}
 
-	static void invert(container_type& dst, container_type const& src)
+	static void invert_containers(container_type& dst, container_type const& src)
 	{
 		static constexpr base_type min = std::numeric_limits<base_type>::min();
 		static constexpr base_type max = std::numeric_limits<base_type>::max();
