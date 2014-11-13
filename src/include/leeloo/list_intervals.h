@@ -358,15 +358,15 @@ public:
 		return strict_integer_cast<count_type>(intervals().size());
 	}
 
-	template <template <class T_, bool atomic_> class UPRNG, class Fset, class RandEngine>
-	void random_sets(count_type size_div, Fset const& fset, RandEngine const& rand_eng) const
+	template <template <class T_, bool atomic_> class UPRNG, class Fset, class UPRNGInit>
+	void random_sets(count_type size_div, Fset const& fset, UPRNGInit&& uprng_init) const
 	{
 		if (size_div <= 0) {
 			size_div = 1;
 		}
 		const difference_type size_all = size_strict();
 		UPRNG<difference_type, false> uprng;
-		uprng.init(size_all, rand_eng);
+		uprng.init(size_all, std::forward<UPRNGInit>(uprng_init));
 
 		base_type* interval_buf;
 		posix_memalign((void**) &interval_buf, 16, sizeof(base_type)*size_div);
@@ -393,7 +393,13 @@ public:
 		free(interval_buf);
 	}
 
-	template <template <class T_, bool atomic_> class UPRNG, class Fset, class Fsize_div, class RandEngine>
+	template <class Fset, class UPRNGInit>
+	inline void random_sets(difference_type size_div, Fset const& fset, UPRNGInit&& uprng_init) const
+	{
+		random_sets<uni>(size_div, fset, std::forward<UPRNGInit>(uprng_init));
+	}
+
+	/*template <template <class T_, bool atomic_> class UPRNG, class Fset, class Fsize_div, class RandEngine>
 	void random_sets(Fsize_div const& fsize_div, const size_t size_max, Fset const& fset, RandEngine const& rand_eng) const
 	{
 		if (size_max == 0) {
@@ -428,17 +434,12 @@ public:
 		free(interval_buf);
 	}
 
-	template <class Fset, class RandEngine>
-	inline void random_sets(difference_type size_div, Fset const& fset, RandEngine const& rand_eng) const
-	{
-		random_sets<uni>(size_div, fset, rand_eng);
-	}
 
 	template <class Fset, class Fsize_div, class RandEngine>
 	void random_sets(Fsize_div const& fsize_div, const difference_type size_max, Fset const& fset, RandEngine const& rand_eng) const
 	{
 		random_sets<uni>(fsize_div, size_max, fset, rand_eng);
-	}
+	}*/
 
 	inline void reserve(count_type n) { intervals().reserve(n); }
 	inline void clear() { intervals().clear(); removed_intervals().clear(); }

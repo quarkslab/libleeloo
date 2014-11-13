@@ -1,7 +1,7 @@
 #ifndef LEELOO_LIST_INTERVALS_RANDOM_H
 #define LEELOO_LIST_INTERVALS_RANDOM_H
 
-#include <boost/random/random_device.hpp>
+#include <random>
 
 #include <leeloo/config.h>
 #include <leeloo/list_intervals.h>
@@ -23,22 +23,27 @@ class list_intervals_random
 	typedef UPRNG<difference_type, atomic> uprng_type;
 
 public:
-	typedef uint32_t seed_type;
+	typedef typename uprng_type::seed_type seed_type;
 
 public:
-	template <class RandEngine>
-	void init(list_intervals_type const& li, RandEngine&& rand_engine, seed_type const seed_, difference_type const step = 0)
+	void init(list_intervals_type const& li, seed_type const seed_, difference_type const step = 0)
 	{
 		_seed = seed_;
-		rand_engine.seed(_seed);
-		_uprng.init(li.size(), rand_engine);
+		_uprng.init(li.size(), seed_);
 		_cur_step = step;
 	}
 
 	template <class RandEngine>
-	void init(list_intervals_type const& li, RandEngine&& rand_engine)
+	void init(list_intervals_type const& li, RandEngine& rand_engine)
 	{
-		init(li, rand_engine, boost::random::random_device()());
+		_seed = seed_type::random(li.size(), rand_engine);
+		init(li, _seed);
+	}
+
+	void init(list_intervals_type const& li)
+	{
+		_seed = seed_type::random(li.size());
+		init(li, _seed);
 	}
 
 	base_type operator()(list_intervals_type const& li)
@@ -52,7 +57,7 @@ public:
 	difference_type size_original() const { return _uprng.max(); }
 	difference_type size_todo() const { return _uprng.max(); }
 	difference_type cur_step() const { return _cur_step; }
-	seed_type seed() const { return _seed; }
+	seed_type const& seed() const { return _seed; }
 
 #ifdef LEELOO_BOOST_SERIALIZE
 	template <class Archive>
@@ -67,8 +72,7 @@ public:
 	{
 		ar >> boost::serialization::make_nvp("seed", _seed);
 		ar >> boost::serialization::make_nvp("cur_step", _cur_step);
-		rand_engine.seed(_seed);
-		_uprng.init(li.size(), rand_engine);
+		_uprng.init(li.size(), _seed);
 	}
 #endif
 
@@ -92,15 +96,12 @@ private:
 	typedef list_intervals<interval<base_type>, base_type> steps_list_intervals;
 
 public:
-	typedef uint32_t seed_type;
+	typedef typename uprng_type::seed_type seed_type;
 
 public:
-	template <class RandEngine>
-	void init(list_intervals_type const& li, RandEngine&& rand_engine, seed_type const seed, difference_type step_start, difference_type step_end)
+	void init(list_intervals_type const& li, seed_type const& seed, difference_type step_start, difference_type step_end)
 	{
-		_seed = seed;
-		rand_engine.seed(_seed);
-		_uprng.init(li.size(), rand_engine);
+		_uprng.init(li.size(), seed);
 		step_end = std::min(step_end, _uprng.max());
 		step_start = std::min(step_start, _uprng.max());
 		if (step_start > step_end) {
@@ -118,17 +119,22 @@ public:
 		_it_steps = _steps_todo.value_begin();
 	}
 
-	template <class RandEngine>
-	void init(list_intervals_type const& li, RandEngine&& rand_engine, seed_type const seed)
+	void init(list_intervals_type const& li, seed_type const& seed)
 	{
-		init(li, rand_engine, seed, 0, li.size());
+		init(li, seed, 0, li.size());
 	}
 
 	template <class RandEngine>
-	void init(list_intervals_type const& li, RandEngine&& rand_engine)
+	void init(list_intervals_type const& li, RandEngine const& rand_engine)
 	{
-		_seed = boost::random::random_device()();
-		init(li, rand_engine, _seed);
+		_seed = seed_type::random(li.size(), rand_engine);
+		init(li, _seed);
+	}
+
+	void init(list_intervals_type const& li)
+	{
+		_seed = seed_type::random(li.size());
+		init(li, _seed);
 	}
 
 	base_type operator()(list_intervals_type const& li)
@@ -201,11 +207,8 @@ public:
 		ar >> boost::serialization::make_nvp("seed", _seed);
 		ar >> boost::serialization::make_nvp("done_steps", _done_steps);
 
-		rand_engine.seed(_seed);
-		_uprng.init(li.size(), rand_engine);
+		_uprng.init(li.size(), _seed);
 		set_done_steps(_done_steps);
-
-		rand_engine.seed(_seed);
 	}
 #endif
 

@@ -4,4 +4,27 @@ set(BOOST_COMPONENTS random)
 if(LEELOO_BOOST_SERIALIZE)
 	set(BOOST_COMPONENTS random serialization)
 endif()
-find_package(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
+find_package(Boost COMPONENTS ${BOOST_COMPONENTS})
+
+#set(Boost_RANDOM_FOUND "OFF")
+
+if(${Boost_RANDOM_FOUND} STREQUAL "ON")
+	set(HAS_BOOST_RANDOM 1)
+else()
+	set(HAS_BOOST_RANDOM 0)
+endif()
+
+if (LEELOO_BOOST_SERIALIZE AND NOT Boost_SERIALIZATION_FOUND)
+	message(FATAL_ERROR "Couldn't find Boost serialize!")
+endif()
+
+# If no boost at all, use the in-tree sub part we need
+if (NOT Boost_FOUND)
+	MESSAGE(STATUS "Boost can't be found. Using in-tree version...")
+	set(Boost_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/third-party/boost")
+	set(Boost_INCLUDE_DIR "${Boost_INCLUDE_DIRS}")
+	set(Boost_LIBRARY_DIRS "")
+	set(Boost_LIBRARY_DIR "")
+	set(Boost_LIBRARIES "")
+	set(Boost_FOUND TRUE)
+endif()

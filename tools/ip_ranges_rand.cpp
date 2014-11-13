@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 	l.create_index_cache(256);
 
 	// Initialize a random generator
-	boost::random::mt19937 mt_rand(time(NULL));
+	std::random_device rd;
 
 	l.random_sets(16, 
 		[](const uint32_t* ips, const size_t n)
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 				std::cout << inet_ntoa(addr) << std::endl;
 			}
 		},
-		leeloo::random_engine<uint32_t>(mt_rand));
+		rd);
 
 	return 0;
 }

@@ -40,6 +40,8 @@
 #include <leeloo/list_intervals_with_properties.h>
 #include <leeloo/random.h>
 
+#include <random>
+
 template <class Interval>
 void print_intervals(Interval const& l)
 {
@@ -203,7 +205,7 @@ int main()
 
 	std::cout << "random_sets_with_properties" << std::endl;
 
-	boost::random::mt19937 mt_rand(time(NULL));
+	std::random_device rd;
 	lip.random_sets_with_properties(4,
 		[](uint32_t const* ints, property const* const* properties, size_t n)
 		{
@@ -221,8 +223,9 @@ int main()
 				std::cout << std::endl;
 			}
 		},
-		leeloo::random_engine<uint32_t>(mt_rand));
+		rd);
 
+	/*
 	lip.random_sets_with_properties(
 		[](size_t const i)
 		{
@@ -245,7 +248,7 @@ int main()
 				std::cout << std::endl;
 			}
 		},
-		leeloo::random_engine<uint32_t>(mt_rand));
+		std::random_device());*/
 
 	{
 		// Test case for #3

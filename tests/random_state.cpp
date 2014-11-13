@@ -27,8 +27,8 @@ int main()
 	list.create_index_cache(32);
 
 	list_intervals_random lir;
-	boost::random::mt19937 gen(time(NULL));
-	lir.init(list, leeloo::random_engine<uint32_t>(gen));
+	std::random_device rd;
+	lir.init(list, rd);
 	list_intervals_random::seed_type const seed = lir.seed();
 	std::vector<uint32_t> ref;
 	const size_t lsize = list.size();
@@ -45,7 +45,7 @@ int main()
 		std::cout << ref[i] << std::endl;
 	}
 
-	lir.init(list, leeloo::random_engine<uint32_t>(gen), seed);
+	lir.init(list, seed);
 	for (uint32_t i = 0; i < lsize; i++) {
 		if (ref[i] != lir(list)) {
 			std::cout << "bad value at index " << i << std::endl;
@@ -53,9 +53,9 @@ int main()
 		}
 	}
 
-	lir.init(list, leeloo::random_engine<uint32_t>(gen), seed);
+	lir.init(list, seed);
 	list_intervals_random lir2;
-	lir2.init(list, leeloo::random_engine<uint32_t>(gen), seed, lsize/2);
+	lir2.init(list, seed, lsize/2);
 	for (uint32_t i = 0; i < lsize/2; i++) {
 		lir(list);
 	}
@@ -72,7 +72,7 @@ int main()
 	}
 
 #ifdef LEELOO_BOOST_SERIALIZE
-	lir2.init(list, leeloo::random_engine<uint32_t>(gen), seed, lsize/2);
+	lir2.init(list, seed, lsize/2);
 
 	std::stringstream ss;
 	boost::archive::text_oarchive oa(ss);
@@ -81,7 +81,7 @@ int main()
 	list_intervals_random lir_boost;
 	ss.seekg(0, std::stringstream::beg);
 	boost::archive::text_iarchive ia(ss);
-	lir_boost.restore_state(ia, list, leeloo::random_engine<uint32_t>(gen));
+	lir_boost.restore_state(ia, list);
 
 	for (uint32_t i = lsize/2; i < lsize; i++) {
 		uint32_t v = lir2(list);
@@ -97,7 +97,7 @@ int main()
 #endif
 
 	list_intervals_random_promise lirp;
-	lirp.init(list, leeloo::random_engine<uint32_t>(gen), seed);
+	lirp.init(list, seed);
 
 	uint32_t j;
 	for (j = 0; !lirp.end(); j++) {
@@ -130,7 +130,7 @@ int main()
 		return 1;
 	}
 
-	lirp.init(list, leeloo::random_engine<uint32_t>(gen), seed);
+	lirp.init(list, seed);
 	for (uint32_t i = 0; i < lsize/2; i++) {
 		lirp(list);
 		if (i % 7 != 0) {
@@ -140,7 +140,7 @@ int main()
 	lirp.aggregate_done_steps();
 	list_intervals done_steps = lirp.done_steps();
 
-	lirp.init(list, leeloo::random_engine<uint32_t>(gen), seed);
+	lirp.init(list, seed);
 	lirp.set_done_steps(done_steps);
 	for (uint32_t i = 0; i < lsize/2; i++) {
 		if (i % 7 == 0) {
@@ -159,7 +159,7 @@ int main()
 	}
 
 #ifdef LEELOO_BOOST_SERIALIZE
-	lirp.init(list, leeloo::random_engine<uint32_t>(gen), seed);
+	lirp.init(list, seed);
 	for (uint32_t i = 0; i < lsize/2; i++) {
 		lirp(list);
 		if (i % 7 != 0) {
@@ -173,7 +173,7 @@ int main()
 	list_intervals_random_promise lirp_boost;
 	ss2.seekg(0, std::stringstream::beg);
 	boost::archive::text_iarchive ia2(ss2);
-	lirp_boost.restore_state(ia2, list, leeloo::random_engine<uint32_t>(gen));
+	lirp_boost.restore_state(ia2);
 
 	for (uint32_t i = 0; i < lsize/2; i++) {
 		if (i % 7 == 0) {

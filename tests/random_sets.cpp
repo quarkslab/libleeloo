@@ -38,7 +38,7 @@
 #include <leeloo/interval.h>
 #include <leeloo/list_intervals.h>
 #include <leeloo/random.h>
-#include <leeloo/uprng.h>
+#include <leeloo/uni.h>
 
 template <class Interval>
 void print_intervals(Interval const& l)
@@ -88,16 +88,16 @@ int main(int argc, char** argv)
 
 	std::cout << "Size all: " << list.size() << std::endl;
 
-	boost::random::mt19937 mt_rand(time(NULL));
+	std::random_device rd;
 	size_t size_sets = 0;
 	list.create_index_cache(2048);
 	BENCH_START(random_sets);
-	list.random_sets<leeloo::uprng>(16,
+	list.random_sets<leeloo::uni>(16,
 		[&size_sets](uint32_t const* /*ints*/, const ssize_t size)
 		{
 			size_sets += size;
 		},
-		leeloo::random_engine<uint32_t>(mt_rand));
+		rd);
 	BENCH_END(random_sets, "random_sets", 1, 1, sizeof(uint32_t), list.size());
 
 	if (size_sets != list.size()) {
@@ -108,6 +108,7 @@ int main(int argc, char** argv)
 		std::cout << "Size all sets: " << size_sets << std::endl;
 	}
 
+#if 0
 	size_sets = 0;
 	const size_t ninters = list.intervals_count();
 	list.random_sets<leeloo::uprng>(
@@ -126,7 +127,7 @@ int main(int argc, char** argv)
 		{
 			size_sets += size;
 		},
-		leeloo::random_engine<uint32_t>(mt_rand));
+		rd);
 
 	if (size_sets != list.size()) {
 		std::cerr << "Random sets returns " << size_sets << " results, expected " << list.size() << std::endl;
@@ -135,6 +136,7 @@ int main(int argc, char** argv)
 	else {
 		std::cout << "Size all sets: " << size_sets << std::endl;
 	}
+#endif
 	               
 	return 0;
 }

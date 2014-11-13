@@ -9,4 +9,8 @@
 #define LEELOO_MP_SUPPORT
 #endif
 
+#if @HAS_BOOST_RANDOM@
+#define HAS_BOOST_RANDOM
+#endif
+
 #endif

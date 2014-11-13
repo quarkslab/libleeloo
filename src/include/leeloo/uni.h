@@ -46,30 +46,52 @@
 #include <leeloo/intrinsics.h>
 #include <leeloo/prime_helpers.h>
 #include <leeloo/integer_traits.h>
+#include <leeloo/uprng_base.h>
 
 namespace leeloo {
 
+namespace __impl {
+
+template <class integer_type>
+struct seed_type_uni
+{
+	integer_type off;
+	integer_type pos;
+	uint32_t seed_perm;
+
+	template <class Engine>
+	static seed_type_uni random(integer_type const max, Engine& eng)
+	{
+		seed_type_uni ret;
+		auto rand = leeloo::random_engine(eng);
+
+		ret.off = rand.template uniform<integer_type>(0, max-1);
+		ret.pos = rand.template uniform<integer_type>(0, max-1);
+		ret.seed_perm = rand.template uniform<uint32_t>();
+		return ret;
+	}
+};
+
+}
+
 template <class Integer, bool atomic = false>
-class uni
+class uni: public uprng_base<uni<Integer, atomic>, Integer, __impl::seed_type_uni<Integer>>
 {
 	static_assert(std::is_signed<Integer>::value == false, "Integer must be an unsigned integer type.");
 	//static_assert(sizeof(Integer) <= 4, "Integers wider than 32-bit integers aren't supported.");
 
 public:
 	typedef Integer integer_type;
+	typedef __impl::seed_type_uni<integer_type> seed_type;
 	typedef typename std::conditional<atomic, tbb::atomic<integer_type>, integer_type>::type pos_integer_type;
+	typedef uprng_base<uni<Integer, atomic>, integer_type, seed_type> base_type;
 
 public:
-	uni():
-		_rem_perm(nullptr)
-	{
-	}
+	using base_type::base_type;
 
-	template <class Engine>
-	uni(integer_type const max, Engine const& rand_eng):
-		_rem_perm(nullptr)
+	void init_base()
 	{
-		init(max, rand_eng);
+		_rem_perm = nullptr;
 	}
 
 	~uni()
@@ -84,14 +106,13 @@ public:
 	 *
 	 * \param max defines the interval of the generated integers. max isn't included (between [0,max[).
 	 */
-	template <class Engine>
-	void init(integer_type const max, Engine const& rand_eng)
+	void init_seed(integer_type const max, seed_type const& seed)
 	{
-		_intermediate_off = rand_eng(0, max-1);
-		_cur_pos = rand_eng(0, max-1);
+		_intermediate_off = seed.off;
+		_cur_pos = seed.pos;
 
 		init_prime(max);
-		init_final_perm(rand_eng);
+		init_final_perm(seed);
 	}
 
 	inline integer_type max() const { return _max; }
@@ -132,8 +153,7 @@ private:
 		_max = max;
 	}
 
-	template <class Engine>
-	void init_final_perm(Engine const& rand_eng)
+	void init_final_perm(seed_type const& seed)
 	{
 		// Generate a random permutation for the final numbers
 		if (_rem_perm) {
@@ -146,8 +166,11 @@ private:
 			_rem_perm[i] = _prime + i;
 		}
 
+		std::mt19937 eng;
+		eng.seed(seed.seed_perm);
+		auto rand_eng = leeloo::random_engine(eng);
 		std::random_shuffle(&_rem_perm[0], &_rem_perm[rem],
-		                    [&rand_eng](size_t n) -> size_t { return integer_cast<size_t>(rand_eng(0, n-1)); });
+		                    [&rand_eng](size_t n) { return rand_eng.uniform<size_t>(0, n-1); });
 	}
 	
 	inline size_t size_rem() const { return integer_cast<size_t>(_max-_prime); }

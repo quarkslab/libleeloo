@@ -62,9 +62,9 @@ int main(int argc, char** argv)
 {
 	size_t n = (argc > 1) ? atoll(argv[1]) : 20;
 	
-	boost::random::mt19937 gen(time(NULL));
+	std::random_device gen;
 	leeloo::uni<uint32_t> uni;
-	uni.init(n, leeloo::random_engine<uint32_t>(gen));
+	uni.init(n, gen);
 
 	std::vector<uint32_t> res;
 	res.resize(n);

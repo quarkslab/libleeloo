@@ -29,56 +29,55 @@
 #ifndef LEELOO_RANDOM_H
 #define LEELOO_RANDOM_H
 
+#include <leeloo/config.h>
+
 #ifdef LEELOO_MP_SUPPORT
 #include <boost/multiprecision/random.hpp>
-#else
+#elif defined HAS_BOOST_RANDOM
 #include <boost/random.hpp>
 #endif
 
 namespace leeloo {
 
-template <class Integer, class RandEng>
+template <class RandEng>
 struct random
 {
-	template <class Integer_, class RandEng_> friend class random;
-
-	typedef Integer integer_type;
-
-	template <class U>
-	struct rebond
-	{
-		typedef random<U, RandEng> result;
-	};
-
 	inline random(RandEng& eng):
 		_eng(eng)
 	{ }
 
-	template <class U>
-	inline random(random<U, RandEng> const& o):
-		_eng(o._eng)
-	{ }
-
-	template <class UInt>
-	inline void seed(UInt seed)
+	template <class IntegerType>
+	inline IntegerType operator()(IntegerType const a, IntegerType const b)
 	{
-		_eng.seed(seed);
+		return uniform(a, b);
 	}
 
-	inline integer_type operator()(integer_type const a, integer_type const b) const
+	template <class IntegerType>
+	inline IntegerType uniform(IntegerType const a, IntegerType const b)
 	{
-		boost::random::uniform_int_distribution<integer_type> d(a, b);
+#ifdef HAS_BOOST_RANDOM
+		// Potential support for boost big-ints
+		boost::random::uniform_int_distribution<IntegerType> d(a, b);
+#else
+		std::uniform_int_distribution<IntegerType> d(a, b);
+#endif
 		return d(_eng);
+	}
+
+	template <class IntegerType>
+	inline IntegerType uniform()
+	{
+		return uniform(std::numeric_limits<IntegerType>::min(), std::numeric_limits<IntegerType>::max());
 	}
 
 private:
 	RandEng& _eng;
 };
 
-template <class Integer, class RandEng>
-random<Integer, RandEng> random_engine(RandEng& eng)
+template <class RandEng>
+random<RandEng> random_engine(RandEng& eng)
 {
-	return random<Integer, RandEng>(eng);
+	return random<RandEng>(eng);
 }
 
 }
