@@ -29,6 +29,7 @@ set(HEADER_DIST_FILES
 	include/leeloo/exports.h
 	include/leeloo/helpers.h
 	include/leeloo/integer_cast.h
+	include/leeloo/integer_traits.h
 	include/leeloo/interval.h
 	include/leeloo/intrinsics.h
 	include/leeloo/ip_list_intervals.h

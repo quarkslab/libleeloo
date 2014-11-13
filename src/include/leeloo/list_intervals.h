@@ -186,6 +186,43 @@ public:
 		_cache_entry_size(0)
 	{ }
 
+	list_intervals(list_intervals const& o):
+		_intervals(o._intervals),
+		_excluded_intervals(o._excluded_intervals),
+		_index_cache(o._index_cache),
+		_cache_entry_size(o._cache_entry_size)
+	{ }
+
+	list_intervals(list_intervals&& o):
+		_intervals(std::move(o._intervals)),
+		_excluded_intervals(std::move(o._excluded_intervals)),
+		_index_cache(std::move(o._index_cache)),
+		_cache_entry_size(std::move(o._cache_entry_size))
+	{ }
+
+public:
+	list_intervals& operator=(list_intervals const& o)
+	{
+		if (&o != this) {
+			_intervals = o._intervals;
+			_excluded_intervals = o._excluded_intervals;
+			_index_cache = o._index_cache;
+			_cache_entry_size = o._cache_entry_size;
+		}
+		return *this;
+	}
+
+	list_intervals& operator=(list_intervals&& o)
+	{
+		if (&o != this) {
+			_intervals = std::move(o._intervals);
+			_excluded_intervals = std::move(o._excluded_intervals);
+			_index_cache = std::move(o._index_cache);
+			_cache_entry_size = o._cache_entry_size;
+		}
+		return *this;
+	}
+
 public:
 	inline void add(base_type const a, base_type const b)
 	{
@@ -246,6 +283,21 @@ public:
 	inline void insert(typename std::enable_if<exclude == false, base_type const>::type a, base_type const b)
 	{
 		add(a, b);
+	}
+
+	this_type invert() const
+	{
+		this_type ret;
+		invert_containers(ret.intervals(), intervals());
+		return ret;
+	}
+
+	void intersect(this_type const& o)
+	{
+		// Suppose o is aggregated
+		aggregate();
+		invert_containers(removed_intervals(), o.intervals());
+		aggregate();
 	}
 
 	void aggregate()
@@ -808,6 +860,33 @@ private:
 		}
 
 		return a*_cache_entry_size;
+	}
+
+	static void invert_containers(container_type& dst, container_type const& src)
+	{
+		static constexpr base_type min = std::numeric_limits<base_type>::min();
+		static constexpr base_type max = std::numeric_limits<base_type>::max();
+
+		dst.clear();
+		if (src.size() == 0) {
+			dst.emplace_back(min, max);
+			return;
+		}
+		typename container_type::const_iterator src_it = src.begin();
+		dst.reserve(src.size()+1);
+		const base_type prev_lower = src_it->lower();
+		if (prev_lower != min) {
+			dst.emplace_back(min, prev_lower);
+		}
+		base_type prev_end = src_it->upper();
+		++src_it;
+		for (; src_it != src.end(); src_it++) {
+			dst.emplace_back(prev_end, src_it->lower());
+			prev_end = src_it->upper();
+		}
+		if (prev_end != max) {
+			dst.emplace_back(prev_end, max);
+		}
 	}
 
 public:
