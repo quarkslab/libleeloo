@@ -28,6 +28,7 @@ set(HEADER_DIST_FILES
 	include/leeloo/exports.h
 	include/leeloo/helpers.h
 	include/leeloo/integer_cast.h
+	include/leeloo/integer_mp.h
 	include/leeloo/integer_traits.h
 	include/leeloo/interval.h
 	include/leeloo/intrinsics.h
@@ -46,8 +47,8 @@ set(HEADER_DIST_FILES
 	include/leeloo/random.h
 	include/leeloo/sort_permute.h
 	include/leeloo/uni.h
-	include/leeloo/uprng_base.h
 	include/leeloo/uprng.h
+	include/leeloo/uprng_base.h
 	include/leeloo/utility.h
 	${INSTANCES_EXPORTED_H}
 	${CONFIG_H}
