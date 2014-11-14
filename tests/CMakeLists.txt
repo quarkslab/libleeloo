@@ -15,9 +15,9 @@ add_executable(uni uni.cpp)
 target_link_libraries(uni leeloo gomp)
 add_test(uni uni)
 
-#add_executable(uprng uprng.cpp)
-#target_link_libraries(uprng leeloo gomp)
-#add_test(uprng uprng)
+add_executable(uprng uprng.cpp)
+target_link_libraries(uprng leeloo gomp)
+add_test(uprng uprng)
 
 add_executable(random_sets random_sets.cpp)
 target_link_libraries(random_sets ${LINK_LIBRARIES})

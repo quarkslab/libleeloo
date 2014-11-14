@@ -63,9 +63,8 @@ int main(int argc, char** argv)
 	size_t n = (argc > 1) ? atoll(argv[1]) : 20;
 	
 	std::random_device gen;
-	auto rand_eng = leeloo::random_engine<uint32_t>(gen);
 	leeloo::uprng<uint32_t> uprng;
-	uprng.init(n, rand_eng);
+	uprng.init(n, gen);
 
 	std::vector<uint32_t> res;
 	res.resize(n);

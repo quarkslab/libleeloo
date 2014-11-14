@@ -39,6 +39,7 @@
 #include <leeloo/list_intervals.h>
 #include <leeloo/random.h>
 #include <leeloo/uni.h>
+#include <leeloo/uprng.h>
 
 template <class Interval>
 void print_intervals(Interval const& l)
@@ -110,7 +111,7 @@ int main(int argc, char** argv)
 
 	size_sets = 0;
 	const size_t ninters = list.intervals_count();
-	list.random_sets<leeloo::uni>(
+	list.random_sets<leeloo::uprng>(
 		[ninters](size_t i)
 		{
 			if (i < 10) {

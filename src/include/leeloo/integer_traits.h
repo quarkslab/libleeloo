@@ -2,7 +2,7 @@
 #define LEELOO_INTEGER_TRAITS_H
 
 #include <leeloo/config.h>
-#include <leeloo/integer_cast.h>
+#include <leeloo/integer_mp.h>
 
 #include <boost/integer.hpp> 
 
@@ -117,6 +117,23 @@ template <class T>
 struct integer_above: public __impl::integer_above<T>
 { };
 
+#ifdef LEELOO_MP_SUPPORT
+template <class T>
+struct is_integral_or_mp: public std::is_integral<T>
+{ };
+
+template <unsigned N>
+struct is_integral_or_mp<boost_uint_mp<N>>: public std::true_type
+{ };
+
+template <unsigned N>
+struct is_integral_or_mp<boost_sint_mp<N>>: public std::true_type
+{ };
+#else
+template <class T>
+struct is_integral_or_mp: public std::is_integral<T>
+{ };
+#endif
 } // leeloo
 
 #endif

@@ -1,7 +1,4 @@
 #include <leeloo/integer_cast.h>
-#ifdef LEELOO_VLI_SUPPORT
-#include <vli/integer.hpp>
-#endif
 
 #include <iostream>
 
@@ -70,7 +67,7 @@ int main()
 
 	uint128_t bigint(0xFFFFFFFFFFFFFFFFULL);
 	bigint *= 4;
-	tmp = !check_throw<leeloo::integer_overflow>([] { leeloo::strict_integer_cast<size_t>(bigint); });
+	tmp = !check_throw<leeloo::integer_overflow>([&bigint] { leeloo::strict_integer_cast<size_t>(bigint); });
 	if (tmp == 1) {
 		std::cerr << "strict_integer_cast<size_t>(uint128_t(1000)) should throw!" << std::endl;
 		ret = 1;

@@ -31,6 +31,7 @@
 
 #include <x86intrin.h>
 #include <leeloo/math_helpers.h>
+#include <leeloo/random.h>
 
 namespace leeloo {
 
@@ -90,12 +91,11 @@ Integer find_next_prime(Integer const v)
 }
 
 template <class Integer, class Engine>
-Integer random_prime_with(Integer const n, Engine& rand_eng_)
+Integer random_prime_with(Integer const n, Engine& rand_eng)
 {
-	typename Engine::template rebond<Integer>::result rand_eng(rand_eng_);
 	Integer ret, g;
 	do {
-		ret = rand_eng(0, n-2);
+		ret = rand_eng.template uniform<Integer>(0, n-2);
 		g = gcd(ret, n);
 	}
 	while (g != 1);

@@ -45,6 +45,7 @@
 #include <leeloo/atomic_helpers.h>
 #include <leeloo/intrinsics.h>
 #include <leeloo/prime_helpers.h>
+#include <leeloo/integer_cast.h>
 #include <leeloo/integer_traits.h>
 #include <leeloo/uprng_base.h>
 

@@ -46,6 +46,13 @@
 #include <leeloo/atomic_helpers.h>
 #include <leeloo/prime_helpers.h>
 #include <leeloo/random.h>
+#include <leeloo/uprng_base.h>
+#include <leeloo/integer_traits.h>
+#include <leeloo/integer_cast.h>
+
+#ifdef LEELOO_BOOST_SERIALIZE
+#include <boost/serialization/nvp.hpp>
+#endif
 
 namespace leeloo {
 
@@ -56,36 +63,58 @@ struct seed_type_uprng
 {
 	typedef IntegerType integer_type;
 
-	integer_type a;
-	integer_type b;
-	integer_type c;
-	uint8_t n;
+	integer_type _a;
+	integer_type _b;
+	integer_type _c;
+	integer_type _max;
+	integer_type _prime;
+	uint8_t _n;
+
+	integer_type const& max() const { return _max; }
 
 	template <class Engine>
 	static seed_type_uprng random(integer_type const max, Engine& eng)
 	{
 		seed_type_uprng ret;
 		auto rand_eng = leeloo::random_engine(eng);
-		_a = rand_eng.template uniform<integer_type>(1, max-1);
-		_b = rand_eng.template uniform<integer_type>(0, max-1);
+		ret._a = rand_eng.template uniform<integer_type>(1, max-1);
+		ret._b = rand_eng.template uniform<integer_type>(0, max-1);
+		ret._prime = find_next_prime(max);
+		assert(ret._prime != 0);
 
-		init_prime(max);
-		_c = random_prime_with(_prime-1, rand_eng);
-		_n = rand_eng.template uniform<uint8_t>(1, 4);
+		ret._c = random_prime_with(ret._prime-1, rand_eng);
+		ret._n = rand_eng.template uniform<uint8_t>(1, 4);
+		ret._max = max;
+		return ret;
 	}
+
+#ifdef LEELOO_BOOST_SERIALIZE
+	friend class boost::serialization::access;
+
+	template<class Archive>
+	void serialize(Archive& ar, const unsigned int)
+	{
+		ar & boost::serialization::make_nvp("a", _a);
+		ar & boost::serialization::make_nvp("b", _b);
+		ar & boost::serialization::make_nvp("c", _c);
+		ar & boost::serialization::make_nvp("max", _max);
+		ar & boost::serialization::make_nvp("prime", _prime);
+		ar & boost::serialization::make_nvp("n", _n);
+	}
+#endif
 };
 
 }
 
 template <class Integer, bool atomic = false>
-class uprng: public uprng_base<uprng<Integer, atomic>, Integer, >
+class uprng: public uprng_base<uprng<Integer, atomic>, Integer, __impl::seed_type_uprng<Integer>>
 {
 	static_assert(std::is_signed<Integer>::value == false, "Integer must be an unsigned integer type.");
-	static_assert(sizeof(Integer) <= 4, "Integers wider than 32-bit integers aren't supported.");
 
 public:
 	typedef Integer integer_type;
 	typedef typename std::conditional<atomic, tbb::atomic<integer_type>, integer_type>::type pos_integer_type;
+	typedef __impl::seed_type_uprng<integer_type> seed_type;
 
 public:
 	void init_base() { }
@@ -94,17 +123,17 @@ public:
 	 *
 	 * \param max defines the interval of the generated integers. max isn't included (between [0,max[).
 	 */
-	template <class Engine>
-	void init(integer_type const max, Engine& rand_eng)
+	void init_seed(seed_type const& seed)
 	{
-		_max = max;
+		_max = seed.max();
 
-		_a = rand_eng(1, max-1);
-		_b = rand_eng(0, max-1);
+		_a = seed._a;
+		_b = seed._b;
 
-		init_prime(max);
-		_c = random_prime_with(_prime-1, rand_eng);
-		_n = rand_eng(1, 4);
+		_c = seed._c;
+		_n = seed._n;
+
+		_prime = seed._prime;
 
 		_cur_step = 0;
 	}
@@ -133,15 +162,10 @@ public:
 	}
 
 private:
-	void init_prime(integer_type const max)
-	{
-		_prime = find_next_prime(max);
-		assert(_prime != 0);
-	}
-
 	inline static integer_type l(integer_type const X, integer_type const a, integer_type const b, integer_type const p)
 	{
-		return ((uint64_t)a*(uint64_t)X+(uint64_t)b)%p;
+		typedef typename integer_above<integer_type>::type integer_above_type;
+		return integer_cast<integer_type>((integer_cast<integer_above_type>(a)*integer_cast<integer_above_type>(X)+integer_cast<integer_above_type>(b))%p);
 	}
 
 	inline static integer_type g(integer_type const X, integer_type const c, integer_type const p)

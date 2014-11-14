@@ -3,6 +3,7 @@
 #include <leeloo/list_intervals.h>
 #include <leeloo/random.h>
 #include <leeloo/uni.h>
+#include <leeloo/uprng.h>
 #include <leeloo/integer_cast.h>
 
 #include <random>
@@ -51,6 +52,22 @@ int main()
 
 	{
 		leeloo::uni<uint128_t> uni;
+		uni.init(0xFFFFFFFFFFULL);
+		for (size_t i = 0; i < 10; i++) {
+			std::cout << uni() << std::endl;
+		}
+	}
+
+	{
+		leeloo::uprng<uint64_t> uni;
+		uni.init(0xFFFFFFFFFFULL);
+		for (size_t i = 0; i < 10; i++) {
+			std::cout << uni() << std::endl;
+		}
+	}
+
+	{
+		leeloo::uprng<uint128_t> uni;
 		uni.init(0xFFFFFFFFFFULL);
 		for (size_t i = 0; i < 10; i++) {
 			std::cout << uni() << std::endl;
