@@ -35,6 +35,8 @@
 #include <boost/multiprecision/random.hpp>
 #elif defined HAS_BOOST_RANDOM
 #include <boost/random.hpp>
+#else
+#include <random>
 #endif
 
 namespace leeloo {

@@ -29,8 +29,6 @@
 #ifndef LEELOO_INTERVAL_LIST_H
 #define LEELOO_INTERVAL_LIST_H
 
-#include <tbb/parallel_sort.h>
-
 #include <errno.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -44,9 +42,10 @@
 #include <leeloo/bench.h>
 #include <leeloo/config.h>
 #include <leeloo/exports.h>
+#include <leeloo/integer_cast.h>
+#include <leeloo/sort.h>
 #include <leeloo/uni.h>
 #include <leeloo/utility.h>
-#include <leeloo/integer_cast.h>
 
 #ifdef LEELOO_BOOST_SERIALIZE
 #include <boost/serialization/vector.hpp>
@@ -283,7 +282,7 @@ public:
 
 		aggregate_container(removed_intervals());
 
-		tbb::parallel_sort(intervals().begin(), intervals().end(), cmp_f());
+		leeloo::parallel_or_serial_sort(intervals().begin(), intervals().end(), cmp_f());
 
 		container_type ret;
 		interval_type cur_merge = intervals().front();
@@ -702,7 +701,7 @@ private:
 			return;
 		}
 		
-		tbb::parallel_sort(ints.begin(), ints.end(), cmp_f());
+		leeloo::parallel_or_serial_sort(ints.begin(), ints.end(), cmp_f());
 
 		container_type ret;
 		interval_type cur_merge = ints.front();

@@ -13,4 +13,8 @@
 #define HAS_BOOST_RANDOM
 #endif
 
+#if @HAS_TBB@
+#define HAS_TBB
+#endif
+
 #endif

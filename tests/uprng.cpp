@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <ctime>
+#include <cstring>
 
 #include <leeloo/bench.h>
 #include <leeloo/helpers.h>

@@ -35,6 +35,7 @@
 #include <cmath>
 #include <algorithm>
 #include <limits>
+#include <cassert>
 
 #include <x86intrin.h>
 

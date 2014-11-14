@@ -1,17 +1,27 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-find_package(TBB REQUIRED)
+
+find_package(TBB)
+if (${TBB_FOUND})
+	set(HAS_TBB 1)
+else()
+	message(WARNING "Intel Threading Building Blocks library hasn't been found. Falling back to sequential alternatives...")
+	set(HAS_TBB 0)
+endif()
+
 set(BOOST_COMPONENTS random)
 if(LEELOO_BOOST_SERIALIZE)
 	set(BOOST_COMPONENTS random serialization)
 endif()
 find_package(Boost COMPONENTS ${BOOST_COMPONENTS})
 
-#set(Boost_RANDOM_FOUND "OFF")
-
 if(${Boost_RANDOM_FOUND} STREQUAL "ON")
 	set(HAS_BOOST_RANDOM 1)
 else()
 	set(HAS_BOOST_RANDOM 0)
+endif()
+
+if (LEELOO_MP_SUPPORT AND NOT HAS_BOOST_RANDOM)
+	message(FATAL_ERROR "Boost::random is needed when MP support is enabled.")
 endif()
 
 if (LEELOO_BOOST_SERIALIZE AND NOT Boost_SERIALIZATION_FOUND)
@@ -20,8 +30,8 @@ endif()
 
 # If no boost at all, use the in-tree sub part we need
 if (NOT Boost_FOUND)
-	MESSAGE(STATUS "Boost can't be found. Using in-tree version...")
-	set(Boost_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/third-party/boost")
+	set(Boost_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/third-party")
+	MESSAGE(STATUS "Boost can't be found. Using in-tree version in ${Boost_INCLUDE_DIRS}...")
 	set(Boost_INCLUDE_DIR "${Boost_INCLUDE_DIRS}")
 	set(Boost_LIBRARY_DIRS "")
 	set(Boost_LIBRARY_DIR "")

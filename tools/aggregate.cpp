@@ -36,6 +36,7 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <cstring>
 
 #include <leeloo/ip_list_intervals.h>
 
