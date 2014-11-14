@@ -682,8 +682,6 @@ private:
 		const base_type inv_mask = ~mask;
 		const base_type max_size = mask+1;
 
-		base_type prev_a = std::numeric_limits<base_type>::min();
-		base_type prev_b = std::numeric_limits<base_type>::max();
 		// Do not use iterator as we will append intervals, and thus modify the end!
 		const count_type org_size = intervals().size();
 		for (count_type i = 0; i < org_size; i++) {
