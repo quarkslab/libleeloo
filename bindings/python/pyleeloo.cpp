@@ -26,7 +26,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <boost/random.hpp>
 #include <boost/python.hpp>
 
 #include <cstdint>
@@ -34,6 +33,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <fstream>
+#include <random>
 
 #include <leeloo/config.h>
 #include <leeloo/ip_list_intervals.h>
@@ -52,7 +52,7 @@
 
 using namespace boost::python;
 
-boost::random::mt19937 g_mt_rand;
+std::random_device g_rd;
 
 void (leeloo::ip_list_intervals::*ip_add1)(leeloo::ip_list_intervals::base_type const, leeloo::ip_list_intervals::base_type const) = &leeloo::ip_list_intervals::add;
 void (leeloo::ip_list_intervals::*ip_add2)(leeloo::ip_list_intervals::base_type const)                                             = &leeloo::ip_list_intervals::add;
@@ -116,7 +116,7 @@ static void ip_list_random_sets(leeloo::ip_list_intervals const& l, size_t const
 {
 	l.random_sets(size_div,
 	              [&f_set](uint32_t const* buf, size_t const size) { f_set(u32_set_read_only(buf, size)); },
-				  leeloo::random_engine<uint32_t>(g_mt_rand));
+				  g_rd);
 }
 
 static void ip_list_random_sets_func(leeloo::ip_list_intervals const& l, object& f_size_div, size_t const size_max, object& f_set)
@@ -128,28 +128,14 @@ static void ip_list_random_sets_func(leeloo::ip_list_intervals const& l, object&
 			},
 		    size_max,
 		    [&f_set](uint32_t const* buf, size_t const size) { f_set(u32_set_read_only(buf, size)); },
-		    leeloo::random_engine<uint32_t>(g_mt_rand));
+		    g_rd);
 }
 
 static void port_list_random_sets(leeloo::port_list_intervals const& l, size_t const size_div, object& f_set)
 {
 	l.random_sets(size_div,
 	              [&f_set](uint32_t const* buf, size_t const size) { f_set(u32_set_read_only(buf, size)); },
-				  leeloo::random_engine<uint32_t>(g_mt_rand));
-}
-
-static void init_rand_gen()
-{
-	int fd = open("/dev/urandom", O_RDONLY);
-	if (fd != -1) {
-		uint32_t seed;
-		read(fd, &seed, sizeof(uint32_t));
-		g_mt_rand.seed(seed);
-		close(fd);
-	}
-	else {
-		g_mt_rand.seed(time(NULL));
-	}
+				  g_rd);
 }
 
 static uint32_t python_ipv4toi1(const char* ip)
@@ -176,7 +162,7 @@ static void u16_list_random_sets(u16_list_intervals const& l, size_t const size_
 {
 	l.random_sets(size_div,
 	              [&f_set](uint16_t const* buf, size_t const size) { f_set(u16_set_read_only(buf, size)); },
-				  leeloo::random_engine<uint16_t>(g_mt_rand));
+				  g_rd);
 }
 
 static void u16_list_random_sets_func(u16_list_intervals const& l, object& f_size_div, size_t const size_max, object& f_set)
@@ -188,7 +174,7 @@ static void u16_list_random_sets_func(u16_list_intervals const& l, object& f_siz
 			},
 	        size_max,
 	        [&f_set](uint16_t const* buf, size_t const size) { f_set(u16_set_read_only(buf, size)); },
-			leeloo::random_engine<uint16_t>(g_mt_rand));
+			g_rd);
 }
 
 // uint32 intervals
@@ -204,7 +190,7 @@ static void u32_list_random_sets(u32_list_intervals const& l, size_t const size_
 {
 	l.random_sets(size_div,
 	              [&f_set](uint32_t const* buf, size_t const size) { f_set(u32_set_read_only(buf, size)); },
-				  leeloo::random_engine<uint32_t>(g_mt_rand));
+				  g_rd);
 }
 
 // Properties
@@ -297,7 +283,7 @@ static void ip_list_with_properties_python_random_sets_with_properties(ip_list_i
 			f_set(u32_set_properties_read_only_python(buf, props, size));
 		}
 		,
-		leeloo::random_engine<uint64_t>(g_mt_rand));
+		g_rd);
 }
 
 static void ip_list_with_properties_python_random_sets_with_properties_func(ip_list_intervals_with_properties_python const& l, object& f_size_div, size_t const size_max, object& f_set)
@@ -313,7 +299,7 @@ static void ip_list_with_properties_python_random_sets_with_properties_func(ip_l
 			f_set(u32_set_properties_read_only_python(buf, props, size));
 		}
 		,
-		leeloo::random_engine<uint32_t>(g_mt_rand));
+		g_rd);
 }
 
 static property_python ip_list_intervals_with_properties_python_property_of_wrapper(ip_list_intervals_with_properties_python const& l, uint32_t v)
@@ -351,22 +337,22 @@ typedef leeloo::list_intervals_random<u32_list_intervals, leeloo::uni> u32_list_
 
 void ip_list_intervals_random_init(ip_list_intervals_random& ipr, leeloo::ip_list_intervals const& ipl)
 {
-	ipr.init(ipl, leeloo::random_engine<uint32_t>(g_mt_rand));
+	ipr.init(ipl, g_rd);
 }
 
 void ip_list_intervals_random_init_seed(ip_list_intervals_random& ipr, leeloo::ip_list_intervals const& ipl, ip_list_intervals_random::seed_type const seed, leeloo::ip_list_intervals::difference_type const start)
 {
-	ipr.init(ipl, leeloo::random_engine<uint32_t>(g_mt_rand), seed, start);
+	ipr.init(ipl, seed, start);
 }
 
 void u32_list_intervals_random_init(u32_list_intervals_random& u32r, u32_list_intervals const& u32l)
 {
-	u32r.init(u32l, leeloo::random_engine<uint32_t>(g_mt_rand));
+	u32r.init(u32l, g_rd);
 }
 
 void u32_list_intervals_random_init_seed(u32_list_intervals_random& u32r, u32_list_intervals const& u32l, u32_list_intervals_random::seed_type const seed, u32_list_intervals::difference_type const start)
 {
-	u32r.init(u32l, leeloo::random_engine<uint32_t>(g_mt_rand), seed, start);
+	u32r.init(u32l, seed, start);
 }
 
 
@@ -374,17 +360,17 @@ typedef leeloo::list_intervals_random_promise<leeloo::ip_list_intervals, leeloo:
 
 void ip_list_intervals_random_promise_init(ip_list_intervals_random_promise& ipr, leeloo::ip_list_intervals const& ipl)
 {
-	ipr.init(ipl, leeloo::random_engine<uint32_t>(g_mt_rand));
+	ipr.init(ipl, g_rd);
 }
 
 void ip_list_intervals_random_promise_init_seed(ip_list_intervals_random_promise& ipr, leeloo::ip_list_intervals const& ipl, ip_list_intervals_random_promise::seed_type const seed)
 {
-	ipr.init(ipl, leeloo::random_engine<uint32_t>(g_mt_rand), seed);
+	ipr.init(ipl, seed);
 }
 
 void ip_list_intervals_random_promise_init_seed_steps(ip_list_intervals_random_promise& ipr, leeloo::ip_list_intervals const& ipl, ip_list_intervals_random_promise::seed_type const seed, ip_list_intervals_random_promise::difference_type step_start, ip_list_intervals_random_promise::difference_type step_end)
 {
-	ipr.init(ipl, leeloo::random_engine<uint32_t>(g_mt_rand), seed, step_start, step_end);
+	ipr.init(ipl, seed, step_start, step_end);
 }
 
 #ifdef LEELOO_BOOST_SERIALIZE
@@ -399,7 +385,7 @@ void ip_list_intervals_random_promise_restore_state(ip_list_intervals_random_pro
 {
 	std::ifstream ifs(file, std::ifstream::in);
 	boost::archive::text_iarchive ia(ifs);
-	ipr.restore_state(ia, ipl, leeloo::random_engine<uint32_t>(g_mt_rand));
+	ipr.restore_state(ia, ipl);
 }
 #endif
 
@@ -420,8 +406,6 @@ static leeloo::port sctp_port(uint16_t value)
 
 BOOST_PYTHON_MODULE(pyleeloo)
 {
-	init_rand_gen();
-
 	enum_<leeloo::port::protocol_enum>("protocol")
 		.value("TCP", leeloo::port::protocol_enum::TCP)
 		.value("UDP", leeloo::port::protocol_enum::UDP)
@@ -608,7 +592,7 @@ BOOST_PYTHON_MODULE(pyleeloo)
 
 	class_<u32_list_intervals_random>("u32_list_intervals_random")
 		.def("init", &u32_list_intervals_random_init)
-		.def("init", &u32_list_intervals_random_init_seed)
+		//.def("init", &u32_list_intervals_random_init_seed)
 		.def("__call__", &u32_list_intervals_random::operator())
 		.def("end", &u32_list_intervals_random::end)
 		.def("cur_step", &u32_list_intervals_random::cur_step)
@@ -616,7 +600,7 @@ BOOST_PYTHON_MODULE(pyleeloo)
 
 	class_<ip_list_intervals_random>("ip_list_intervals_random")
 		.def("init", &ip_list_intervals_random_init)
-		.def("init", &ip_list_intervals_random_init_seed)
+		//.def("init", &ip_list_intervals_random_init_seed)
 		.def("__call__", &ip_list_intervals_random::operator())
 		.def("end", &ip_list_intervals_random::end)
 		.def("cur_step", &ip_list_intervals_random::cur_step)
@@ -624,8 +608,8 @@ BOOST_PYTHON_MODULE(pyleeloo)
 
 	class_<ip_list_intervals_random_promise>("ip_list_intervals_random_promise")
 		.def("init", &ip_list_intervals_random_promise_init)
-		.def("init", &ip_list_intervals_random_promise_init_seed)
-		.def("init", &ip_list_intervals_random_promise_init_seed_steps)
+		//.def("init", &ip_list_intervals_random_promise_init_seed)
+		//.def("init", &ip_list_intervals_random_promise_init_seed_steps)
 		.def("__call__", &ip_list_intervals_random_promise::operator())
 		.def("end", &ip_list_intervals_random_promise::end)
 		.def("get_current_step", &ip_list_intervals_random_promise::get_current_step)

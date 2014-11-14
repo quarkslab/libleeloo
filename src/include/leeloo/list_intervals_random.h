@@ -126,7 +126,7 @@ public:
 	}
 
 	template <class RandEngine>
-	void init(list_intervals_type const& li, RandEngine const& rand_engine)
+	void init(typename std::enable_if<std::is_same<RandEngine, seed_type>::value == false, list_intervals_type>::type const& li, RandEngine& rand_engine)
 	{
 		_seed = seed_type::random(li.size(), rand_engine);
 		init(li, _seed);

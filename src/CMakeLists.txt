@@ -25,7 +25,6 @@ set(HEADER_DIST_FILES
 	include/leeloo/atomic_helpers.h
 	include/leeloo/bench.h
 	include/leeloo/bit_field.h
-	include/leeloo/bits_permutation.h
 	include/leeloo/exports.h
 	include/leeloo/helpers.h
 	include/leeloo/integer_cast.h
@@ -47,6 +46,7 @@ set(HEADER_DIST_FILES
 	include/leeloo/random.h
 	include/leeloo/sort_permute.h
 	include/leeloo/uni.h
+	include/leeloo/uprng_base.h
 	include/leeloo/uprng.h
 	include/leeloo/utility.h
 	${INSTANCES_EXPORTED_H}
