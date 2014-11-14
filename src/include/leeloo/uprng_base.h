@@ -12,7 +12,7 @@ class uprng_base
 	typedef Integer integer_type;
 	typedef SeedType seed_type;
 
-	static_assert(std::is_pod<seed_type>::value, "seed_type must be a POD");
+	//static_assert(std::is_pod<seed_type>::value, "seed_type must be a POD");
 
 public:
 	uprng_base()
