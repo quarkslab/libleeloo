@@ -26,10 +26,10 @@ public:
 	typedef typename uprng_type::seed_type seed_type;
 
 public:
-	void init(list_intervals_type const& li, seed_type const seed_, difference_type const step = 0)
+	void init(seed_type const seed_, difference_type const step = 0)
 	{
 		_seed = seed_;
-		_uprng.init(li.size(), seed_);
+		_uprng.init(seed_);
 		_cur_step = step;
 	}
 
@@ -37,13 +37,13 @@ public:
 	void init(list_intervals_type const& li, RandEngine& rand_engine)
 	{
 		_seed = seed_type::random(li.size(), rand_engine);
-		init(li, _seed);
+		init(_seed);
 	}
 
 	void init(list_intervals_type const& li)
 	{
 		_seed = seed_type::random(li.size());
-		init(li, _seed);
+		init(_seed);
 	}
 
 	base_type operator()(list_intervals_type const& li)
@@ -68,11 +68,11 @@ public:
 	}
 
 	template <class Archive>
-	void restore_state(Archive& ar, list_intervals_type const& li)
+	void restore_state(Archive& ar)
 	{
 		ar >> boost::serialization::make_nvp("seed", _seed);
 		ar >> boost::serialization::make_nvp("cur_step", _cur_step);
-		_uprng.init(li.size(), _seed);
+		_uprng.init(_seed);
 	}
 #endif
 
@@ -99,10 +99,10 @@ public:
 	typedef typename uprng_type::seed_type seed_type;
 
 public:
-	void init(list_intervals_type const& li, seed_type const& seed, difference_type step_start, difference_type step_end)
+	void init(seed_type const& seed, difference_type step_start, difference_type step_end)
 	{
 		_seed = seed;
-		_uprng.init(li.size(), seed);
+		_uprng.init(seed);
 		step_end = std::min(step_end, _uprng.max());
 		step_start = std::min(step_start, _uprng.max());
 		if (step_start > step_end) {
@@ -120,22 +120,20 @@ public:
 		_it_steps = _steps_todo.value_begin();
 	}
 
-	void init(list_intervals_type const& li, seed_type const& seed)
+	void init(seed_type const& seed)
 	{
-		init(li, seed, 0, li.size());
+		init(seed, 0, seed.max());
 	}
 
 	template <class RandEngine>
-	void init(typename std::enable_if<std::is_same<RandEngine, seed_type>::value == false, list_intervals_type>::type const& li, RandEngine& rand_engine)
+	void init(list_intervals_type const& li, RandEngine& rand_engine)
 	{
-		_seed = seed_type::random(li.size(), rand_engine);
-		init(li, _seed);
+		init(seed_type::random(li.size(), rand_engine));
 	}
 
 	void init(list_intervals_type const& li)
 	{
-		_seed = seed_type::random(li.size());
-		init(li, _seed);
+		init(seed_type::random(li.size()));
 	}
 
 	base_type operator()(list_intervals_type const& li)
@@ -203,12 +201,12 @@ public:
 	}
 
 	template <class Archive>
-	void restore_state(Archive& ar, list_intervals_type const& li)
+	void restore_state(Archive& ar)
 	{
 		ar >> boost::serialization::make_nvp("seed", _seed);
 		ar >> boost::serialization::make_nvp("done_steps", _done_steps);
 
-		_uprng.init(li.size(), _seed);
+		_uprng.init(_seed);
 		set_done_steps(_done_steps);
 	}
 #endif

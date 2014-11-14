@@ -340,9 +340,9 @@ void ip_list_intervals_random_init(ip_list_intervals_random& ipr, leeloo::ip_lis
 	ipr.init(ipl, g_rd);
 }
 
-void ip_list_intervals_random_init_seed(ip_list_intervals_random& ipr, leeloo::ip_list_intervals const& ipl, ip_list_intervals_random::seed_type const seed, leeloo::ip_list_intervals::difference_type const start)
+void ip_list_intervals_random_init_seed(ip_list_intervals_random& ipr, ip_list_intervals_random::seed_type const seed, leeloo::ip_list_intervals::difference_type const start)
 {
-	ipr.init(ipl, seed, start);
+	ipr.init(seed, start);
 }
 
 void u32_list_intervals_random_init(u32_list_intervals_random& u32r, u32_list_intervals const& u32l)
@@ -350,9 +350,9 @@ void u32_list_intervals_random_init(u32_list_intervals_random& u32r, u32_list_in
 	u32r.init(u32l, g_rd);
 }
 
-void u32_list_intervals_random_init_seed(u32_list_intervals_random& u32r, u32_list_intervals const& u32l, u32_list_intervals_random::seed_type const seed, u32_list_intervals::difference_type const start)
+void u32_list_intervals_random_init_seed(u32_list_intervals_random& u32r, u32_list_intervals_random::seed_type const seed, u32_list_intervals::difference_type const start)
 {
-	u32r.init(u32l, seed, start);
+	u32r.init(seed, start);
 }
 
 
@@ -363,14 +363,14 @@ void ip_list_intervals_random_promise_init(ip_list_intervals_random_promise& ipr
 	ipr.init(ipl, g_rd);
 }
 
-void ip_list_intervals_random_promise_init_seed(ip_list_intervals_random_promise& ipr, leeloo::ip_list_intervals const& ipl, ip_list_intervals_random_promise::seed_type const seed)
+void ip_list_intervals_random_promise_init_seed(ip_list_intervals_random_promise& ipr, ip_list_intervals_random_promise::seed_type const seed)
 {
-	ipr.init(ipl, seed);
+	ipr.init(seed);
 }
 
-void ip_list_intervals_random_promise_init_seed_steps(ip_list_intervals_random_promise& ipr, leeloo::ip_list_intervals const& ipl, ip_list_intervals_random_promise::seed_type const seed, ip_list_intervals_random_promise::difference_type step_start, ip_list_intervals_random_promise::difference_type step_end)
+void ip_list_intervals_random_promise_init_seed_steps(ip_list_intervals_random_promise& ipr, ip_list_intervals_random_promise::seed_type const seed, ip_list_intervals_random_promise::difference_type step_start, ip_list_intervals_random_promise::difference_type step_end)
 {
-	ipr.init(ipl, seed, step_start, step_end);
+	ipr.init(seed, step_start, step_end);
 }
 
 #ifdef LEELOO_BOOST_SERIALIZE
@@ -381,11 +381,11 @@ void ip_list_intervals_random_promise_save_state(ip_list_intervals_random_promis
 	ipr.save_state(oa);
 }
 
-void ip_list_intervals_random_promise_restore_state(ip_list_intervals_random_promise& ipr, const char* file, leeloo::ip_list_intervals const& ipl)
+void ip_list_intervals_random_promise_restore_state(ip_list_intervals_random_promise& ipr, const char* file)
 {
 	std::ifstream ifs(file, std::ifstream::in);
 	boost::archive::text_iarchive ia(ifs);
-	ipr.restore_state(ia, ipl);
+	ipr.restore_state(ia);
 }
 #endif
 

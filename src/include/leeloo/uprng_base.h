@@ -21,16 +21,16 @@ public:
 	}
 
 public:
-	void init(integer_type const max, seed_type const& seed)
+	void init(seed_type const& seed)
 	{
 		static_cast<uprng_type*>(this)->init_base();
-		static_cast<uprng_type*>(this)->init_seed(max, seed);
+		static_cast<uprng_type*>(this)->init_seed(seed);
 	}
 	
 	template <class Engine>
-	void init(typename std::enable_if<std::is_same<Engine, seed_type>::value == false, integer_type>::type const max, Engine& eng)
+	void init(integer_type const max, Engine& eng)
 	{
-		init(max, seed_type::random(max, eng));
+		init(seed_type::random(max, eng));
 	}
 
 	void init(integer_type const max)
@@ -39,6 +39,7 @@ public:
 		init(max, rd);
 	}
 };
+
 
 }
 

@@ -59,9 +59,10 @@ namespace __impl {
 template <class integer_type>
 struct seed_type_uni
 {
-	integer_type off;
-	integer_type pos;
-	uint32_t seed_perm;
+	integer_type _off;
+	integer_type _pos;
+	integer_type _max;
+	uint32_t _seed_perm;
 
 	template <class Engine>
 	static seed_type_uni random(integer_type const max, Engine& eng)
@@ -69,11 +70,17 @@ struct seed_type_uni
 		seed_type_uni ret;
 		auto rand = leeloo::random_engine(eng);
 
-		ret.off = rand.template uniform<integer_type>(0, max-1);
-		ret.pos = rand.template uniform<integer_type>(0, max-1);
-		ret.seed_perm = rand.template uniform<uint32_t>();
+		ret._off = rand.template uniform<integer_type>(0, max-1);
+		ret._pos = rand.template uniform<integer_type>(0, max-1);
+		ret._seed_perm = rand.template uniform<uint32_t>();
+		ret._max = max;
 		return ret;
 	}
+
+	integer_type const& off() const { return _off; }
+	integer_type const& pos() const { return _pos; }
+	integer_type const& max() const { return _max; }
+	uint32_t seed_perm() const { return _seed_perm; }
 
 #ifdef LEELOO_BOOST_SERIALIZE
 	friend class boost::serialization::access;
@@ -81,9 +88,10 @@ struct seed_type_uni
 	template<class Archive>
 	void serialize(Archive& ar, const unsigned int)
 	{
-		ar & boost::serialization::make_nvp("off", off);
-		ar & boost::serialization::make_nvp("pos", pos);
-		ar & boost::serialization::make_nvp("seed_perm", seed_perm);
+		ar & boost::serialization::make_nvp("off", _off);
+		ar & boost::serialization::make_nvp("pos", _pos);
+		ar & boost::serialization::make_nvp("seed_perm", _seed_perm);
+		ar & boost::serialization::make_nvp("max", _max);
 	}
 #endif
 };
@@ -106,7 +114,7 @@ public:
 	using base_type::base_type;
 
 	void init_base()
-	{
+	{ 
 		_rem_perm = nullptr;
 	}
 
@@ -122,12 +130,12 @@ public:
 	 *
 	 * \param max defines the interval of the generated integers. max isn't included (between [0,max[).
 	 */
-	void init_seed(integer_type const max, seed_type const& seed)
+	void init_seed(seed_type const& seed)
 	{
-		_intermediate_off = seed.off;
-		_cur_pos = seed.pos;
+		_intermediate_off = seed.off();
+		_cur_pos = seed.pos();
 
-		init_prime(max);
+		init_prime(seed.max());
 		init_final_perm(seed);
 	}
 
@@ -183,7 +191,7 @@ private:
 		}
 
 		std::mt19937 eng;
-		eng.seed(seed.seed_perm);
+		eng.seed(seed.seed_perm());
 		auto rand_eng = leeloo::random_engine(eng);
 		std::random_shuffle(&_rem_perm[0], &_rem_perm[rem],
 		                    [&rand_eng](size_t n) { return rand_eng.uniform<size_t>(0, n-1); });

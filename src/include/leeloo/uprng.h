@@ -59,19 +59,19 @@ struct seed_type_uprng
 	integer_type a;
 	integer_type b;
 	integer_type c;
-	integer_type n;
+	uint8_t n;
 
 	template <class Engine>
 	static seed_type_uprng random(integer_type const max, Engine& eng)
 	{
 		seed_type_uprng ret;
 		auto rand_eng = leeloo::random_engine(eng);
-		_a = rand_eng(1, max-1);
-		_b = rand_eng(0, max-1);
+		_a = rand_eng.template uniform<integer_type>(1, max-1);
+		_b = rand_eng.template uniform<integer_type>(0, max-1);
 
 		init_prime(max);
 		_c = random_prime_with(_prime-1, rand_eng);
-		_n = rand_eng(1, 4);
+		_n = rand_eng.template uniform<uint8_t>(1, 4);
 	}
 };
 
@@ -126,7 +126,7 @@ public:
 	inline integer_type get_step(integer_type const step) const
 	{
 		integer_type ret = step;
-		for (integer_type i = 0; i < _n; i++) {
+		for (uint8_t i = 0; i < _n; i++) {
 			ret = g(l(ret, _a, _b, _prime), _c, _prime);
 		}
 		return ret;
@@ -155,7 +155,7 @@ private:
 	integer_type _a;
 	integer_type _b;
 	integer_type _c;
-	integer_type _n;
+	uint8_t _n;
 	pos_integer_type _cur_step;
 };
 
