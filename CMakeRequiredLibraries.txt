@@ -16,7 +16,7 @@ if(LEELOO_BOOST_SERIALIZE)
 endif()
 find_package(Boost COMPONENTS ${BOOST_COMPONENTS})
 
-if(${Boost_RANDOM_FOUND} STREQUAL "ON")
+if(${Boost_RANDOM_FOUND}) 
 	set(HAS_BOOST_RANDOM 1)
 else()
 	set(HAS_BOOST_RANDOM 0)
