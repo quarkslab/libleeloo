@@ -38,8 +38,6 @@
 
 #include <x86intrin.h>
 
-#include <boost/random.hpp>
-
 #include <tbb/atomic.h>
 
 #include <leeloo/intrinsics.h>

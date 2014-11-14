@@ -32,15 +32,12 @@
 #include <ctime>
 #include <set>
 #include <array>
-
-#include <boost/random.hpp>
+#include <random>
 
 #include <leeloo/interval.h>
 #include <leeloo/list_intervals_properties.h>
 #include <leeloo/list_intervals_with_properties.h>
 #include <leeloo/random.h>
-
-#include <random>
 
 template <class Interval>
 void print_intervals(Interval const& l)

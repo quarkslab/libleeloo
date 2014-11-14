@@ -32,8 +32,7 @@
 #include <ctime>
 #include <set>
 #include <math.h>
-
-#include <boost/random.hpp>
+#include <random>
 
 #include <leeloo/interval.h>
 #include <leeloo/list_intervals.h>

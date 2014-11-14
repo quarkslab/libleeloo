@@ -31,8 +31,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <set>
-
-#include <boost/random.hpp>
+#include <random>
 
 #include <leeloo/interval.h>
 #include <leeloo/list_intervals.h>
