@@ -6,6 +6,8 @@ if (${TBB_FOUND})
 else()
 	message(WARNING "Intel Threading Building Blocks library hasn't been found. Falling back to sequential alternatives...")
 	set(HAS_TBB 0)
+	set(TBB_LIBRARIES "")
+	set(TBB_INCLUDE_DIR "")
 endif()
 
 set(BOOST_COMPONENTS random)
