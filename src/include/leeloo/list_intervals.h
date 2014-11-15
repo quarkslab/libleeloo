@@ -131,13 +131,13 @@ public:
 		}
 
 		value_iterator(container_type const& v):
-			//_iter(v.cbegin()),
+			_iter(v.cbegin()),
 			_offset(0)
 		{
 		}
 
 		value_iterator(container_type const& v, tag_vi_end):
-			//_iter(v.cend()),
+			_iter(v.cend()),
 			_offset(0)
 		{
 		}
@@ -586,28 +586,29 @@ public:
 		os << nintervals;
 		os.write((const char*) &intervals()[0], intervals().size()*sizeof(interval_type));
 	}
-#if 0
-	void dump_to_fd(int fd)
+
+	void dump_to_file(FILE* f)
 	{
-		if (fd == -1) {
+		if (f == nullptr) {
 			throw file_exception(errno);
 		}
 
 		size_t size_write = intervals().size()*sizeof(interval_type);
-		ssize_t w = write(fd, &intervals()[0], size_write);
+		ssize_t w = fwrite(&intervals()[0], 1, size_write, f);
 		if ((w < 0) ||
 		    (((size_t)w) != size_write)) {
 			throw file_exception(errno);
 		}
+		fflush(f);
 	}
 
-	void read_from_fd(int fd)
+	void read_from_file(FILE* f)
 	{
-		off_t size = lseek(fd, 0, SEEK_END);
-		if (size == -1) {
+		if (fseek(f, 0, SEEK_END) == -1) {
 			throw file_exception(errno);
 		}
-		if (lseek(fd, 0, SEEK_SET) == -1) {
+		off_t size = ftell(f);
+		if (fseek(f, 0, SEEK_SET) == -1) {
 			throw file_exception(errno);
 		}
 
@@ -618,11 +619,8 @@ public:
 		size_t n = size/sizeof(interval_type);
 		clear();
 		intervals().resize(n);
-		ssize_t r = read(fd, &intervals()[0], size);
-		if (r < 0) {
-			throw file_exception(errno);
-		}
-		if (r != size) {
+		ssize_t r = fread(&intervals()[0], 1, size, f);
+		if ((r < 0) || (r != size)) {
 			throw file_exception(errno);
 		}
 
@@ -635,28 +633,28 @@ public:
 
 	void dump_to_file(const char* file)
 	{
-		int fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
-		if (fd == -1) {
+		FILE* f = fopen(file, "wb");
+		if (f == nullptr) {
 			throw file_exception(errno);
 		}
 
-		dump_to_fd(fd);
+		dump_to_file(f);
 
-		close(fd);
+		fclose(f);
 	}
 
 	void read_from_file(const char* file)
 	{
-		int fd = open(file, O_RDONLY);
-		if (fd == -1) {
+		FILE* f = fopen(file, "rb");
+		if (f == nullptr) {
 			throw file_exception(errno);
 		}
 
-		read_from_fd(fd);
+		read_from_file(f);
 
-		close(fd);
+		fclose(f);
 	}
-#endif
+
 #ifdef LEELOO_BOOST_SERIALIZE
 	template<class Archive>
 	void save(Archive& ar, unsigned int const /*version*/) const

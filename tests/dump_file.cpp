@@ -51,8 +51,7 @@ typedef leeloo::list_intervals<leeloo::interval<uint32_t>, uint32_t> list_interv
 
 int main()
 {
-	char tmpfile[] = "/tmp/leeloo-test-dump-XXXXXX";
-	int fd_tmp = mkstemp(tmpfile);
+	FILE* f_tmp = tmpfile();
 
 	list_intervals ref;
 	ref.add(0, 2);
@@ -62,22 +61,21 @@ int main()
 	ref.add(9, 15);
 	ref.add(19, 21);
 	ref.aggregate();
-	ref.dump_to_fd(fd_tmp);
+	ref.dump_to_file(f_tmp);
 
-	if (lseek(fd_tmp, 0, SEEK_SET) == -1) {
-		perror("lseek");
+	if (fseek(f_tmp, 0, SEEK_SET) == -1) {
+		perror("fseek");
 		return 1;
 	}
 
 	list_intervals list;
-	list.read_from_fd(fd_tmp);
+	list.read_from_file(f_tmp);
 	if (ref != list) {
 		std::cerr << "Read after dump does not give the same result!" << std::endl;
 		return 1;
 	}
 
-	close(fd_tmp);
-	unlink(tmpfile);
+	fclose(f_tmp);
 
 	{
 		std::stringstream ss;
