@@ -2,6 +2,7 @@
 #define LEELOO_COMPAT_H
 
 #include <leeloo/exports.h>
+#include <cstdlib>
 
 #ifdef _MSC_VER
 #include <BaseTsd.h>
