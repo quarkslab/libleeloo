@@ -586,7 +586,7 @@ public:
 		os.write((const char*) &intervals()[0], intervals().size()*sizeof(interval_type));
 	}
 
-	void dump_to_file(FILE* f)
+	void dump_to_fd(FILE* f)
 	{
 		if (f == nullptr) {
 			throw file_exception(errno);
@@ -601,7 +601,7 @@ public:
 		fflush(f);
 	}
 
-	void read_from_file(FILE* f)
+	void read_from_fd(FILE* f)
 	{
 		if (fseek(f, 0, SEEK_END) == -1) {
 			throw file_exception(errno);
@@ -637,7 +637,7 @@ public:
 			throw file_exception(errno);
 		}
 
-		dump_to_file(f);
+		dump_to_fd(f);
 
 		fclose(f);
 	}
@@ -649,7 +649,7 @@ public:
 			throw file_exception(errno);
 		}
 
-		read_from_file(f);
+		read_from_fd(f);
 
 		fclose(f);
 	}

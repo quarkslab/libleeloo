@@ -48,6 +48,7 @@ set(HEADER_DIST_FILES
 	include/leeloo/port_list_intervals.h
 	include/leeloo/prime_helpers.h
 	include/leeloo/random.h
+	include/leeloo/sort.h
 	include/leeloo/sort_permute.h
 	include/leeloo/uni.h
 	include/leeloo/uprng.h

@@ -61,7 +61,7 @@ int main()
 	ref.add(9, 15);
 	ref.add(19, 21);
 	ref.aggregate();
-	ref.dump_to_file(f_tmp);
+	ref.dump_to_fd(f_tmp);
 
 	if (fseek(f_tmp, 0, SEEK_SET) == -1) {
 		perror("fseek");
@@ -69,7 +69,7 @@ int main()
 	}
 
 	list_intervals list;
-	list.read_from_file(f_tmp);
+	list.read_from_fd(f_tmp);
 	if (ref != list) {
 		std::cerr << "Read after dump does not give the same result!" << std::endl;
 		return 1;
