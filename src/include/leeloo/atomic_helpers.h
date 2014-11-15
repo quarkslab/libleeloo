@@ -29,7 +29,7 @@
 #ifndef LEELOO_ATOMIC_HELPERS_H
 #define LEELOO_ATOMIC_HELPERS_H
 
-#include <tbb/atomic.h>
+#include <atomic>
 
 namespace leeloo {
 
@@ -46,7 +46,7 @@ static inline IntegerType pos_increment(IntegerType& i, IntegerType const max)
 }
 
 template <class IntegerType>
-static inline IntegerType pos_increment(tbb::atomic<IntegerType>& i, IntegerType const max)
+static inline IntegerType pos_increment(std::atomic<IntegerType>& i, IntegerType const max)
 {
 	return i.fetch_and_increment() % max;
 }

@@ -37,10 +37,11 @@
 #include <cmath>
 #include <limits>
 #include <type_traits>
+#include <atomic>
 
+#ifndef _MSC_VER
 #include <x86intrin.h>
-
-#include <tbb/atomic.h>
+#endif
 
 #include <leeloo/atomic_helpers.h>
 #include <leeloo/intrinsics.h>
@@ -108,7 +109,7 @@ class uni: public uprng_base<uni<Integer, atomic>, Integer, __impl::seed_type_un
 public:
 	typedef Integer integer_type;
 	typedef __impl::seed_type_uni<integer_type> seed_type;
-	typedef typename std::conditional<atomic, tbb::atomic<integer_type>, integer_type>::type pos_integer_type;
+	typedef typename std::conditional<atomic, std::atomic<integer_type>, integer_type>::type pos_integer_type;
 	typedef uprng_base<uni<Integer, atomic>, integer_type, seed_type> base_type;
 
 public:

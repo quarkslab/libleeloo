@@ -30,10 +30,12 @@
 #define LEELOO_INTERVAL_LIST_H
 
 #include <errno.h>
+#ifndef WIN32
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#endif
 
 #include <exception>
 #include <iterator>
@@ -54,16 +56,16 @@
 
 namespace leeloo {
 
-class LEELOO_API file_exception: public std::exception
+class LEELOO_API file_exception
 {
 public:
-	file_exception():
-		_errno(errno),
-		_what(strerror(errno))
+	file_exception(const int err):
+		_errno(err),
+		_what(strerror(err))
 	{ }
 
 public:
-	const char* what() const throw() override { return _what.c_str(); }
+	const char* what() const { return _what.c_str(); }
 	int get_errno() const { return _errno; }
 
 private:
@@ -71,7 +73,7 @@ private:
 	std::string _what;
 };
 
-class LEELOO_API file_format_exception: public std::exception
+class LEELOO_API file_format_exception
 {
 public:
 	file_format_exception(const char* msg):
@@ -79,14 +81,14 @@ public:
 	{ }
 
 public:
-	const char* what() const throw() override { return _msg; }
+	const char* what() const { return _msg; }
 
 private:
 	const char* _msg;
 };
 
 template <class Interval, class DiffType = typename Interval::difference_type, class CountType = uint32_t>
-class list_intervals 
+class LEELOO_API list_intervals 
 {
 	// CountType is the type for the *number* of intervals
 public:
@@ -129,13 +131,13 @@ public:
 		}
 
 		value_iterator(container_type const& v):
-			_iter(v.begin()),
+			//_iter(v.cbegin()),
 			_offset(0)
 		{
 		}
 
 		value_iterator(container_type const& v, tag_vi_end):
-			_iter(v.end()),
+			//_iter(v.cend()),
 			_offset(0)
 		{
 		}
@@ -571,6 +573,11 @@ public:
 		clear();
 		intervals().resize(nintervals);
 		os.read((char*) &intervals()[0], nintervals*sizeof(interval_type));
+		for (interval_type const& i : intervals()) {
+			if (i.lower() >= i.upper()) {
+				throw file_format_exception("invalid interval");
+			}
+		}
 	}
 
 	void dump_stream(std::ostream& os)
@@ -579,18 +586,18 @@ public:
 		os << nintervals;
 		os.write((const char*) &intervals()[0], intervals().size()*sizeof(interval_type));
 	}
-
+#if 0
 	void dump_to_fd(int fd)
 	{
 		if (fd == -1) {
-			throw file_exception();
+			throw file_exception(errno);
 		}
 
 		size_t size_write = intervals().size()*sizeof(interval_type);
 		ssize_t w = write(fd, &intervals()[0], size_write);
 		if ((w < 0) ||
 		    (((size_t)w) != size_write)) {
-			throw file_exception();
+			throw file_exception(errno);
 		}
 	}
 
@@ -598,10 +605,10 @@ public:
 	{
 		off_t size = lseek(fd, 0, SEEK_END);
 		if (size == -1) {
-			throw file_exception();
+			throw file_exception(errno);
 		}
 		if (lseek(fd, 0, SEEK_SET) == -1) {
-			throw file_exception();
+			throw file_exception(errno);
 		}
 
 		if (size % sizeof(interval_type) != 0) {
@@ -613,10 +620,10 @@ public:
 		intervals().resize(n);
 		ssize_t r = read(fd, &intervals()[0], size);
 		if (r < 0) {
-			throw file_exception();
+			throw file_exception(errno);
 		}
 		if (r != size) {
-			throw file_exception();
+			throw file_exception(errno);
 		}
 
 		for (interval_type const& i: intervals()) {
@@ -630,7 +637,7 @@ public:
 	{
 		int fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
 		if (fd == -1) {
-			throw file_exception();
+			throw file_exception(errno);
 		}
 
 		dump_to_fd(fd);
@@ -642,14 +649,14 @@ public:
 	{
 		int fd = open(file, O_RDONLY);
 		if (fd == -1) {
-			throw file_exception();
+			throw file_exception(errno);
 		}
 
 		read_from_fd(fd);
 
 		close(fd);
 	}
-
+#endif
 #ifdef LEELOO_BOOST_SERIALIZE
 	template<class Archive>
 	void save(Archive& ar, unsigned int const /*version*/) const
@@ -832,8 +839,8 @@ private:
 
 	static void invert_containers(container_type& dst, container_type const& src)
 	{
-		static constexpr base_type min = std::numeric_limits<base_type>::min();
-		static constexpr base_type max = std::numeric_limits<base_type>::max();
+		static const base_type min = std::numeric_limits<base_type>::min();
+		static const base_type max = std::numeric_limits<base_type>::max();
 
 		dst.clear();
 		if (src.size() == 0) {

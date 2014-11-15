@@ -26,14 +26,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifdef WIN32
+#include <windows.h>
+#else
 #include <sys/time.h>
 #include <stdlib.h>
+#endif
 
 #include <leeloo/helpers.h>
 
 double leeloo::get_current_timestamp()
 {
+#ifdef WIN32
+	FILETIME ft;
+	GetSystemTimeAsFileTime(&ft);
+	ULARGE_INTEGER uli;
+	uli.LowPart = ft.dwLowDateTime;
+	uli.HighPart = ft.dwHighDateTime;
+	return ((double)(uli.QuadPart / 10)) / 1000.0;
+#else
 	struct timeval curt;
 	gettimeofday(&curt, NULL);
 	return (double)curt.tv_sec + ((double)curt.tv_usec)/1000000.0;
+#endif
 }

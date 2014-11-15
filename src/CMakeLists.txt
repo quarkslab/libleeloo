@@ -61,5 +61,5 @@ add_library(leeloo SHARED ${SRC_FILES})
 set(LINK_LIBRARIES ${TBB_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(leeloo ${LINK_LIBRARIES})
 
-install(TARGETS leeloo LIBRARY DESTINATION lib)
+install(TARGETS leeloo ARCHIVE DESTINATION lib LIBRARY DESTINATION lib)
 install(FILES ${HEADER_DIST_FILES} DESTINATION include/leeloo)

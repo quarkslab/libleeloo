@@ -29,7 +29,6 @@
 #ifndef LEELOO_PRIME_HELPERS_H
 #define LEELOO_PRIME_HELPERS_H
 
-#include <x86intrin.h>
 #include <leeloo/math_helpers.h>
 #include <leeloo/random.h>
 

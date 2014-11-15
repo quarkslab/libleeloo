@@ -29,9 +29,8 @@
 #ifndef LEELOO_INTRINSICS_H
 #define LEELOO_INTRINSICS_H
 
-#include <x86intrin.h>
-
 #ifdef __SSE4_2__
+#include <x86intrin.h>
 
 inline static __m128i _mm_urem_epi32(__m128i const a, __m128i const div)
 {

@@ -38,6 +38,7 @@
 #include <utility>
 #include <algorithm>
 
+#include <leeloo/compat.h>
 #include <leeloo/exports.h>
 
 namespace leeloo {
@@ -132,12 +133,12 @@ public:
 			}
 			if (new_bit >= (ssize_t)bits_per_chunk) {
 				_chunk++;
-				_bit = new_bit-bits_per_chunk;
+				_bit = (uint8_t)(new_bit-bits_per_chunk);
 			}
 			else
 			if (new_bit < 0) {
 				_chunk--;
-				_bit = bits_per_chunk+new_bit;
+				_bit = (uint8_t)(bits_per_chunk+new_bit);
 			}
 			else {
 				_bit = new_bit;
