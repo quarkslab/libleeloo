@@ -221,8 +221,8 @@ int main(int argc, char** argv)
 	{
 		if (list.size() != 0) {
 			std::cerr << "error, list should be empty" << std::endl;
+			ret = 1;
 		}
-		ret = 1;
 	}
 
 	std::cout << "[10,50[ - [8,11[" << std::endl;
