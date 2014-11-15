@@ -4,7 +4,7 @@
 void* leeloo::aligned_malloc(size_t alignment, size_t size)
 {
 #ifdef WIN32
-	return _aligned_malloc(alignment, size);
+	return _aligned_malloc(size, alignment);
 #else
 	void* ptr;
 	int ret = posix_memalign(&ptr, alignment, size);
