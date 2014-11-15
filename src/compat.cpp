@@ -6,12 +6,12 @@ void* leeloo::aligned_malloc(size_t alignment, size_t size)
 #ifdef WIN32
 	return _aligned_malloc(alignment, size);
 #else
-	void* ret;
-	int ret = posix_memalign(&ret, alignment, size);
+	void* ptr;
+	int ret = posix_memalign(&ptr, alignment, size);
 	if (ret != 0) {
 		return nullptr;
 	}
-	return ret;
+	return ptr;
 #endif
 }
 
