@@ -8,6 +8,7 @@ endforeach()
 
 set(SRC_FILES
 	bit_field.cpp
+	compat.cpp
 	helpers.cpp
 	ip_list_intervals.cpp
 	ips_parser.cpp
@@ -25,6 +26,7 @@ set(HEADER_DIST_FILES
 	include/leeloo/atomic_helpers.h
 	include/leeloo/bench.h
 	include/leeloo/bit_field.h
+	include/leeloo/compat.h
 	include/leeloo/exports.h
 	include/leeloo/helpers.h
 	include/leeloo/integer_cast.h
@@ -54,11 +56,11 @@ set(HEADER_DIST_FILES
 	${CONFIG_H}
 )
 
-include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${TBB_INCLUDE_DIR})
-
 add_library(leeloo SHARED ${SRC_FILES})
 set(LINK_LIBRARIES ${TBB_LIBRARIES} ${Boost_LIBRARIES})
+if(WIN32)
+	set(LINK_LIBRARIES ${LINK_LIBRARIES} wsock32 ws2_32)
+endif()
 target_link_libraries(leeloo ${LINK_LIBRARIES})
 
 install(TARGETS leeloo ARCHIVE DESTINATION lib LIBRARY DESTINATION lib)

@@ -28,7 +28,7 @@
 
 #include <iostream>
 
-#include <boost/random.hpp>
+#include <random>
 
 #include <leeloo/ip_list_intervals.h>
 #include <leeloo/ips_parser.h>

@@ -39,6 +39,8 @@
 #include <random>
 #endif
 
+#include <cstdint>
+
 namespace leeloo {
 
 template <class RandEng>

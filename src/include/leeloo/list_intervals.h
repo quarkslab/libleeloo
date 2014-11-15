@@ -43,6 +43,7 @@
 
 #include <leeloo/bench.h>
 #include <leeloo/config.h>
+#include <leeloo/compat.h>
 #include <leeloo/exports.h>
 #include <leeloo/integer_cast.h>
 #include <leeloo/sort.h>
@@ -88,7 +89,7 @@ private:
 };
 
 template <class Interval, class DiffType = typename Interval::difference_type, class CountType = uint32_t>
-class LEELOO_API list_intervals 
+class list_intervals 
 {
 	// CountType is the type for the *number* of intervals
 public:
@@ -169,16 +170,16 @@ public:
 
 		bool operator!=(value_iterator const& other) const
 		{
-			return _iter != other._iter or _offset != other._offset;
+			return (_iter != other._iter )|| (_offset != other._offset);
 		}
 
 		bool operator==(value_iterator const& other) const
 		{
-			return _iter == other._iter and _offset == other._offset;
+			return (_iter == other._iter) && (_offset == other._offset);
 		}
 
 	private:
-		iterator _iter;
+		typename container_type::const_iterator _iter;
 		difference_type _offset;
 	};
 
@@ -369,8 +370,7 @@ public:
 		UPRNG<difference_type, false> uprng;
 		uprng.init(size_all, std::forward<UPRNGInit>(uprng_init));
 
-		base_type* interval_buf;
-		posix_memalign((void**) &interval_buf, 16, sizeof(base_type)*size_div);
+		base_type* interval_buf = (base_type*) aligned_malloc(16, sizeof(base_type)*size_div);
 		if (interval_buf == nullptr) {
 			return;
 		}
@@ -391,7 +391,7 @@ public:
 			fset(interval_buf, rem);
 		}
 
-		free(interval_buf);
+		aligned_free(interval_buf);
 	}
 
 	template <class Fset, class UPRNGInit>
@@ -411,8 +411,7 @@ public:
 		UPRNG<difference_type, false> uprng;
 		uprng.init(size_rem, std::forward<UPRNGInit>(rand_eng));
 
-		base_type* interval_buf;
-		posix_memalign((void**) &interval_buf, 16, sizeof(base_type)*size_max);
+		base_type* interval_buf = (base_type*) aligned_malloc(16, sizeof(base_type)*size_max);
 		if (interval_buf == nullptr) {
 			return;
 		}
@@ -432,7 +431,7 @@ public:
 			size_rem -= size;
 		}
 
-		free(interval_buf);
+		aligned_free(interval_buf);
 	}
 
 

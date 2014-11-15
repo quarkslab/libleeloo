@@ -16,6 +16,8 @@ include(CMakeRequiredLibraries.txt)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/include)
 include_directories(${CMAKE_BINARY_DIR}/src/include)
+include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${TBB_INCLUDE_DIR})
 
 add_subdirectory(src)
 if (NOT (DEFINED NO_TESTS OR NO_TESTS))

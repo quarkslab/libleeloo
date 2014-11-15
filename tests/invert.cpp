@@ -2,6 +2,7 @@
 #include <leeloo/interval.h>
 
 #include <iostream>
+#include <ctime>
 
 #define N 1000
 

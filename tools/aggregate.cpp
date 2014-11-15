@@ -26,7 +26,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <x86intrin.h>
+#ifdef _MSC_VER
+#include <intrin.h>
+#define __builtin_popcount __popcnt
+inline unsigned long __builtin_ctz(unsigned int n)
+{
+	unsigned long ret;
+	_BitScanForward(&ret, n);
+	return ret;
+}
+#endif
+
 #include <errno.h>
 #include <string.h>
 

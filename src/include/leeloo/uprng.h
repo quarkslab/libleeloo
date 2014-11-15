@@ -36,10 +36,7 @@
 #include <algorithm>
 #include <limits>
 #include <cassert>
-
-#include <x86intrin.h>
-
-#include <tbb/atomic.h>
+#include <atomic>
 
 #include <leeloo/intrinsics.h>
 #include <leeloo/atomic_helpers.h>
@@ -82,7 +79,8 @@ struct seed_type_uprng
 		assert(ret._prime != 0);
 
 		ret._c = random_prime_with(ret._prime-1, rand_eng);
-		ret._n = rand_eng.template uniform<uint8_t>(1, 4);
+		// AG: std::random_int_distribution does not work for 8-bit numbers
+		ret._n = rand_eng.template uniform<uint16_t>(1, 4);
 		ret._max = max;
 		return ret;
 	}
@@ -112,7 +110,7 @@ class uprng: public uprng_base<uprng<Integer, atomic>, Integer, __impl::seed_typ
 
 public:
 	typedef Integer integer_type;
-	typedef typename std::conditional<atomic, tbb::atomic<integer_type>, integer_type>::type pos_integer_type;
+	typedef typename std::conditional<atomic, std::atomic<integer_type>, integer_type>::type pos_integer_type;
 	typedef __impl::seed_type_uprng<integer_type> seed_type;
 
 public:

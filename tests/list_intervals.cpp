@@ -32,7 +32,7 @@
 #include <ctime>
 #include <set>
 
-#include <boost/random.hpp>
+#include <random>
 
 #include <leeloo/interval.h>
 #include <leeloo/list_intervals.h>
@@ -71,7 +71,7 @@ typedef leeloo::list_intervals<leeloo::interval<uint32_t>, uint32_t> list_interv
 
 int main(int argc, char** argv)
 {
-	int ret = 0;
+	int ret = 0, tmp;
 	list_intervals list;
 	list.add(0, 2);
 	list.add(5, 9);
@@ -182,9 +182,10 @@ int main(int argc, char** argv)
 
 
 #define COMPARE()\
-		ret = compare_intervals(list, intervals_agg, sizeof(intervals_agg)/(2*sizeof(uint32_t)));\
-		if (ret != 0) {\
+		tmp = compare_intervals(list, intervals_agg, sizeof(intervals_agg)/(2*sizeof(uint32_t)));\
+		if (tmp != 0) {\
 			std::cerr << "error" << std::endl;\
+			ret = 1;\
 		}
 
 	std::cout << "[0,10[ - [20,21[" << std::endl;
@@ -218,9 +219,10 @@ int main(int argc, char** argv)
 	list.remove(0, 10);
 	list.aggregate();
 	{
-		uint32_t intervals_agg[] = {
-		};
-		COMPARE()
+		if (list.size() != 0) {
+			std::cerr << "error, list should be empty" << std::endl;
+		}
+		ret = 1;
 	}
 
 	std::cout << "[10,50[ - [8,11[" << std::endl;

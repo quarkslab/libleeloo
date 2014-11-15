@@ -43,7 +43,7 @@
 
 namespace leeloo {
 
-class LEELOO_API bit_field
+class bit_field
 {
 public:
 	typedef size_t integer_type;
@@ -57,7 +57,7 @@ private:
 	static constexpr int ln2_bits_per_chunk = boost::static_log2<bits_per_chunk>::value;
 
 public:
-	class LEELOO_LOCAL bit_reference
+	class bit_reference
 	{
 	public:
 		bit_reference():
@@ -155,7 +155,7 @@ public:
 		uint8_t _bit;
 	};
 
-	class LEELOO_LOCAL bit_value
+	class bit_value
 	{
 	public:
 		bit_value()
@@ -288,7 +288,7 @@ public:
 		memset(buffer(), 0x55, sizeof(integer_type)*size_chunks());
 	}
 
-	void set_random();
+	LEELOO_API void set_random();
 
 	void clear_storage()
 	{
@@ -398,17 +398,17 @@ public:
 	}
 
 private:
-	LEELOO_LOCAL inline integer_type* buffer() { return _buf; }
-	LEELOO_LOCAL inline integer_type const* buffer() const { return _buf; }
+	inline integer_type* buffer() { return _buf; }
+	inline integer_type const* buffer() const { return _buf; }
 
-	LEELOO_LOCAL inline integer_type& chunk_at(size_type const n) { return buffer()[n]; }
-	LEELOO_LOCAL inline integer_type const& chunk_at(size_type const n) const { return buffer()[n]; }
+	inline integer_type& chunk_at(size_type const n) { return buffer()[n]; }
+	inline integer_type const& chunk_at(size_type const n) const { return buffer()[n]; }
 
-	LEELOO_LOCAL inline size_type size_chunks() const { return _size; }
-	LEELOO_LOCAL inline size_type size_bits() const { return size_chunks()*bits_per_chunk; }
+	inline size_type size_chunks() const { return _size; }
+	inline size_type size_bits() const { return size_chunks()*bits_per_chunk; }
 
 private:
-	LEELOO_LOCAL void copy(bit_field const& o)
+	void copy(bit_field const& o)
 	{
 		if (_buf) {
 			allocator_type().deallocate(_buf, _size);
@@ -421,7 +421,7 @@ private:
 		memcpy(buffer(), o.buffer(), size_chunks()*sizeof(integer_type));
 	}
 
-	LEELOO_LOCAL void move(bit_field&& o)
+	void move(bit_field&& o)
 	{
 		if (_buf) {
 			allocator_type().deallocate(_buf, _size);

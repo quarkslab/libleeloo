@@ -1,5 +1,3 @@
-include_directories(${TBB_INCLUDE_DIRS})
-
 set(LINK_LIBRARIES leeloo ${TBB_LIBRARIES} ${Boost_LIBRARIES})
 
 add_executable(leeloo-ip-ranges-rand ip_ranges_rand.cpp)

@@ -2,6 +2,7 @@
 #include <leeloo/interval.h>
 
 #include <iostream>
+#include <ctime>
 
 typedef leeloo::list_intervals<leeloo::interval<uint32_t>> list_intervals;
 

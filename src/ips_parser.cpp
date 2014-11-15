@@ -26,15 +26,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <leeloo/ips_parser.h>
+#include <leeloo/ip_list_intervals.h>
+
 #ifdef WIN32
+#include <Winsock2.h>
+// AG: remove these useless macros!!
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif
-
-#include <leeloo/ips_parser.h>
-#include <leeloo/ip_list_intervals.h>
 
 #include <string.h>
 
@@ -337,9 +345,6 @@ bool leeloo::ips_parser::parse_ips_remove(ip_list_intervals& l, const char* str)
 
 std::string leeloo::ips_parser::ipv4tostr(uint32_t const ip)
 {
-#ifdef WIN32
-#else
 	uint32_t const ip_n = htonl(ip);
 	return inet_ntoa(*reinterpret_cast<struct in_addr const*>(&ip_n));
-#endif
 }

@@ -1,3 +1,4 @@
+#include <leeloo/config.h>
 #include <leeloo/integer_cast.h>
 
 #include <iostream>

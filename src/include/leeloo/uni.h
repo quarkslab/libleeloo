@@ -43,6 +43,7 @@
 #include <x86intrin.h>
 #endif
 
+#include <leeloo/compat.h>
 #include <leeloo/atomic_helpers.h>
 #include <leeloo/intrinsics.h>
 #include <leeloo/prime_helpers.h>
@@ -123,7 +124,7 @@ public:
 	~uni()
 	{
 		if (_rem_perm) {
-			free(_rem_perm);
+			aligned_free(_rem_perm);
 		}
 	}
 
@@ -186,7 +187,7 @@ private:
 			free(_rem_perm);
 		}
 		const size_t rem = size_rem();
-		posix_memalign((void**) &_rem_perm, 16, rem*sizeof(integer_type));
+		_rem_perm = (integer_type*) aligned_malloc(16, rem*sizeof(integer_type));
 		assert(_rem_perm);
 		for (size_t i = 0; i < rem; i++) {
 			_rem_perm[i] = _prime + i;
