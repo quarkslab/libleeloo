@@ -26,6 +26,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifdef WIN32
+#else
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
+
 #include <leeloo/ips_parser.h>
 #include <leeloo/ip_list_intervals.h>
 
@@ -326,4 +333,13 @@ bool leeloo::ips_parser::parse_ips_add(ip_list_intervals& l, const char* str)
 bool leeloo::ips_parser::parse_ips_remove(ip_list_intervals& l, const char* str)
 {
 	return __parse_ips<true>(l, str);
+}
+
+std::string leeloo::ips_parser::ipv4tostr(uint32_t const ip)
+{
+#ifdef WIN32
+#else
+	uint32_t const ip_n = htonl(ip);
+	return inet_ntoa(*reinterpret_cast<struct in_addr const*>(&ip_n));
+#endif
 }

@@ -26,9 +26,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <x86intrin.h>
 #include <errno.h>
 #include <string.h>
@@ -39,27 +36,20 @@
 #include <cstring>
 
 #include <leeloo/ip_list_intervals.h>
-
-static inline const char* ip2str(uint32_t ip)
-{
-	ip = htonl(ip);
-	return inet_ntoa(*reinterpret_cast<struct in_addr const*>(&ip));
-}
+#include <leeloo/ips_parser.h>
 
 static void display(leeloo::ip_interval const& it)
 {
 	const uint32_t width = it.width();
-	const char* ip_a = ip2str(it.lower());
+	std::string const ip_a = leeloo::ips_parser::ipv4tostr(it.lower());
 	if (__builtin_popcount(width) == 1) {
 		// CIDR prefix
 		const int prefix = 32-__builtin_ctz(width);
 		std::cout << ip_a << "/" << prefix << std::endl;
 	}
 	else {
-		// AG: as a static buffer is used for inet_ntoa, we need to make two
-		// std::cout statements here, or the same IP will be shown twice!
 		std::cout << ip_a << "-"; 
-		std::cout << ip2str(it.upper()) << std::endl;
+		std::cout << leeloo::ips_parser::ipv4tostr(it.upper()) << std::endl;
 	}
 }
 

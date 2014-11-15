@@ -32,6 +32,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <type_traits>
+#include <string>
 
 #include <leeloo/exports.h>
 
@@ -45,6 +46,8 @@ typedef void(*interval_callback)(uint32_t a, uint32_t b);
 
 extern LEELOO_API uint32_t ipv4toi(const char* str, bool& valid, int min_dots = 3);
 extern LEELOO_API uint32_t ipv4toi(const char* str, const size_t size, bool& valid, int min_dots = 3);
+
+extern LEELOO_API std::string ipv4tostr(uint32_t const ip);
 
 extern LEELOO_API bool parse_ips_add(ip_list_intervals& l, const char* str);
 extern LEELOO_API bool parse_ips_remove(ip_list_intervals& l, const char* str);

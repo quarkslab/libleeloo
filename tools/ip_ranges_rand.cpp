@@ -31,11 +31,8 @@
 #include <boost/random.hpp>
 
 #include <leeloo/ip_list_intervals.h>
+#include <leeloo/ips_parser.h>
 #include <leeloo/random.h>
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
 int main(int argc, char** argv)
 {
@@ -84,9 +81,7 @@ int main(int argc, char** argv)
 		[](const uint32_t* ips, const size_t n)
 		{
 			for (size_t i = 0; i < n; i++) {
-				struct in_addr addr;
-				addr.s_addr = htonl(ips[i]);
-				std::cout << inet_ntoa(addr) << std::endl;
+				std::cout << leeloo::ips_parser::ipv4tostr(ips[i]) << std::endl;
 			}
 		},
 		rd);
