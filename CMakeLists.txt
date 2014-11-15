@@ -11,8 +11,8 @@ if (NOT LEELOO_MP_SUPPORT)
 	set(LEELOO_MP_SUPPORT 0)
 endif()
 
-include(CMakeCompilers.txt)
 include(CMakeRequiredLibraries.txt)
+include(CMakeCompilers.txt)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/include)
 include_directories(${CMAKE_BINARY_DIR}/src/include)

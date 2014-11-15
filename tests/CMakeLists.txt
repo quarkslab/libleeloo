@@ -10,11 +10,11 @@ add_test(ip_list_intervals ip_list_intervals)
 
 add_definitions(-fopenmp)
 add_executable(uni uni.cpp)
-target_link_libraries(uni leeloo gomp)
+target_link_libraries(uni ${LINK_LIBRARIES})
 add_test(uni uni)
 
 add_executable(uprng uprng.cpp)
-target_link_libraries(uprng leeloo gomp)
+target_link_libraries(uprng ${LINK_LIBRARIES})
 add_test(uprng uprng)
 
 add_executable(random_sets random_sets.cpp)
