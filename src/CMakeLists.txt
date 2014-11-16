@@ -12,6 +12,7 @@ set(SRC_FILES
 	helpers.cpp
 	ip_list_intervals.cpp
 	ips_parser.cpp
+	ipv6_list_intervals.cpp
 	list_intervals.cpp
 	port.cpp
 	port_list_intervals.cpp
@@ -38,6 +39,8 @@ set(HEADER_DIST_FILES
 	include/leeloo/ip_list_intervals.h
 	include/leeloo/ip_list_intervals_with_properties.h
 	include/leeloo/ips_parser.h
+	include/leeloo/ipv6.h
+	include/leeloo/ipv6_list_intervals.h
 	include/leeloo/list_intervals.h
 	include/leeloo/list_intervals_properties.h
 	include/leeloo/list_intervals_random.h

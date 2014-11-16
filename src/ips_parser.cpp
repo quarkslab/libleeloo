@@ -26,8 +26,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <leeloo/config.h>
 #include <leeloo/ips_parser.h>
 #include <leeloo/ip_list_intervals.h>
+#ifdef LEELOO_MP_SUPPORT
+#include <leeloo/ipv6_list_intervals.h>
+#endif
 
 #ifdef WIN32
 #include <Winsock2.h>
@@ -348,3 +352,37 @@ std::string leeloo::ips_parser::ipv4tostr(uint32_t const ip)
 	uint32_t const ip_n = htonl(ip);
 	return inet_ntoa(*reinterpret_cast<struct in_addr const*>(&ip_n));
 }
+
+#ifdef LEELOO_MP_SUPPORT
+
+// IPv6 support
+//
+
+leeloo::ipv6_int leeloo::ips_parser::ipv6toi(const char* str, const size_t size, bool& valid, int min_colons)
+{
+	valid = false;
+	return 0;
+}
+
+leeloo::ipv6_int leeloo::ips_parser::ipv6toi(const char* str, bool& valid, int min_colons)
+{
+	return ipv6toi(str, strlen(str), valid, min_colons);
+}
+
+template <bool exclude>
+static bool __parse_ipv6s(leeloo::ipv6_list_intervals& l, const char* str)
+{
+	return false;
+}
+
+bool leeloo::ips_parser::parse_ipv6s_add(ipv6_list_intervals& l, const char* str)
+{
+	return __parse_ipv6s<false>(l, str);
+}
+
+bool leeloo::ips_parser::parse_ipv6s_remove(ipv6_list_intervals& l, const char* str)
+{
+	return __parse_ipv6s<true>(l, str);
+}
+
+#endif

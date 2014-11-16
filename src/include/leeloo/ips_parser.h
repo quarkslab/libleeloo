@@ -34,11 +34,19 @@
 #include <type_traits>
 #include <string>
 
+#include <leeloo/config.h>
 #include <leeloo/exports.h>
+
+#ifdef LEELOO_MP_SUPPORT
+#include <leeloo/ipv6.h>
+#endif
 
 namespace leeloo {
 
 class ip_list_intervals;
+#ifdef LEELOO_MP_SUPPORT
+class ipv6_list_intervals;
+#endif
 
 namespace ips_parser {
 
@@ -64,8 +72,29 @@ inline bool parse_ips(typename std::enable_if<exclude == false, ip_list_interval
 	return parse_ips_add(l, str);
 }
 
+#ifdef LEELOO_MP_SUPPORT
+extern LEELOO_API ipv6_int ipv6toi(const char* str, bool& valid, int min_dots = 3);
+extern LEELOO_API ipv6_int ipv6toi(const char* str, const size_t size, bool& valid, int min_dots = 3);
+
+extern LEELOO_API bool parse_ipv6s_add(ipv6_list_intervals& l, const char* str);
+extern LEELOO_API bool parse_ipv6s_remove(ipv6_list_intervals& l, const char* str);
+
+template <bool exclude = false>
+inline bool parse_ipv6s(typename std::enable_if<exclude == true, ipv6_list_intervals&>::type l, const char* str)
+{
+	return parse_ipv6s_remove(l, str);
 }
 
+template <bool exclude = false>
+inline bool parse_ipv6s(typename std::enable_if<exclude == false, ipv6_list_intervals&>::type l, const char* str)
+{
+	return parse_ipv6s_add(l, str);
 }
+
+#endif
+
+} // ips_parser
+
+} // leeloo
 
 #endif
