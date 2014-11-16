@@ -15,10 +15,6 @@
 #define HAS_OPENMP
 #endif
 
-#if @HAS_BOOST_RANDOM@
-#define HAS_BOOST_RANDOM
-#endif
-
 #if @HAS_TBB@
 #define HAS_TBB
 #endif

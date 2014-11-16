@@ -33,13 +33,10 @@
 
 #ifdef LEELOO_MP_SUPPORT
 #include <boost/multiprecision/random.hpp>
-#elif defined HAS_BOOST_RANDOM
-#include <boost/random.hpp>
-#else
-#include <random>
 #endif
 
 #include <cstdint>
+#include <random>
 
 namespace leeloo {
 
@@ -59,7 +56,7 @@ struct random
 	template <class IntegerType>
 	inline IntegerType uniform(IntegerType const a, IntegerType const b)
 	{
-#ifdef HAS_BOOST_RANDOM
+#ifdef LEELOO_MP_SUPPORT
 		// Potential support for boost big-ints
 		boost::random::uniform_int_distribution<IntegerType> d(a, b);
 #else

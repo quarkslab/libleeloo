@@ -10,21 +10,10 @@ else()
 	set(TBB_INCLUDE_DIR "")
 endif()
 
-set(BOOST_COMPONENTS random)
 if(LEELOO_BOOST_SERIALIZE)
-	set(BOOST_COMPONENTS random serialization)
+	set(BOOST_COMPONENTS serialization)
 endif()
 find_package(Boost COMPONENTS ${BOOST_COMPONENTS})
-
-if(${Boost_RANDOM_FOUND}) 
-	set(HAS_BOOST_RANDOM 1)
-else()
-	set(HAS_BOOST_RANDOM 0)
-endif()
-
-if (LEELOO_MP_SUPPORT AND NOT HAS_BOOST_RANDOM)
-	message(FATAL_ERROR "Boost::random is needed when MP support is enabled.")
-endif()
 
 if (LEELOO_BOOST_SERIALIZE AND NOT Boost_SERIALIZATION_FOUND)
 	message(FATAL_ERROR "Couldn't find Boost serialize!")
