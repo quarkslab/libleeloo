@@ -135,6 +135,14 @@ public:
 		}
 	}
 
+	template <bool exclude = false>
+	inline void insert_prefix(ipv6_int const& base_ip, const int prefix)
+	{
+		assert(prefix >= 0);
+		const ipv6_int mask = prefix2mask(prefix);
+		insert<exclude>(base_ip & (~mask), base_ip|mask);
+	}
+
 	using intervals_base_type::contains;
 	bool contains(const char* ipv6_str) const;
 
@@ -146,6 +154,15 @@ public:
 	inline void intersect(ipv6_list_intervals const& o)
 	{
 		intervals_base_type::intersect(o);
+	}
+
+	static inline ipv6_int prefix2mask(const int prefix)
+	{
+		assert(prefix >= 0);
+		if (prefix == 0) {
+			return 0;
+		}
+		return (ipv6_int(1)<<(128-prefix))-1;
 	}
 };
 

@@ -1,8 +1,12 @@
 set(LINK_LIBRARIES leeloo ${TBB_LIBRARIES} ${Boost_LIBRARIES})
 
-add_executable(test_ips_parser ips_parser.cpp)
-target_link_libraries(test_ips_parser ${LINK_LIBRARIES})
-add_test(ips_parser test_ips_parser)
+add_executable(ips_parser ips_parser.cpp)
+target_link_libraries(ips_parser ${LINK_LIBRARIES})
+add_test(ips_parser ips_parser)
+
+add_executable(ips_parser_v6 ips_parser_v6.cpp)
+target_link_libraries(ips_parser_v6 ${LINK_LIBRARIES})
+add_test(ips_parser_v6 ips_parser_v6)
 
 add_executable(ip_list_intervals ip_list_intervals.cpp)
 target_link_libraries(ip_list_intervals ${LINK_LIBRARIES})

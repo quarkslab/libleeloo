@@ -73,8 +73,8 @@ inline bool parse_ips(typename std::enable_if<exclude == false, ip_list_interval
 }
 
 #ifdef LEELOO_MP_SUPPORT
-extern LEELOO_API ipv6_int ipv6toi(const char* str, bool& valid, int min_dots = 3);
-extern LEELOO_API ipv6_int ipv6toi(const char* str, const size_t size, bool& valid, int min_dots = 3);
+extern LEELOO_API ipv6_int ipv6toi(const char* str, bool& valid);
+extern LEELOO_API ipv6_int ipv6toi(const char* str, const size_t size, bool& valid);
 
 extern LEELOO_API bool parse_ipv6s_add(ipv6_list_intervals& l, const char* str);
 extern LEELOO_API bool parse_ipv6s_remove(ipv6_list_intervals& l, const char* str);

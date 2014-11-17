@@ -358,20 +358,98 @@ std::string leeloo::ips_parser::ipv4tostr(uint32_t const ip)
 // IPv6 support
 //
 
-leeloo::ipv6_int leeloo::ips_parser::ipv6toi(const char* str, const size_t size, bool& valid, int min_colons)
+leeloo::ipv6_int leeloo::ips_parser::ipv6toi(const char* str, const size_t size, bool& valid)
 {
-	valid = false;
-	return 0;
+	// AG: this a POC, waiting for something better!
+	char* tmp_str = (char*) malloc(size+1);
+	if (tmp_str == nullptr) {
+		valid = false;
+		return 0;
+	}
+	memcpy(tmp_str, str, size);
+	tmp_str[size] = 0;
+	uint16_t tmp[sizeof(ipv6_int)/2];
+	if (inet_pton(AF_INET6, tmp_str, &tmp[0]) == 0) {
+		valid = false;
+		return 0;
+	}
+	valid = true;
+	ipv6_int ret;
+	uint16_t* buf = (uint16_t*) &ret;
+	for (size_t i = 0; i < sizeof(ret)/2; i++) {
+		buf[sizeof(ret)/2-i-1] = ntohs(tmp[i]);
+	}
+	free(tmp_str);
+	return ret;
 }
 
-leeloo::ipv6_int leeloo::ips_parser::ipv6toi(const char* str, bool& valid, int min_colons)
+leeloo::ipv6_int leeloo::ips_parser::ipv6toi(const char* str, bool& valid)
 {
-	return ipv6toi(str, strlen(str), valid, min_colons);
+	return ipv6toi(str, strlen(str), valid);
 }
 
 template <bool exclude>
 static bool __parse_ipv6s(leeloo::ipv6_list_intervals& l, const char* str)
 {
+	// We want to support these formats:
+	// 2001:0DB8::/32
+	// 2001:0DB8:: - 2001:0DB9::
+	// 2001:0DB8:AA-BBCC:1::1
+	// 2001:0DB8:*:*:*:*:*:1
+	
+	const size_t size_str = strlen(str);
+
+	// TODO: merge these loops
+	const size_t ndashes = count_char_buf(str, size_str, '-');
+	const size_t nslashes = count_char_buf(str, size_str, '/');
+	const size_t nstars = count_char_buf(str, size_str, '*');
+
+	// Fast case with no slashes or dashes (simple IP)
+	if ((nslashes == 0) && (ndashes == 0) && (nstars == 0)) {
+		// Just parse the IP
+		bool valid;
+		const leeloo::ipv6_int ip = leeloo::ips_parser::ipv6toi(str, size_str, valid);
+		if (!valid) {
+			return false;
+		}
+
+		l.insert<exclude>(ip, ip);
+		return true;
+	}
+
+	if (ndashes == 1) {
+		if ((nslashes > 0) || (nstars > 0)) {
+			return false;
+		}
+
+		// TODO
+		return false;
+	}
+
+	if (nslashes > 1) {
+		return false;
+	}
+
+	if ((ndashes == 0) && (nstars == 0)) {
+		const char* slash = strchr(str, '/');
+		if (!slash || strlen(slash) == 0) {
+			return false;
+		}
+		const int prefix = strtol(slash+1, nullptr, 10);
+		if (prefix < 0) {
+			return false;
+		}
+		bool valid = false;
+		leeloo::ipv6_int ip_start = leeloo::ips_parser::ipv6toi(str, (uintptr_t)slash-(uintptr_t)str, valid);
+		if (!valid) {
+			return false;
+		}
+
+		l.insert_prefix<exclude>(ip_start, prefix);
+
+		return true;
+	}
+
 	return false;
 }
 
