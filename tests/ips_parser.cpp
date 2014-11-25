@@ -150,6 +150,7 @@ int main()
 	TEST_IP_PARSER("   192 . 168  . 10.  1   / 24     ", true, "192.168.10.0", "192.168.10.255");
 	TEST_IP_PARSER("192.168.10.1/24", true, "192.168.10.0", "192.168.10.255");
 	TEST_IP_PARSER("192.168.10.1/16", true, "192.168.0.0", "192.168.255.255");
+	TEST_IP_PARSER("192.168.10.1-8", true, "192.168.10.1", "192.168.10.8");
 	TEST_IP_PARSER("10/2", true, "0.0.0.0", "63.255.255.255");
 	TEST_IP_PARSER("  10 /   2 ", true, "0.0.0.0", "63.255.255.255");
 	TEST_IP_PARSER("10--10.1.5.20----25", false, "", "");
@@ -185,6 +186,23 @@ int main()
 		leeloo::ip_list_intervals ref;
 		ref.add(leeloo::ips_parser::ipv4toi("10.4.5.8", valid), leeloo::ips_parser::ipv4toi("10.4.5.20", valid));
 		ret |= test_dashes("10.4.5.8-20", ref);
+	}
+
+	{
+		leeloo::ip_list_intervals ref;
+		ref.add("10.4.5.8");
+		ref.add("10.5.5.8");
+		ref.add("10.6.5.8");
+		ref.add("10.7.5.8");
+		ref.add("10.8.5.8");
+		ret |= test_dashes("10.4-8.5.8", ref);
+	}
+
+	{
+		leeloo::ip_list_intervals ref;
+		ref.add("10.4.5.6");
+		ref.add("11.4.5.6");
+		ret |= test_dashes("10-11.4.5.6", ref);
 	}
 
 	return ret;

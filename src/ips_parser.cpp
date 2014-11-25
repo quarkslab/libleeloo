@@ -237,24 +237,34 @@ static bool __parse_ips(leeloo::ip_list_intervals& l, const char* str)
 
 		bool valid = false;
 		uint32_t a = leeloo::ips_parser::ipv4toi(str, idx_sep, valid);
-		if (!valid) {
-			return false;
-		}
-		const size_t size_part2 = size_str-(idx_sep+1);
-		uint32_t b = leeloo::ips_parser::ipv4toi(sep+1, size_part2, valid);
-		if (!valid) {
-			// Check if this is just a number
-			b = atoi3(sep+1, size_part2);
-			if (b > 0xFF) {
-				return false;
+		if (valid) {
+			const size_t size_part2 = size_str-(idx_sep+1);
+			uint32_t b = leeloo::ips_parser::ipv4toi(sep+1, size_part2, valid);
+			bool goon = false;
+			if (!valid) {
+				// Check if this is just a number
+				b = atoi3(sep+1, size_part2);
+				if (b > 0xFF) {
+					if (size_part2 > 3) {
+						// This might be 10.4-5.1.1
+						goon = true;
+					}
+					else {
+						return false;
+					}
+				}
+				else {
+					b = (a & 0xFFFFFF00) | b;
+				}
 			}
-			b = (a & 0xFFFFFF00) | b;
+			if (!goon) {
+				if (a > b) {
+					std::swap(a, b);
+				}
+				l.insert<exclude>(a, b);
+				return true;
+			}
 		}
-		if (a > b) {
-			std::swap(a, b);
-		}
-		l.insert<exclude>(a, b);
-		return true;
 	}
 
 	if (nslashes > 1) {
@@ -322,7 +332,7 @@ static bool __parse_ips(leeloo::ip_list_intervals& l, const char* str)
 		intervals[cur_interval].set(byte_min, byte_max);
 	}
 	else {
-		const int32_t byte = atoi3_trim(cur, (uintptr_t)dot-(uintptr_t)cur);
+		const int32_t byte = atoi3_trim(cur, (uintptr_t)(str+size_str)-(uintptr_t)cur);
 		if (byte == -1) {
 			return false;
 		}
