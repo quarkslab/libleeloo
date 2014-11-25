@@ -102,6 +102,12 @@ int main()
 
 	std::cout << "Test IPv6 parser..." << std::endl;
 	TEST_IP_PARSER("2001:0DB8::/32", true, "2001:0DB8::", "2001:0DB8:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF");
+	TEST_IP_PARSER("2001::1-A", true, "2001::1", "2001::A");
+	TEST_IP_PARSER("2001::1-ABCD", true, "2001::1", "2001::ABCD");
+	TEST_IP_PARSER("2001::1-ABCDEF", false, "", "");
+	TEST_IP_PARSER("2001::1--5", false, "", "");
+	TEST_IP_PARSER("2001::1-2002::5", true, "2001::1", "2002::5");
+	TEST_IP_PARSER("2001:1-2:4-5::6", false, "", "");
 
 	return ret;
 }
