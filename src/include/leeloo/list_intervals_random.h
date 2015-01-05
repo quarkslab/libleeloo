@@ -53,6 +53,11 @@ public:
 		return li.at_cached(n);
 	}
 
+	base_type get_step(list_intervals_type const& li, difference_type const& step)
+	{
+		return li.at_cached(_uprng.get_step(step));
+	}
+
 	bool end() const { return _cur_step == size_todo(); }
 	difference_type size_original() const { return _uprng.max(); }
 	difference_type size_todo() const { return _uprng.max(); }
