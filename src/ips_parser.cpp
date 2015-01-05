@@ -51,9 +51,19 @@
 #include <string.h>
 
 // This is a closed interval [min, max]
-struct byte_interval
+template <class Integer>
+struct closed_interval
 {
-	void set(uint8_t const min_, uint8_t const max_)
+	typedef Integer integer_type;
+
+#ifndef DEBUG
+	closed_interval():
+		min(-1),
+		max(-1)
+	{ }
+#endif
+
+	void set(integer_type const min_, uint8_t const max_)
 	{
 		if (min_ > max_) {
 			min = max_;
@@ -65,9 +75,12 @@ struct byte_interval
 		}
 	}
 
-	uint8_t min;
-	uint8_t max;
+	integer_type min;
+	integer_type max;
 };
+
+typedef closed_interval<uint8_t>  byte_interval;
+typedef closed_interval<uint16_t> short_interval;
 
 static size_t count_char_buf(const char* str, size_t size, const char c)
 {
@@ -224,24 +237,34 @@ static bool __parse_ips(leeloo::ip_list_intervals& l, const char* str)
 
 		bool valid = false;
 		uint32_t a = leeloo::ips_parser::ipv4toi(str, idx_sep, valid);
-		if (!valid) {
-			return false;
-		}
-		const size_t size_part2 = size_str-(idx_sep+1);
-		uint32_t b = leeloo::ips_parser::ipv4toi(sep+1, size_part2, valid);
-		if (!valid) {
-			// Check if this is just a number
-			b = atoi3(sep+1, size_part2);
-			if (b > 0xFF) {
-				return false;
+		if (valid) {
+			const size_t size_part2 = size_str-(idx_sep+1);
+			uint32_t b = leeloo::ips_parser::ipv4toi(sep+1, size_part2, valid);
+			bool goon = false;
+			if (!valid) {
+				// Check if this is just a number
+				b = atoi3(sep+1, size_part2);
+				if (b > 0xFF) {
+					if (size_part2 > 3) {
+						// This might be 10.4-5.1.1
+						goon = true;
+					}
+					else {
+						return false;
+					}
+				}
+				else {
+					b = (a & 0xFFFFFF00) | b;
+				}
 			}
-			b = (a & 0xFFFFFF00) | b;
+			if (!goon) {
+				if (a > b) {
+					std::swap(a, b);
+				}
+				l.insert<exclude>(a, b);
+				return true;
+			}
 		}
-		if (a > b) {
-			std::swap(a, b);
-		}
-		l.insert<exclude>(a, b);
-		return true;
 	}
 
 	if (nslashes > 1) {
@@ -268,17 +291,11 @@ static bool __parse_ips(leeloo::ip_list_intervals& l, const char* str)
 		return true;
 	}
 
-	// Parse recursively block by block (separated by '.')
 	byte_interval intervals[4];
 	const char* cur = str;
 	int cur_interval = 0;
 	const char* dot;
 	while (((dot = strchr(cur, '.')) != nullptr) && cur_interval < 4) {
-		//*dot = 0;
-		/*char* slash = strchr(cur, '/');
-		if (slash) {
-			// End of loop
-		}*/
 		const char* dash = (const char*) memchr(cur, '-', (uintptr_t)dot-(uintptr_t)cur);
 		if (dash) {
 			const int32_t byte_min = atoi3_trim(cur, (uintptr_t)dash-(uintptr_t)cur);
@@ -315,7 +332,7 @@ static bool __parse_ips(leeloo::ip_list_intervals& l, const char* str)
 		intervals[cur_interval].set(byte_min, byte_max);
 	}
 	else {
-		const int32_t byte = atoi3_trim(cur, (uintptr_t)dot-(uintptr_t)cur);
+		const int32_t byte = atoi3_trim(cur, (uintptr_t)(str+size_str)-(uintptr_t)cur);
 		if (byte == -1) {
 			return false;
 		}
@@ -422,8 +439,36 @@ static bool __parse_ipv6s(leeloo::ipv6_list_intervals& l, const char* str)
 			return false;
 		}
 
-		// TODO
-		return false;
+		// We want to parse this:
+		// 2001:ABCD::1 - 2002:ABCD::1
+		// We support the fact that the interval could have been written the wrong way.
+		const char* sep = strchr(str, '-');
+		if (*(sep+1) == 0) {
+			return false;
+		}
+		const size_t idx_sep = (uintptr_t)sep-(uintptr_t)str;
+
+		bool valid = false;
+		leeloo::ipv6_int a = leeloo::ips_parser::ipv6toi(str, idx_sep, valid);
+		if (!valid) {
+			return false;
+		}
+		const size_t size_part2 = size_str-(idx_sep+1);
+		leeloo::ipv6_int b = leeloo::ips_parser::ipv6toi(sep+1, size_part2, valid);
+		if (!valid) {
+			// Check if this is just a 16bit hexadecimal number
+			char* end;
+			int b_ = strtol(sep+1, &end, 16);
+			if (end == (sep+1) || (b_ < 0) || (b_ > 0xFFFF)) {
+				return false;
+			}
+			b = (a & (~leeloo::ipv6_int(0xFFFF))) | ((unsigned short)b_);
+		}
+		if (a > b) {
+			std::swap(a, b);
+		}
+		l.insert<exclude>(a, b);
+		return true;
 	}
 
 	if (nslashes > 1) {
@@ -448,6 +493,102 @@ static bool __parse_ipv6s(leeloo::ipv6_list_intervals& l, const char* str)
 		l.insert_prefix<exclude>(ip_start, prefix);
 
 		return true;
+	}
+
+	short_interval intervals[8];
+	const char* cur = str;
+	int cur_interval = 0;
+	const char* colon;
+	bool seen_double = false;
+	while (((colon = strchr(cur, ':')) != nullptr) && cur_interval < 8) {
+		if (*(colon + 1) == ':') {
+			if (seen_double) {
+				// Can't have twice '::'
+				return false;
+			}
+			seen_double = true;
+			size_t ncolons = count_char_buf(str, size_str, ':');
+			const int interval_end = (8-ncolons)+cur_interval;
+			for (; cur_interval <= interval_end; cur_interval++) {
+				intervals[cur_interval].set(0, 0);
+			}
+			cur = colon+2;
+			continue;
+		}
+
+		const char* dash = (const char*) memchr(cur, '-', (uintptr_t)colon-(uintptr_t)cur);
+		if (dash) {
+			char* end;
+			const int32_t short_min = strtol(cur, &end, 16);
+			if (end == cur) {
+			   return false;
+			}
+			const int32_t short_max = strtol(dash+1, &end, 16);
+			if (end == (dash+1)) {
+				return false;
+			}
+			if ((short_min < 0) || (short_min > 0xFFFF) || (short_max < 0) || (short_max > 0xFFFF)) {
+				return false;
+			}
+			intervals[cur_interval].set(short_min, short_max);
+		}
+		else {
+			char* end;
+			const int32_t s = strtol(cur, &end, 16);
+			if (end == cur) {
+				return false;
+			}
+			if ((s < 0) || (s > 0xFFFF)) {
+				return false;
+			}
+			intervals[cur_interval].set(s, s);
+		}
+		cur = colon+1;
+		cur_interval++;
+	}
+
+	// Check that 7 intervals have been found
+	if (cur_interval != 7) {
+		return false;
+	}
+
+	if (seen_double && (*(cur-1)) == ':') {
+		// It was ended by a double colon. We miss a short interval!
+		intervals[cur_interval].set(0, 0);
+	}
+	else {
+		// Process the last one
+		const char* dash = (const char*) memchr(cur, '-', (uintptr_t)colon-(uintptr_t)cur);
+		if (dash) {
+			char* end;
+			const int32_t short_min = strtol(cur, &end, 16);
+			if (end == cur) {
+			   return false;
+			}
+			const int32_t short_max = strtol(dash+1, &end, 16);
+			if (end == (dash+1)) {
+				return false;
+			}
+			if ((short_min < 0) || (short_min > 0xFFFF) || (short_max < 0) || (short_max > 0xFFFF)) {
+				return false;
+			}
+			intervals[cur_interval].set(short_min, short_max);
+		}
+		else {
+			char* end;
+			const int32_t s = strtol(cur, &end, 16);
+			if (end == cur) {
+				return false;
+			}
+			if ((s < 0) || (s > 0xFFFF)) {
+				return false;
+			}
+			intervals[cur_interval].set(s, s);
+		}
+	}
+
+	for (int i = 0; i < 8; i++) {
+		std::cerr << std::hex << intervals[i].min << "\t" << intervals[i].max << std::endl;
 	}
 
 	return false;
