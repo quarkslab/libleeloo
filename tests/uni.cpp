@@ -92,7 +92,8 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-#ifdef __SSE4_2__
+//#ifdef __SSE4_2__
+#if 0
 	leeloo::uni<__m128i> uni_sse;
 	uni_sse.init(n, leeloo::random_engine<uint32_t>(gen));
 

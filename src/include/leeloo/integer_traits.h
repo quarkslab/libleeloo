@@ -29,6 +29,10 @@ public:
 					 static_N<std::numeric_limits<T>::digits>>::type::N;
 };
 
+template <class T>
+struct is_integer_mp: public std::false_type
+{ };
+
 #ifdef LEELOO_MP_SUPPORT
 template <unsigned N_>
 struct integer_bits<boost_uint_mp<N_>>
@@ -43,6 +47,14 @@ struct integer_bits<boost_sint_mp<N_>>
 	static constexpr size_t N = N_;
 	static constexpr bool is_signed = false;
 };
+
+template <unsigned N>
+struct is_integer_mp<boost_uint_mp<N>>: public std::true_type
+{ };
+
+template <unsigned N>
+struct is_integer_mp<boost_sint_mp<N>>: public std::true_type
+{ };
 #endif
 
 namespace __impl {

@@ -31,25 +31,58 @@
 
 #include <leeloo/math_helpers.h>
 #include <leeloo/random.h>
+#include <leeloo/integer_traits.h>
+
+#ifdef LEELOO_MP_SUPPORT
+#include <leeloo/integer_mp.h>
+#include <boost/multiprecision/miller_rabin.hpp>
+#endif
 
 namespace leeloo {
 
-template <class Integer>
-bool is_prime(Integer const v)
+namespace __impl {
+
+template <typename Integer, bool is_mp>
+struct is_prime;
+
+template <typename Integer>
+struct is_prime<Integer, false>
 {
-	// Don't check with two because we only check odd numbers
-	Integer const v_sqrt = sqrt(v);
-	for (Integer d = 3; d <= v_sqrt; d++) {
-		// TODO: does gcc vectorize this ?
-		if ((v % d) == 0) {
-			return false;
+	static bool run(Integer const v)
+	{
+		// Don't check with two because we only check odd numbers
+		Integer const v_sqrt = sqrt(v);
+		for (Integer d = 3; d <= v_sqrt; d++) {
+			// TODO: does gcc vectorize this ?
+			if ((v % d) == 0) {
+				return false;
+			}
 		}
+		return true;
 	}
-	return true;
+};
+
+#ifdef LEELOO_MP_SUPPORT
+template <typename Integer>
+struct is_prime<Integer, true>
+{
+	static inline bool run(Integer const& v)
+	{
+		return boost::multiprecision::miller_rabin_test(v, 25);
+	}
+};
+#endif
+
+} // __impl
+
+template <class Integer>
+static inline bool is_prime(Integer const& v)
+{
+	return __impl::is_prime<Integer, is_integer_mp<Integer>::value>::run(v);
 }
 
 template <class Integer>
-Integer find_previous_matching_prime(Integer const v)
+static Integer find_previous_matching_prime(Integer const v)
 {
 	Integer p;
 	if ((v & 1) == 0) {
@@ -69,7 +102,7 @@ Integer find_previous_matching_prime(Integer const v)
 }
 
 template <class Integer>
-Integer find_next_prime(Integer const v)
+static Integer find_next_prime(Integer const v)
 {
 	Integer p;
 	if ((v & 1) == 0) {
@@ -90,7 +123,7 @@ Integer find_next_prime(Integer const v)
 }
 
 template <class Integer, class Engine>
-Integer random_prime_with(Integer const n, Engine& rand_eng)
+static Integer random_prime_with(Integer const n, Engine& rand_eng)
 {
 	Integer ret, g;
 	do {
