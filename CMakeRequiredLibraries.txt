@@ -13,7 +13,7 @@ endif()
 if(LEELOO_BOOST_SERIALIZE)
 	set(BOOST_COMPONENTS serialization)
 endif()
-find_package(Boost COMPONENTS ${BOOST_COMPONENTS})
+find_package(Boost 1.53.0 COMPONENTS ${BOOST_COMPONENTS})
 
 if (LEELOO_BOOST_SERIALIZE AND NOT Boost_SERIALIZATION_FOUND)
 	message(FATAL_ERROR "Couldn't find Boost serialize!")
