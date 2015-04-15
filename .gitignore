@@ -11,3 +11,43 @@
 *.lai
 *.la
 *.a
+
+# Build files generated after dpkg-buildpackage
+# main packages
+debian/files
+debian/leeloo-tools.debhelper.log
+debian/leeloo-tools.substvars
+debian/leeloo-tools/
+debian/libleeloo-dbg.debhelper.log
+debian/libleeloo-dbg.substvars
+debian/libleeloo-dbg/
+debian/libleeloo-dev.debhelper.log
+debian/libleeloo-dev.substvars
+debian/libleeloo-dev/
+debian/libleeloo.debhelper.log
+debian/libleeloo.substvars
+debian/libleeloo/
+debian/stamp-makefile-build
+debian/stamp-makefile-install
+debian/tmp/
+obj-x86_64-linux-gnu/
+
+# python bindings
+bindings/pyleeloo_*.dsc
+bindings/pyleeloo_*.tar.gz
+bindings/pyleeloo_*_amd64.changes
+bindings/python-pyleeloo_*_all.deb
+bindings/python/build/
+bindings/python/debian/files
+bindings/python/debian/python-pyleeloo.debhelper.log
+bindings/python/debian/python-pyleeloo.postinst.debhelper
+bindings/python/debian/python-pyleeloo.prerm.debhelper
+bindings/python/debian/python-pyleeloo.substvars
+bindings/python/debian/python-pyleeloo/
+bindings/python/debian/python3-pyleeloo.debhelper.log
+bindings/python/debian/python3-pyleeloo.postinst.debhelper
+bindings/python/debian/python3-pyleeloo.prerm.debhelper
+bindings/python/debian/python3-pyleeloo.substvars
+bindings/python/debian/python3-pyleeloo/
+bindings/python/debian/tmp/
+bindings/python3-pyleeloo_*_all.deb

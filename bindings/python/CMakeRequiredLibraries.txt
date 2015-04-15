@@ -3,7 +3,7 @@ find_package(TBB REQUIRED)
 
 # Python and boost python
 if(NOT DEFINED PYTHON_VERSION)
-	set(PYTHON_VERSION 3.3)
+	set(PYTHON_VERSION 3.4)
 endif()
 if (NOT DEFINED PYTHON_BOOST)
 	string(REGEX REPLACE "\\." "" PYTHON_VERSION_BOOST ${PYTHON_VERSION})
