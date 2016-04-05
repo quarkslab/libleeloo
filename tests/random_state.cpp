@@ -9,6 +9,7 @@
 #endif
 
 #include <iostream>
+#include <sstream>
 
 typedef leeloo::interval<uint32_t> interval;
 typedef leeloo::list_intervals<interval, uint32_t> list_intervals;
