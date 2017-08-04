@@ -81,6 +81,7 @@ int main(int argc, char** argv)
 	
 	memset(&res[0], 0, sizeof(uint32_t)*n);
 
+#if 0
 	// Remark: this is just for benchmark comparaison.
 	// Here, the algorithm should be slighter more sofisticated as
 	// we need to check that v < n and then store the results in a
@@ -92,6 +93,7 @@ int main(int argc, char** argv)
 		res[i] = v;
 	}
 	BENCH_END(parallel, "rand-parallel", 1, 1, sizeof(uint32_t), n);
+#endif
 
 	return 0;
 }

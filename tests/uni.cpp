@@ -80,6 +80,7 @@ int main(int argc, char** argv)
 	
 	memset(&res[0], 0, sizeof(uint32_t)*n);
 
+#if 0
 	BENCH_START(parallel2);
 #pragma omp parallel for
 	for (size_t i = 0; i < n; i++) {
@@ -90,6 +91,7 @@ int main(int argc, char** argv)
 	if (!check(res, n)) {
 		return 1;
 	}
+#endif
 
 #ifdef __SSE4_2__
 	leeloo::uni<__m128i> uni_sse;
@@ -110,6 +112,7 @@ int main(int argc, char** argv)
 
 	memset(&res[0], 0, sizeof(uint32_t)*n);
 
+#if 0
 	BENCH_START(parallel_sse);
 #pragma omp parallel for
 	for (size_t i = 0; i < n/4; i++) {
@@ -121,6 +124,7 @@ int main(int argc, char** argv)
 	if (!check(res, n & ~3U)) {
 		return 1;
 	}
+#endif
 #endif
 
 	return 0;
