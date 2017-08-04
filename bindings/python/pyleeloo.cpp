@@ -200,6 +200,8 @@ typedef leeloo::list_intervals<u32_interval> u32_list_intervals;
 void (u32_list_intervals::*u32_add1)(u32_list_intervals::base_type const, u32_list_intervals::base_type const) = &u32_list_intervals::add;
 void (u32_list_intervals::*u32_add2)(u32_list_intervals const&)                                                = &u32_list_intervals::add;
 
+void (u32_list_intervals::*u32_remove)(u32_list_intervals const&)                                              = &u32_list_intervals::remove;
+
 static void u32_list_random_sets(u32_list_intervals const& l, size_t const size_div, object& f_set)
 {
 	l.random_sets(size_div,
@@ -510,6 +512,7 @@ BOOST_PYTHON_MODULE(pyleeloo)
 	class_<u32_list_intervals>("u32_list_intervals")
 		.def("add", u32_add1)
 		.def("add", u32_add2)
+		.def("remove", u32_remove)
 		.def("aggregate", &u32_list_intervals::aggregate)
 		.def("aggregate_max_prefix", &ip_list_intervals_with_properties_python::aggregate_max_prefix)
 		.def("create_index_cache", &u32_list_intervals::create_index_cache)
