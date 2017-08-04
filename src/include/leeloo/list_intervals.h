@@ -40,6 +40,7 @@
 #include <exception>
 #include <iterator>
 #include <iostream>
+#include <vector>
 
 #include <leeloo/bench.h>
 #include <leeloo/config.h>
