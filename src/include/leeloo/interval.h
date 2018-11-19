@@ -30,6 +30,7 @@
 #define LEELOO_INTERVAL_H
 
 #include <algorithm>
+#include <cstdint>
 
 #include <leeloo/config.h>
 #include <leeloo/exports.h>
