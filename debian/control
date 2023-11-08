@@ -1,7 +1,7 @@
 Source: libleeloo
 Priority: optional
 Maintainer: Adrien Guinet <aguinet@quarkslab.com>
-Build-Depends: debhelper (>= 8.0.0), cmake, libtbb-dev, dh-exec
+Build-Depends: debhelper (>= 8.0.0), cmake, libtbb2-dev, dh-exec, cdbs, libboost-all-dev
 Standards-Version: 3.9.4
 Section: libs
 Homepage: http://quarkslab.com
@@ -10,7 +10,7 @@ Vcs-Browser: https://github.com/quarkslab/libleeloo.git
 Package: libleeloo-dev
 Section: libdevel
 Architecture: any
-Depends: libleeloo (= ${binary:Version}), libtbb-dev
+Depends: libleeloo (= ${binary:Version}), libtbb2-dev
 Description: Library to manage big sets of integers - development files
  leeloo library development files
  . 
